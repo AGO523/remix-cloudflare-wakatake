@@ -1,4 +1,28 @@
-import type { MetaFunction } from "@remix-run/cloudflare";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/cloudflare";
+import { json } from "@remix-run/cloudflare";
+import { useLoaderData } from "@remix-run/react";
+
+interface Env {
+  DB: D1Database;
+}
+
+type Post = {
+  id: number;
+  user_id: number;
+  content: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export async function loader({ context }: LoaderFunctionArgs) {
+  const env = context.env as Env;
+
+  const { results } = await env.DB.prepare("SELECT * FROM posts").all<Post>();
+
+  return json({
+    posts: results ?? [],
+  });
+}
 
 export const meta: MetaFunction = () => {
   return [
@@ -8,6 +32,8 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
+  const { posts } = useLoaderData<typeof loader>();
+
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
       <h1>Welcome to Remix</h1>
@@ -35,6 +61,9 @@ export default function Index() {
             Remix Docs
           </a>
         </li>
+        {posts.map((post) => (
+          <li key={post.id}>{post.content}</li>
+        ))}
       </ul>
     </div>
   );
