@@ -11,10 +11,16 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@mantine/carousel": "^7.5.3",
+    "@mantine/core": "^7.5.3",
+    "@mantine/form": "^7.5.3",
+    "@mantine/hooks": "^7.5.3",
+    "@mantine/modals": "^7.5.3",
     "@remix-run/cloudflare": "^2.6.0",
     "@remix-run/cloudflare-pages": "^2.6.0",
     "@remix-run/css-bundle": "^2.6.0",
     "@remix-run/react": "^2.6.0",
+    "embla-carousel-react": "^8.0.0",
     "isbot": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -31,6 +37,9 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "postcss": "^8.4.35",
+    "postcss-preset-mantine": "^1.13.0",
+    "postcss-simple-vars": "^7.0.1",
     "typescript": "^5.1.0",
     "wrangler": "^3.24.0"
   },
