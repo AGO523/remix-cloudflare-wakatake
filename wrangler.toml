@@ -1,4 +1,4 @@
 [[ d1_databases ]]
 binding = "DB"
-database_name = "${DATABASE_NAME}"
-database_id = "${DATABASE_ID}"
+database_name = "wakatake"
+database_id = "${D1_DATABASE_ID}"
