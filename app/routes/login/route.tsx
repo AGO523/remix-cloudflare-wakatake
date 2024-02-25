@@ -3,10 +3,19 @@ import { Form } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
+  console.log("Loader function called");
+  console.log("Request:", request);
+  console.log("Context:", context);
+
   const authenticator = getAuthenticator(context);
-  return await authenticator.isAuthenticated(request, {
+  console.log("Authenticator:", authenticator);
+
+  const isAuthenticated = await authenticator.isAuthenticated(request, {
     successRedirect: "/",
   });
+  console.log("Authentication Result:", isAuthenticated);
+
+  return isAuthenticated;
 }
 
 export default function Login() {
