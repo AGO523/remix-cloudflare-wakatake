@@ -3,13 +3,14 @@ import { json } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
 import { AppShell, Burger } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import header_logo from "../images/header_logo.jpg";
+import header_logo from "../../images/header_logo.jpg";
+import { getAuthenticator } from "~/features/common/services/auth.server";
 
 interface Env {
   DB: D1Database;
 }
 
-type Post = {
+type Arts = {
   id: number;
   user_id: number;
   content: string;
@@ -17,13 +18,18 @@ type Post = {
   updated_at: string;
 };
 
-export async function loader({ context }: LoaderFunctionArgs) {
+export async function loader({ request, context }: LoaderFunctionArgs) {
+  const authenticator = getAuthenticator(context);
+  const user = await authenticator.isAuthenticated(request, {
+    failureRedirect: "/login",
+  });
   const env = context.env as Env;
 
-  const { results } = await env.DB.prepare("SELECT * FROM arts").all<Post>();
+  const { results } = await env.DB.prepare("SELECT * FROM arts").all<Arts>();
 
   return json({
-    posts: results ?? [],
+    arts: results ?? [],
+    user: user,
   });
 }
 
@@ -35,7 +41,8 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Admin() {
-  const { posts } = useLoaderData<typeof loader>();
+  const { arts } = useLoaderData<typeof loader>();
+  const { user } = useLoaderData<typeof loader>();
   const [opened, { toggle }] = useDisclosure();
 
   return (
@@ -56,11 +63,17 @@ export default function Admin() {
       <AppShell.Navbar p="md">Navbar</AppShell.Navbar>
 
       <AppShell.Main>
-        <h1>Posts</h1>
+        <h1>arts</h1>
         <ul>
-          {posts.map((post) => (
+          {arts.map((post) => (
             <li key={post.id}>{post.content}</li>
           ))}
+        </ul>
+
+        <h1>Admin</h1>
+        <ul>
+          <li>user: {user.id}</li>
+          <li>user: {user.displayName}</li>
         </ul>
       </AppShell.Main>
     </AppShell>

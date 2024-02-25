@@ -9,3 +9,5 @@ node_modules
 .dev.vars
 .wrangler/
 *.md
+.secrets
+db/excute.sql

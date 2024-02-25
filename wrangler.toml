@@ -2,3 +2,9 @@
 binding = "DB"
 database_name = "artora"
 database_id = "${D1_DATABASE_ID}"
+migrations_dir = "db/migrate"
+
+[[ kv_namespaces ]]
+binding = "SESSION_KV"
+id = "${KV_ID}"
+preview_id = "${PREVIEW_KV_ID}"
