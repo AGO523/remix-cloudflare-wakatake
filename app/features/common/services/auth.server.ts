@@ -23,7 +23,6 @@ let _authenticator: Authenticator<AuthUser> | undefined;
 export function getAuthenticator(
   context: AppLoadContext
 ): Authenticator<AuthUser> {
-  console.log("getAuthenticator called");
   console.log("Context:", context);
   if (_authenticator == null) {
     const env = context.env as Env;
@@ -40,7 +39,6 @@ export function getAuthenticator(
       kv: env.SESSION_KV as KVNamespace,
       cookie,
     });
-    console.log("SessionStorage configuration:", sessionStorage);
     _authenticator = new Authenticator<AuthUser>(sessionStorage);
     const googleAuth = new GoogleStrategy(
       {
@@ -75,7 +73,6 @@ export function getAuthenticator(
       }
     );
     _authenticator.use(googleAuth);
-    console.log("GoogleStrategy has been added to the authenticator");
   }
   return _authenticator;
 }
