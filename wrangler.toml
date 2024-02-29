@@ -1,7 +1,7 @@
 [[ d1_databases ]]
 binding = "DB"
 database_name = "artora"
-database_id = "${D1_DATABASE_ID}"
+database_id = "d4658898-a398-4788-9d0e-cdf755ce2cd9"
 migrations_dir = "db/migrate"
 
 [[ kv_namespaces ]]
