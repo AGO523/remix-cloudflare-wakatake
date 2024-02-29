@@ -23,6 +23,7 @@ let _authenticator: Authenticator<AuthUser> | undefined;
 export function getAuthenticator(
   context: AppLoadContext
 ): Authenticator<AuthUser> {
+  console.log("Context:", context);
   if (_authenticator == null) {
     const env = context.env as Env;
     const cookie = createCookie("__session", {
@@ -32,6 +33,7 @@ export function getAuthenticator(
       httpOnly: true,
       secure: process.env.NODE_ENV == "production",
     });
+    console.log("Cookie configuration:", cookie);
 
     const sessionStorage = createWorkersKVSessionStorage({
       kv: env.SESSION_KV as KVNamespace,
