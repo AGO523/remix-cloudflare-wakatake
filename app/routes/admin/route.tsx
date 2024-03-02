@@ -1,9 +1,6 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
-import { AppShell, Burger } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import header_logo from "../../images/header_logo.jpg";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 
 interface Env {
@@ -43,39 +40,21 @@ export const meta: MetaFunction = () => {
 export default function Admin() {
   const { arts } = useLoaderData<typeof loader>();
   const { user } = useLoaderData<typeof loader>();
-  const [opened, { toggle }] = useDisclosure();
 
   return (
-    <AppShell
-      header={{ height: 60 }}
-      navbar={{
-        width: 300,
-        breakpoint: "sm",
-        collapsed: { mobile: !opened },
-      }}
-      padding="md"
-    >
-      <AppShell.Header>
-        <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-        <img src={header_logo} alt="サイトのロゴ" width={40} height={40} />
-      </AppShell.Header>
+    <>
+      <h1>arts</h1>
+      <ul>
+        {arts.map((post) => (
+          <li key={post.id}>{post.content}</li>
+        ))}
+      </ul>
 
-      <AppShell.Navbar p="md">Navbar</AppShell.Navbar>
-
-      <AppShell.Main>
-        <h1>arts</h1>
-        <ul>
-          {arts.map((post) => (
-            <li key={post.id}>{post.content}</li>
-          ))}
-        </ul>
-
-        <h1>Admin</h1>
-        <ul>
-          <li>user: {user.id}</li>
-          <li>user: {user.displayName}</li>
-        </ul>
-      </AppShell.Main>
-    </AppShell>
+      <h1>Admin</h1>
+      <ul>
+        <li>user: {user.id}</li>
+        <li>user: {user.displayName}</li>
+      </ul>
+    </>
   );
 }

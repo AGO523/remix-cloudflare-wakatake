@@ -1,12 +1,9 @@
-import { Image } from "@mantine/core";
-import hero_top1 from "../images/hero_top1.jpg";
-import hero_top2 from "../images/hero_top2.jpg";
-
 export default function Work() {
   return (
     <>
-      <Image src={hero_top1} />
-      <Image src={hero_top2} />
+      <section className="flex flex-row items-center justify-center mt-4">
+        <h1 className="text-2xl font-bold">Work</h1>
+      </section>
     </>
   );
 }
