@@ -6,7 +6,7 @@ export default {
     extend: {},
   },
   plugins: [require("daisyui")],
-  dasiyui: {
-    themes: ["nord", "dark"],
+  daisyui: {
+    themes: ["retro", "nord", "dark"],
   },
 } satisfies Config;

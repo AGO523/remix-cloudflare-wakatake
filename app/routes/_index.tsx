@@ -1,6 +1,4 @@
 import type { MetaFunction } from "@remix-run/cloudflare";
-import { Link } from "@remix-run/react";
-import hero_top1 from "../images/hero_top1.jpg";
 import hero_top2 from "../images/hero_top2.jpg";
 
 export const meta: MetaFunction = () => {
@@ -13,44 +11,27 @@ export const meta: MetaFunction = () => {
 export default function Index() {
   return (
     <>
-      <div className="card card-compact w-96 bg-base-100 shadow-xl">
-        <figure>
-          <img src={hero_top1} alt="Shoes" />
-        </figure>
-        <div className="card-body">
-          <h2 className="card-title">Shoes!</h2>
-          <p>If a dog chews shoes whose shoes does he choose?</p>
-          <div className="card-actions justify-end">
-            <button className="btn btn-primary">Buy Now</button>
+      <div className="container mx-auto">
+        <div
+          className="hero min-h-screen"
+          style={{
+            backgroundImage: `url(${hero_top2})`,
+          }}
+        >
+          <div className="hero-overlay bg-opacity-60"></div>
+          <div className="hero-content text-center text-neutral-content">
+            <div className="max-w-md">
+              <h1 className="mb-5 text-5xl font-bold">Hello there</h1>
+              <p className="mb-5">
+                Provident cupiditate voluptatem et in. Quaerat fugiat ut
+                assumenda excepturi exercitationem quasi. In deleniti eaque aut
+                repudiandae et a id nisi.
+              </p>
+              <button className="btn btn-primary">Get Started</button>
+            </div>
           </div>
         </div>
       </div>
-
-      <div className="card card-compact w-96 bg-base-100 shadow-xl">
-        <figure>
-          <img src={hero_top2} alt="Shoes" />
-        </figure>
-        <div className="card-body">
-          <h2 className="card-title">Shoes!</h2>
-          <p>If a dog chews shoes whose shoes does he choose?</p>
-          <div className="card-actions justify-end">
-            <button className="btn btn-primary">Buy Now</button>
-          </div>
-        </div>
-      </div>
-
-      <Link to="#">
-        <button className="btn btn-primary">Works</button>
-      </Link>
-      <Link to="/login">
-        <button className="btn btn-primary">Login</button>
-      </Link>
-      <Link to="/admin">
-        <button className="btn btn-primary">Admin</button>
-      </Link>
-      <Link to="/logout">
-        <button className="btn btn-primary">Logout</button>
-      </Link>
     </>
   );
 }
