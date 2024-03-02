@@ -11,8 +11,18 @@ export const Header: React.FC = () => {
       <div className="flex-none">
         <ul className="menu menu-horizontal px-1">
           <li>
-            <Link to="#">作品</Link>
+            <Link to="#">Works</Link>
           </li>
+          <li>
+            <Link to="/login">Login</Link>
+          </li>
+          <li>
+            <Link to="/admin">Admin</Link>
+          </li>
+          <li>
+            <Link to="/logout">Logout</Link>
+          </li>
+
           <li>
             <details>
               <summary>メニュー</summary>

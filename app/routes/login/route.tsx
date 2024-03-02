@@ -18,7 +18,9 @@ export default function Login() {
       </section>
       <section className="flex flex-row items-center justify-center mt-4">
         <Form method="post" action="/auth/google">
-          <button type="submit">Login with Google</button>
+          <button type="submit" className="btn btn-primary">
+            Login with Google
+          </button>
         </Form>
       </section>
     </>
