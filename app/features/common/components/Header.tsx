@@ -4,7 +4,7 @@ export const Header: React.FC = () => {
   return (
     <div className="navbar bg-base-100">
       <div className="flex-1">
-        <Link to="#" className="btn btn-ghost text-xl">
+        <Link to="/" className="btn btn-ghost text-xl">
           Artora
         </Link>
       </div>
