@@ -5,17 +5,17 @@ export const Header: React.FC = () => {
     <div className="navbar bg-base-100">
       <div className="flex-1">
         <Link to="#" className="btn btn-ghost text-xl">
-          daisyUI
+          Artora
         </Link>
       </div>
       <div className="flex-none">
         <ul className="menu menu-horizontal px-1">
           <li>
-            <Link to="#">Link</Link>
+            <Link to="#">作品</Link>
           </li>
           <li>
             <details>
-              <summary>Parent</summary>
+              <summary>メニュー</summary>
               <ul className="p-2 bg-base-100 rounded-t-none">
                 <li>
                   <Link to="#">Link 1</Link>
