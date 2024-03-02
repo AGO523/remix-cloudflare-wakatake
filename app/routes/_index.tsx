@@ -21,7 +21,7 @@ export default function Index() {
           <h2 className="card-title">Shoes!</h2>
           <p>If a dog chews shoes whose shoes does he choose?</p>
           <div className="card-actions justify-end">
-            <button className="btn btn-primary">Buy Now</button>
+            <button className="btn btn-secondary">Buy Now</button>
           </div>
         </div>
       </div>
@@ -34,22 +34,22 @@ export default function Index() {
           <h2 className="card-title">Shoes!</h2>
           <p>If a dog chews shoes whose shoes does he choose?</p>
           <div className="card-actions justify-end">
-            <button className="btn btn-primary">Buy Now</button>
+            <button className="btn btn-secondary">Buy Now</button>
           </div>
         </div>
       </div>
 
       <Link to="#">
-        <button className="btn btn-primary">Works</button>
+        <button className="btn btn-secondary">Works</button>
       </Link>
       <Link to="/login">
-        <button className="btn btn-primary">Login</button>
+        <button className="btn btn-secondary">Login</button>
       </Link>
       <Link to="/admin">
-        <button className="btn btn-primary">Admin</button>
+        <button className="btn btn-secondary">Admin</button>
       </Link>
       <Link to="/logout">
-        <button className="btn btn-primary">Logout</button>
+        <button className="btn btn-secondary">Logout</button>
       </Link>
     </>
   );
