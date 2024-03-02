@@ -13,44 +13,46 @@ export const meta: MetaFunction = () => {
 export default function Index() {
   return (
     <>
-      <div className="card card-compact w-96 bg-base-100 shadow-xl">
-        <figure>
-          <img src={hero_top1} alt="Shoes" />
-        </figure>
-        <div className="card-body">
-          <h2 className="card-title">Shoes!</h2>
-          <p>If a dog chews shoes whose shoes does he choose?</p>
-          <div className="card-actions justify-end">
-            <button className="btn btn-secondary">Buy Now</button>
+      <div className="container mx-auto">
+        <div className="card card-compact w-96 bg-base-100 shadow-xl">
+          <figure>
+            <img src={hero_top1} alt="Shoes" />
+          </figure>
+          <div className="card-body">
+            <h2 className="card-title">Shoes!</h2>
+            <p>If a dog chews shoes whose shoes does he choose?</p>
+            <div className="card-actions justify-end">
+              <button className="btn btn-secondary">Buy Now</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="card card-compact w-96 bg-base-100 shadow-xl">
-        <figure>
-          <img src={hero_top2} alt="Shoes" />
-        </figure>
-        <div className="card-body">
-          <h2 className="card-title">Shoes!</h2>
-          <p>If a dog chews shoes whose shoes does he choose?</p>
-          <div className="card-actions justify-end">
-            <button className="btn btn-secondary">Buy Now</button>
+        <div className="card card-compact w-96 bg-base-100 shadow-xl">
+          <figure>
+            <img src={hero_top2} alt="Shoes" />
+          </figure>
+          <div className="card-body">
+            <h2 className="card-title">Shoes!</h2>
+            <p>If a dog chews shoes whose shoes does he choose?</p>
+            <div className="card-actions justify-end">
+              <button className="btn btn-secondary">Buy Now</button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <Link to="#">
-        <button className="btn btn-secondary">Works</button>
-      </Link>
-      <Link to="/login">
-        <button className="btn btn-secondary">Login</button>
-      </Link>
-      <Link to="/admin">
-        <button className="btn btn-secondary">Admin</button>
-      </Link>
-      <Link to="/logout">
-        <button className="btn btn-secondary">Logout</button>
-      </Link>
+        <Link to="#">
+          <button className="btn btn-secondary">Works</button>
+        </Link>
+        <Link to="/login">
+          <button className="btn btn-secondary">Login</button>
+        </Link>
+        <Link to="/admin">
+          <button className="btn btn-secondary">Admin</button>
+        </Link>
+        <Link to="/logout">
+          <button className="btn btn-secondary">Logout</button>
+        </Link>
+      </div>
     </>
   );
 }
