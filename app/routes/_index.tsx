@@ -81,6 +81,8 @@ export default function Index() {
             </div>
           </div>
         </div>
+      </section>
+      <section className="container mx-auto flex flex-row items-center justify-center mt-4">
         <div className="card card-compact w-96 bg-base-100 shadow-xl">
           <figure>
             <img src={neko} alt="猫の作品" />
