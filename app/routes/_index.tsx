@@ -38,7 +38,7 @@ export default function Index() {
             <img
               src={yagi_neko}
               alt="ヤギと猫の作品"
-              className="max-w-lg rounded-lg shadow-2xl"
+              className="max-w-sm rounded-lg shadow-2xl"
             />
             <div>
               <p className="mb-5">
