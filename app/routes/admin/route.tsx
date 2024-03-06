@@ -1,7 +1,8 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/cloudflare";
+import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { useLoaderData } from "@remix-run/react";
+import { Form, useLoaderData } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
+import { createArt } from "~/data";
 
 interface Env {
   DB: D1Database;
@@ -9,10 +10,10 @@ interface Env {
 
 type Arts = {
   id: number;
-  user_id: number;
+  userId: number;
   content: string;
-  created_at: string;
-  updated_at: string;
+  createdAt: number;
+  updatedAt: number;
 };
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
@@ -30,16 +31,14 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   });
 }
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
-  ];
+export const action = async ({ context, request }: LoaderFunctionArgs) => {
+  const env = context.env as Env;
+  const formData = await request.formData();
+  return createArt(formData, env);
 };
 
 export default function Admin() {
-  const { arts } = useLoaderData<typeof loader>();
-  const { user } = useLoaderData<typeof loader>();
+  const { arts, user } = useLoaderData<typeof loader>();
 
   return (
     <>
@@ -55,6 +54,15 @@ export default function Admin() {
         <li>user: {user.id}</li>
         <li>user: {user.displayName}</li>
       </ul>
+
+      <div>
+        <span>作品を投稿する</span>
+        <Form method="post">
+          <input type="hidden" name="userId" value={user.id} />
+          <input type="text" name="content" />
+          <button type="submit">投稿</button>
+        </Form>
+      </div>
     </>
   );
 }
