@@ -34,7 +34,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 export const action = async ({ context, request }: LoaderFunctionArgs) => {
   const env = context.env as Env;
   const formData = await request.formData();
-  return createArt(formData, env);
+  return await createArt(formData, env);
 };
 
 export default function Admin() {
@@ -42,26 +42,43 @@ export default function Admin() {
 
   return (
     <>
-      <h1>arts</h1>
-      <ul>
-        {arts.map((post) => (
-          <li key={post.id}>{post.content}</li>
-        ))}
-      </ul>
+      <div className="container mx-auto">
+        <div className="badge badge-primary">user: {user.displayName}</div>
 
-      <h1>Admin</h1>
-      <ul>
-        <li>user: {user.id}</li>
-        <li>user: {user.displayName}</li>
-      </ul>
+        <h1>作品</h1>
+        {arts.length > 0 ? (
+          arts.map((art) => (
+            <div
+              key={art.id}
+              className="card max-w-lg bg-base-100 shadow-xl m-2"
+            >
+              <h2 className="card-title">Card title!</h2>
+              <div className="card-body">
+                <p>{art.content}</p>
+              </div>
+              <div className="card-actions justify-end">
+                <button className="btn btn-primary">Buy Now</button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>表示する作品がありません。</p>
+        )}
 
-      <div>
-        <span>作品を投稿する</span>
-        <Form method="post">
-          <input type="hidden" name="userId" value={user.id} />
-          <input type="text" name="content" />
-          <button type="submit">投稿</button>
-        </Form>
+        <div>
+          <span>作品を投稿する</span>
+          <Form method="post">
+            <input type="hidden" name="userId" value={user.id} />
+            <textarea
+              placeholder="作品の詳細"
+              className="textarea textarea-bordered textarea-lg w-full max-w-xs"
+              name="content"
+            ></textarea>
+            <button type="submit" className="btn btn-primary">
+              ポスト
+            </button>
+          </Form>
+        </div>
       </div>
     </>
   );
