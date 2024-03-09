@@ -2,19 +2,11 @@ import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Form, useLoaderData } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
-import { createArt } from "~/data";
+import { getArts, createArt } from "~/data";
 
 interface Env {
   DB: D1Database;
 }
-
-type Arts = {
-  id: number;
-  userId: number;
-  content: string;
-  createdAt: number;
-  updatedAt: number;
-};
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -22,13 +14,8 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     failureRedirect: "/login",
   });
   const env = context.env as Env;
-
-  const { results } = await env.DB.prepare("SELECT * FROM arts").all<Arts>();
-
-  return json({
-    arts: results ?? [],
-    user: user,
-  });
+  const arts = await getArts(env);
+  return json({ arts, user });
 }
 
 export const action = async ({ context, request }: LoaderFunctionArgs) => {
@@ -46,7 +33,7 @@ export default function Admin() {
         <div className="badge badge-primary">user: {user.displayName}</div>
 
         <h1>作品</h1>
-        {arts.length > 0 ? (
+        {arts ? (
           arts.map((art) => (
             <div
               key={art.id}
