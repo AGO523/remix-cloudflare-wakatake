@@ -8,14 +8,28 @@ import { json } from "@remix-run/cloudflare";
 
 type CreateArt = InferInsertModel<typeof arts>;
 
+type Arts = {
+  id: number;
+  userId: number;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export async function getArts(env: {
+  DB: D1Database;
+}): Promise<Arts[] | undefined> {
+  const db = createClient(env.DB);
+  const artList = await db.select().from(arts).all();
+  return artList;
+}
+
 export async function createArt(formData: FormData, env: { DB: D1Database }) {
   const db = createClient(env.DB);
-  const userId = formData.get("userId") as string;
-  const content = formData.get("content") as string;
   const currentTime = new Date();
   const newArt: CreateArt = {
-    userId: Number(userId),
-    content,
+    userId: Number(formData.get("userId")),
+    content: formData.get("content") as string,
     createdAt: currentTime,
     updatedAt: currentTime,
   };
