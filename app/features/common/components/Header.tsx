@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { Link } from "@remix-run/react";
 
 export const Header: React.FC = () => {
@@ -21,7 +22,10 @@ export const Header: React.FC = () => {
               />
             </svg>
           </button>
-          <ul className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+          <ul
+            className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+            tabIndex={0}
+          >
             <li>
               <Link to="/login">ログイン</Link>
             </li>
