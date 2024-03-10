@@ -39,7 +39,7 @@ export default function Admin() {
               key={art.id}
               className="card max-w-lg bg-base-100 shadow-xl m-2"
             >
-              <h2 className="card-title">Card title!</h2>
+              <h2 className="card-title">{art.title}</h2>
               <div className="card-body">
                 <p>{art.content}</p>
               </div>

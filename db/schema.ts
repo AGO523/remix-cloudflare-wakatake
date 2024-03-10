@@ -11,6 +11,7 @@ export const users = sqliteTable("users", {
 export const arts = sqliteTable("arts", {
   id: integer("id").primaryKey().notNull(),
   userId: integer("userId").notNull(),
+  title: text("title").notNull().default("アートラの作品"),
   content: text("content").notNull(),
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),

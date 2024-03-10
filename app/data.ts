@@ -11,6 +11,7 @@ type CreateArt = InferInsertModel<typeof arts>;
 type Arts = {
   id: number;
   userId: number;
+  title: string;
   content: string;
   createdAt: Date;
   updatedAt: Date;

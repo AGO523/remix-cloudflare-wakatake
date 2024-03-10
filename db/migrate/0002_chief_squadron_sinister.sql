@@ -1,0 +1,1 @@
+ALTER TABLE arts ADD `title` text DEFAULT 'アートラの作品' NOT NULL;
