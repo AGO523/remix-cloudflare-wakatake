@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { json } from "@remix-run/cloudflare";
+import { json, redirect } from "@remix-run/cloudflare";
 import { Form, useLoaderData } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import { getArts, createArt } from "~/data";
@@ -13,6 +13,10 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   const user = await authenticator.isAuthenticated(request, {
     failureRedirect: "/login",
   });
+  const adminIds = [1, 2];
+  if (!adminIds.includes(user.id)) {
+    return redirect("/");
+  }
   const env = context.env as Env;
   const arts = await getArts(env);
   return json({ arts, user });
