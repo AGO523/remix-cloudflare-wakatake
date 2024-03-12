@@ -47,6 +47,7 @@ export async function createArt(formData: FormData, context: AppLoadContext) {
   const currentTime = new Date();
   const newArt: CreateArt = {
     userId: Number(formData.get("userId")),
+    title: formData.get("title") as string,
     content: formData.get("content") as string,
     createdAt: currentTime,
     updatedAt: currentTime,
