@@ -2,7 +2,11 @@ import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Form, Link, useLoaderData, useActionData } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
-import { getArts, createArt } from "~/features/common/services/data.server";
+import {
+  getArts,
+  createArt,
+  deleteArt,
+} from "~/features/common/services/data.server";
 
 type ActionResponse = {
   message?: string;
@@ -26,12 +30,34 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
 export const action = async ({ context, request }: LoaderFunctionArgs) => {
   const formData = await request.formData();
+  const actionType = formData.get("_action");
+  if (actionType === "delete") {
+    return await deleteArt(formData, context);
+  }
   return await createArt(formData, context);
 };
 
 export default function Admin() {
   const { arts, user } = useLoaderData<typeof loader>();
   const actionData = useActionData<ActionResponse>();
+
+  function handleDelete(e: React.FormEvent<HTMLFormElement>, artId: number) {
+    e.preventDefault(); // フォームのデフォルトの送信を阻止
+    if (confirm("本当にこの作品を削除しますか？")) {
+      // 確認ダイアログでOKが選択された場合、フォームをプログラム的に送信
+      const form = new FormData();
+      form.append("artId", String(artId));
+      form.append("_action", "delete");
+
+      fetch(e.currentTarget.action, {
+        method: "POST",
+        body: form,
+      }).then(() => {
+        // ページをリロードして更新された作品リストを表示
+        window.location.reload();
+      });
+    }
+  }
 
   return (
     <>
@@ -71,9 +97,20 @@ export default function Admin() {
                 <p>{art.content}</p>
               </div>
               <div className="card-actions justify-end">
-                <Link to={`/admin/${art.id}/edit`} className="btn btn-sm">
+                <Link to={`/admin/${art.id}/edit`} className="btn">
                   編集
                 </Link>
+                <Form method="post" onSubmit={(e) => handleDelete(e, art.id)}>
+                  <input type="hidden" name="artId" value={art.id} />
+                  <button
+                    type="submit"
+                    name="_action"
+                    value="delete"
+                    className="btn btn-error"
+                  >
+                    削除
+                  </button>
+                </Form>
               </div>
             </div>
           ))
