@@ -30,14 +30,14 @@ interface Env {
 
 const createArtSchema = z.object({
   userId: z.number(),
-  title: z.string(),
-  content: z.string(),
+  title: z.string().min(1).max(300),
+  content: z.string().min(1).max(10000),
 });
 
 const updateArtSchema = z.object({
   artId: z.number(),
-  title: z.string(),
-  content: z.string(),
+  title: z.string().min(1).max(300),
+  content: z.string().min(1).max(10000),
 });
 
 export async function getArts(context: AppLoadContext) {
@@ -67,7 +67,7 @@ export async function createArt(formData: FormData, context: AppLoadContext) {
   const result = createArtSchema.safeParse(formObject);
   if (!result.success) {
     return json(
-      { message: "入力値が無効です", errors: result.error },
+      { message: result.error.errors[0].message, errors: result.error },
       { status: 400 }
     );
   }
@@ -99,7 +99,7 @@ export async function updateArt(formData: FormData, context: AppLoadContext) {
   const result = updateArtSchema.safeParse(formObject);
   if (!result.success) {
     return json(
-      { message: "入力値が無効です", errors: result.error },
+      { message: result.error.errors[0].message, errors: result.error },
       { status: 400 }
     );
   }
@@ -120,4 +120,24 @@ export async function updateArt(formData: FormData, context: AppLoadContext) {
     return json({ message: "作品を更新しました" }, { status: 200 });
   }
   return json({ message: "作品の更新に失敗しました" }, { status: 500 });
+}
+
+export async function deleteArt(formData: FormData, context: AppLoadContext) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+  const artId = Number(formData.get("artId"));
+
+  const response = await db.delete(arts).where(eq(arts.id, artId)).execute();
+
+  if (response.success) {
+    return json(
+      { message: "作品が削除されました", success: true },
+      { status: 200 }
+    );
+  } else {
+    return json(
+      { message: "作品の削除に失敗しました", success: false },
+      { status: 500 }
+    );
+  }
 }
