@@ -52,8 +52,7 @@ export default function Admin() {
         method: "POST",
         body: form,
       }).then(() => {
-        // ページをリロードして更新された作品リストを表示
-        window.location.reload();
+        window.location.reload(); // ページをリロード
       });
     }
   }
