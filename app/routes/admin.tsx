@@ -44,7 +44,6 @@ export default function Admin() {
   function handleDelete(e: React.FormEvent<HTMLFormElement>, artId: number) {
     e.preventDefault(); // フォームのデフォルトの送信を阻止
     if (confirm("本当にこの作品を削除しますか？")) {
-      // 確認ダイアログでOKが選択された場合、フォームをプログラム的に送信
       const form = new FormData();
       form.append("artId", String(artId));
       form.append("_action", "delete");
