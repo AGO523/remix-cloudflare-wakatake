@@ -1,8 +1,15 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { Form, Link, useLoaderData } from "@remix-run/react";
+import { Form, Link, useLoaderData, useActionData } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import { getArts, createArt } from "~/features/common/services/data.server";
+
+type ActionResponse = {
+  message?: string;
+  success?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  errors?: any;
+};
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -24,6 +31,7 @@ export const action = async ({ context, request }: LoaderFunctionArgs) => {
 
 export default function Admin() {
   const { arts, user } = useLoaderData<typeof loader>();
+  const actionData = useActionData<ActionResponse>();
 
   return (
     <>
@@ -73,6 +81,18 @@ export default function Admin() {
           <p>表示する作品がありません。</p>
         )}
       </div>
+
+      {actionData?.message && (
+        <div
+          className={`toast ${
+            actionData.success ? "toast-success" : "toast-error"
+          }`}
+        >
+          <div className="alert alert-info">
+            <span>{actionData.message}</span>
+          </div>
+        </div>
+      )}
     </>
   );
 }
