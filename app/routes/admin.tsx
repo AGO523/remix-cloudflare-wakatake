@@ -1,8 +1,15 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { Form, Link, useLoaderData } from "@remix-run/react";
+import { Form, Link, useLoaderData, useActionData } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import { getArts, createArt } from "~/features/common/services/data.server";
+
+type ActionResponse = {
+  message?: string;
+  success?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  errors?: any;
+};
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -24,22 +31,29 @@ export const action = async ({ context, request }: LoaderFunctionArgs) => {
 
 export default function Admin() {
   const { arts, user } = useLoaderData<typeof loader>();
+  const actionData = useActionData<ActionResponse>();
 
   return (
     <>
       <div className="container mx-auto">
         <div className="badge badge-primary">user: {user.displayName}</div>
 
-        <div>
+        <div className="card max-w-lg bg-base-100 shadow-xl m-2">
           <span>作品を投稿する</span>
           <Form method="post">
             <input type="hidden" name="userId" value={user.id} />
+            <input
+              type="text"
+              placeholder="タイトル"
+              className="input input-bordered input-lg w-full max-w-xs m-2"
+              name="title"
+            />
             <textarea
               placeholder="作品の詳細"
-              className="textarea textarea-bordered textarea-lg w-full max-w-xs"
+              className="textarea textarea-bordered textarea-lg w-full max-w-xs m-2"
               name="content"
             ></textarea>
-            <button type="submit" className="btn btn-primary">
+            <button type="submit" className="btn btn-primary mb-4">
               ポスト
             </button>
           </Form>
@@ -67,6 +81,18 @@ export default function Admin() {
           <p>表示する作品がありません。</p>
         )}
       </div>
+
+      {actionData?.message && (
+        <div
+          className={`toast ${
+            actionData.success ? "toast-success" : "toast-error"
+          }`}
+        >
+          <div className="alert alert-info">
+            <span>{actionData.message}</span>
+          </div>
+        </div>
+      )}
     </>
   );
 }
