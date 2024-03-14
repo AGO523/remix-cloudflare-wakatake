@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////
 import type { AppLoadContext } from "@remix-run/cloudflare";
 import { arts } from "db/schema";
-import { InferInsertModel, eq } from "drizzle-orm";
+import { InferInsertModel, eq, desc } from "drizzle-orm";
 import { createClient } from "~/features/common/services/db.server";
 import { json } from "@remix-run/cloudflare";
 import { z } from "zod";
@@ -43,8 +43,11 @@ const updateArtSchema = z.object({
 export async function getArts(context: AppLoadContext) {
   const env = context.env as Env;
   const db = createClient(env.DB);
-  const artList = await db.select().from(arts).all();
-  return artList;
+  return await db
+    .select()
+    .from(arts)
+    .orderBy(desc(arts.updatedAt), desc(arts.createdAt))
+    .all();
 }
 
 export async function getArtBy(artId: number, context: AppLoadContext) {
