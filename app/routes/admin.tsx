@@ -3,7 +3,7 @@ import { json } from "@remix-run/cloudflare";
 import { Form, Link, useLoaderData, useActionData } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
-  getArts,
+  getArtsWithImages,
   createArt,
   deleteArt,
 } from "~/features/common/services/data.server";
@@ -24,7 +24,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   if (!adminIds.includes(user.id)) {
     throw new Response("Forbidden", { status: 403 });
   }
-  const arts = await getArts(context);
+  const arts = await getArtsWithImages(context);
   return json({ arts, user });
 }
 
@@ -93,8 +93,19 @@ export default function Admin() {
               <h2 className="card-title">{art.title}</h2>
               <div className="card-body">
                 <p>{art.content}</p>
+                {art.images?.map((image) => (
+                  <img
+                    key={image.id}
+                    src={image.imageUrl}
+                    alt="作品の画像"
+                    className="m-2"
+                  />
+                ))}
               </div>
               <div className="card-actions justify-end">
+                <Link to={`/admin/${art.id}/upload-image`} className="btn">
+                  画像をアップロード
+                </Link>
                 <Link to={`/admin/${art.id}/edit`} className="btn">
                   編集
                 </Link>
