@@ -2,30 +2,31 @@
 // このファイルはデータベースと接続してデータ操作を行う処理を記述する //
 /////////////////////////////////////////////////////////////
 import type { AppLoadContext } from "@remix-run/cloudflare";
-import { arts } from "db/schema";
+import { arts, artImages } from "db/schema";
 import { InferInsertModel, eq, desc } from "drizzle-orm";
 import { createClient } from "~/features/common/services/db.server";
 import { json } from "@remix-run/cloudflare";
 import { z } from "zod";
 
 type CreateArt = InferInsertModel<typeof arts>;
+type createArtImage = InferInsertModel<typeof artImages>;
 type UpdateArt = {
   title: string;
   content: string;
   updatedAt: Date;
 };
 
-// type Arts = {
-//   id: number;
-//   userId: number;
-//   title: string;
-//   content: string;
-//   createdAt: Date;
-//   updatedAt: Date;
-// };
-
 interface Env {
   DB: D1Database;
+  COMAJI_API_BASE_URL: string;
+  COMAJI_AUTH_KEY: string;
+}
+
+// api からのレスポンスは imageUrl ではなく url というキーで返る
+interface UploadResponse {
+  success: boolean;
+  message: string;
+  url: string;
 }
 
 const createArtSchema = z.object({
@@ -40,6 +41,12 @@ const updateArtSchema = z.object({
   content: z.string().min(1).max(10000),
 });
 
+const createArtImageSchema = z.object({
+  artId: z.number(),
+  imageUrl: z.string(),
+  createdAt: z.date(),
+});
+
 export async function getArts(context: AppLoadContext) {
   const env = context.env as Env;
   const db = createClient(env.DB);
@@ -48,6 +55,36 @@ export async function getArts(context: AppLoadContext) {
     .from(arts)
     .orderBy(desc(arts.updatedAt), desc(arts.createdAt))
     .all();
+}
+
+export async function getArtsWithImages(context: AppLoadContext) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  // arts テーブルからすべての作品を取得
+  const artsData = await db
+    .select()
+    .from(arts)
+    .orderBy(desc(arts.updatedAt), desc(arts.createdAt))
+    .all();
+
+  // 各作品に対応する画像を取得
+  const artsWithImages = await Promise.all(
+    artsData.map(async (art) => {
+      const images = await db
+        .select()
+        .from(artImages)
+        .where(eq(artImages.artId, art.id))
+        .all();
+
+      return {
+        ...art,
+        images,
+      };
+    })
+  );
+
+  return artsWithImages;
 }
 
 export async function getArtBy(artId: number, context: AppLoadContext) {
@@ -143,4 +180,90 @@ export async function deleteArt(formData: FormData, context: AppLoadContext) {
       { status: 500 }
     );
   }
+}
+
+export async function uploadAndCreateArtImage(
+  formData: FormData,
+  context: AppLoadContext
+) {
+  // 画像をGCSにアップロード
+  const uploadResponse = await uploadArtImage(formData, context);
+  if (!uploadResponse.success) {
+    return json({
+      message: uploadResponse.message,
+      success: uploadResponse.success,
+    });
+  }
+
+  const newFormData = {
+    artId: Number(formData.get("artId")),
+    imageUrl: uploadResponse.url,
+    createdAt: new Date(),
+  };
+
+  console.log("newFormData", newFormData);
+
+  const result = createArtImageSchema.safeParse(newFormData);
+  if (!result.success) {
+    return json(
+      { message: result.error.errors[0].message, errors: result.error },
+      { status: 400 }
+    );
+  }
+
+  // 画像のURLをDBに保存
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+  const newArtImage: createArtImage = result.data;
+  const response = await db.insert(artImages).values(newArtImage).execute();
+
+  if (response.success) {
+    return json({ message: "画像をアップロードしました", success: true });
+  }
+  return json({ message: "画像のアップロードに失敗しました", success: false });
+}
+
+export async function uploadArtImage(
+  formData: FormData,
+  context: AppLoadContext
+): Promise<UploadResponse> {
+  const env = context.env as Env;
+  const apiEndpoint = env.COMAJI_API_BASE_URL;
+  const authKey = env.COMAJI_AUTH_KEY;
+
+  const uploadFormData = new FormData();
+  const imageFile = formData.get("image");
+
+  if (imageFile && typeof imageFile !== "string") {
+    uploadFormData.append("image", imageFile);
+  } else {
+    return {
+      success: false,
+      message: "画像ファイルが不正です。",
+      url: "",
+    };
+  }
+
+  const response = await fetch(`${apiEndpoint}/upload`, {
+    method: "POST",
+    body: uploadFormData,
+    headers: {
+      "X-Auth-Key": authKey,
+    },
+  });
+
+  if (!response.ok) {
+    return {
+      success: false,
+      message: "画像のアップロードに失敗しました。",
+      url: "",
+    };
+  }
+
+  const data = (await response.json()) as UploadResponse;
+  return {
+    success: true,
+    message: "画像がアップロードされました",
+    url: data.url,
+  };
 }

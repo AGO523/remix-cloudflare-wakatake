@@ -22,6 +22,13 @@
       "when": 1710031052047,
       "tag": "0002_chief_squadron_sinister",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1710634306065,
+      "tag": "0003_perpetual_kingpin",
+      "breakpoints": true
     }
   ]
 }

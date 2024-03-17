@@ -16,3 +16,11 @@ export const arts = sqliteTable("arts", {
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
 });
+
+// arts と１対多の関係の artImages テーブル
+export const artImages = sqliteTable("artImages", {
+  id: integer("id").primaryKey().notNull(),
+  artId: integer("artId").notNull(),
+  imageUrl: text("imageUrl").notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+});
