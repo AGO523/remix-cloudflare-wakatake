@@ -218,9 +218,9 @@ export async function uploadAndCreateArtImage(
   const response = await db.insert(artImages).values(newArtImage).execute();
 
   if (response.success) {
-    return json({ message: "画像をアップロードしました", success: true });
+    return json({ message: "画像を作品に追加しました", success: true });
   }
-  return json({ message: "画像のアップロードに失敗しました", success: false });
+  return json({ message: "画像の追加に失敗しました", success: false });
 }
 
 export async function uploadArtImage(
@@ -251,6 +251,8 @@ export async function uploadArtImage(
       "X-Auth-Key": authKey,
     },
   });
+
+  console.log("response", response);
 
   if (!response.ok) {
     return {
