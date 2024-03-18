@@ -231,6 +231,9 @@ export async function uploadArtImage(
   const apiEndpoint = env.COMAJI_API_BASE_URL;
   const authKey = env.COMAJI_AUTH_KEY;
 
+  console.log("apiEndpoint", apiEndpoint);
+  console.log("authKey", authKey);
+
   const uploadFormData = new FormData();
   const imageFile = formData.get("image");
 
@@ -252,7 +255,7 @@ export async function uploadArtImage(
     },
   });
 
-  console.log("response", response);
+  console.log("response", response.body);
 
   if (!response.ok) {
     return {
