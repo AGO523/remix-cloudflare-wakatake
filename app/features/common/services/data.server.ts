@@ -230,8 +230,6 @@ export async function uploadArtImage(
   const env = context.env as Env;
   const apiEndpoint = env.COMAJI_API_BASE_URL;
   const authKey = env.COMAJI_AUTH_KEY;
-
-  console.log("apiEndpoint", apiEndpoint);
   console.log("authKey", authKey);
 
   const uploadFormData = new FormData();
@@ -254,8 +252,6 @@ export async function uploadArtImage(
       "X-Auth-Key": authKey,
     },
   });
-
-  console.log("response", response.body);
 
   if (!response.ok) {
     return {
