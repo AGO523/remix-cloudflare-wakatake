@@ -201,8 +201,6 @@ export async function uploadAndCreateArtImage(
     createdAt: new Date(),
   };
 
-  console.log("newFormData", newFormData);
-
   const result = createArtImageSchema.safeParse(newFormData);
   if (!result.success) {
     return json(
@@ -230,8 +228,6 @@ export async function uploadArtImage(
   const env = context.env as Env;
   const apiEndpoint = env.COMAJI_API_BASE_URL;
   const authKey = env.COMAJI_AUTH_KEY;
-  console.log("authKey", authKey);
-
   const uploadFormData = new FormData();
   const imageFile = formData.get("image");
 
