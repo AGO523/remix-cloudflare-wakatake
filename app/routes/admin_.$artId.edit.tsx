@@ -1,6 +1,11 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json, redirect } from "@remix-run/cloudflare";
-import { Form, useLoaderData, useActionData } from "@remix-run/react";
+import {
+  Form,
+  useLoaderData,
+  useActionData,
+  useNavigation,
+} from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import { getArtBy, updateArt } from "~/features/common/services/data.server";
 
@@ -34,6 +39,8 @@ export const action = async ({ context, request }: LoaderFunctionArgs) => {
 export default function EditArt() {
   const { art } = useLoaderData<typeof loader>();
   const actionData = useActionData<ActionResponse>();
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
 
   return (
     <>
@@ -60,8 +67,12 @@ export default function EditArt() {
             </div>
             <input type="hidden" name="artId" value={art.id} />
             <div className="form-control">
-              <button type="submit" className="btn btn-primary">
-                保存
+              <button
+                type="submit"
+                className="btn btn-primary m-2"
+                disabled={isSubmitting}
+              >
+                作品を更新
               </button>
             </div>
           </Form>
