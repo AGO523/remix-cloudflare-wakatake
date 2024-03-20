@@ -9,21 +9,14 @@ export const Header: React.FC = () => {
         </Link>
       </div>
       <div className="flex-none">
-        <ul className="menu menu-horizontal px-1">
-          <li>
-            <details>
-              <summary>ナビゲーション</summary>
-              <ul className="p-2 bg-base-100">
-                <li>
-                  <Link to="/admin">管理画面</Link>
-                </li>
-                <li>
-                  <Link to="/auth/logout">ログアウト</Link>
-                </li>
-              </ul>
-            </details>
-          </li>
-        </ul>
+        <div className="btn btn-ghost ml-2">
+          <Link to="/admin" prefetch="intent">
+            管理画面
+          </Link>
+        </div>
+        <div className="btn btn-ghost ml-2">
+          <Link to="/auth/logout">ログアウト</Link>
+        </div>
       </div>
     </div>
   );
