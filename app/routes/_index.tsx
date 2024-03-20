@@ -4,6 +4,7 @@ import inu from "../images/inu.jpg";
 import kame from "../images/kame.jpg";
 import neko from "../images/neko.jpg";
 import mitumeru from "../images/mitumeru.jpg";
+import { Link } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -30,6 +31,9 @@ export default function Index() {
           </div>
         </div>
       </section>
+      <div className="btn">
+        <Link to="/admin">管理画面</Link>
+      </div>
 
       <section className="container mx-auto flex flex-row items-center justify-center m-4">
         <div className="card card-compact w-96 bg-base-100 shadow-xl m-2">
