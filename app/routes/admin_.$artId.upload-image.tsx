@@ -1,5 +1,10 @@
 import { LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { Form, useActionData, useParams } from "@remix-run/react"; // useSearchParamsをuseParamsに変更
+import {
+  Form,
+  useActionData,
+  useParams,
+  useNavigation,
+} from "@remix-run/react";
 import { useRef } from "react";
 import { uploadAndCreateArtImage } from "~/features/common/services/data.server";
 
@@ -19,6 +24,8 @@ export default function UploadImage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const params = useParams();
   const artId = params.artId;
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
 
   return (
     <div>
@@ -31,8 +38,12 @@ export default function UploadImage() {
           accept="image/*"
         />
         <input type="hidden" name="artId" value={artId || ""} />
-        <button type="submit" className="btn m-2">
-          画像をアップロード
+        <button
+          type="submit"
+          className="btn btn-primary m-2"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "送信中..." : "画像をアップロード"}
         </button>
       </Form>
       {actionData?.message && <p>{actionData.message}</p>}

@@ -1,6 +1,12 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { Form, Link, useLoaderData, useActionData } from "@remix-run/react";
+import {
+  Form,
+  Link,
+  useLoaderData,
+  useActionData,
+  useNavigation,
+} from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getArtsWithImages,
@@ -40,6 +46,8 @@ export const action = async ({ context, request }: LoaderFunctionArgs) => {
 export default function Admin() {
   const { arts, user } = useLoaderData<typeof loader>();
   const actionData = useActionData<ActionResponse>();
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
 
   function handleDelete(e: React.FormEvent<HTMLFormElement>, artId: number) {
     e.preventDefault(); // フォームのデフォルトの送信を阻止
@@ -77,8 +85,12 @@ export default function Admin() {
               className="textarea textarea-bordered textarea-lg w-full max-w-xs m-2"
               name="content"
             ></textarea>
-            <button type="submit" className="btn btn-primary mb-4">
-              ポスト
+            <button
+              type="submit"
+              className="btn btn-primary mb-4"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "送信中..." : "ポスト"}
             </button>
           </Form>
         </div>
