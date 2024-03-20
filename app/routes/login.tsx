@@ -5,7 +5,7 @@ import { getAuthenticator } from "~/features/common/services/auth.server";
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
   const isAuthenticated = await authenticator.isAuthenticated(request, {
-    successRedirect: "/",
+    successRedirect: "/admin",
   });
   return isAuthenticated;
 }
