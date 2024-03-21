@@ -6,13 +6,18 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useNavigation,
 } from "@remix-run/react";
 import styles from "./tailwind.css";
 import { Header } from "./features/common/components/Header";
+import LoadingIndicator from "./features/common/components/LoadingIndicator";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
 export default function App() {
+  const navigation = useNavigation();
+  const isTransitioning = navigation.state !== "idle";
+
   return (
     <html lang="ja" data-theme="retro">
       <head>
@@ -23,6 +28,7 @@ export default function App() {
       </head>
       <body>
         <Header />
+        {isTransitioning && <LoadingIndicator />}
         <Outlet />
         <ScrollRestoration />
         <Scripts />
