@@ -28,7 +28,9 @@ export default function App() {
       <body>
         <Header />
         {isTransitioning && (
-          <span className="loading loading-spinner text-primary"></span>
+          <div>
+            Now loading<span className="loading loading-dots loading-sm"></span>
+          </div>
         )}
         <Outlet />
         <ScrollRestoration />
