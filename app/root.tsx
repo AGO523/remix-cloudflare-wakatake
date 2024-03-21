@@ -10,6 +10,7 @@ import {
 } from "@remix-run/react";
 import styles from "./tailwind.css";
 import { Header } from "./features/common/components/Header";
+import LoadingIndicator from "./features/common/components/LoadingIndicator";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
@@ -27,11 +28,7 @@ export default function App() {
       </head>
       <body>
         <Header />
-        {isTransitioning && (
-          <div>
-            Now loading<span className="loading loading-dots loading-sm"></span>
-          </div>
-        )}
+        {isTransitioning && <LoadingIndicator />}
         <Outlet />
         <ScrollRestoration />
         <Scripts />
