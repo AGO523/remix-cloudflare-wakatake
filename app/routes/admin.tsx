@@ -1,18 +1,7 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import {
-  Form,
-  Link,
-  useLoaderData,
-  useActionData,
-  useNavigation,
-} from "@remix-run/react";
+import { Link, useLoaderData, useActionData, Outlet } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
-import {
-  getArtsWithImages,
-  createArt,
-  deleteArt,
-} from "~/features/common/services/data.server";
 
 type ActionResponse = {
   message?: string;
@@ -30,114 +19,120 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   if (!adminIds.includes(user.id)) {
     throw new Response("Forbidden", { status: 403 });
   }
-  const arts = await getArtsWithImages(context);
-  return json({ arts, user });
+  return json({ user });
 }
 
-export const action = async ({ context, request }: LoaderFunctionArgs) => {
-  const formData = await request.formData();
-  const actionType = formData.get("_action");
-  if (actionType === "delete") {
-    return await deleteArt(formData, context);
-  }
-  return await createArt(formData, context);
-};
-
 export default function Admin() {
-  const { arts, user } = useLoaderData<typeof loader>();
+  const { user } = useLoaderData<typeof loader>();
   const actionData = useActionData<ActionResponse>();
-  const navigation = useNavigation();
-  const isSubmitting = navigation.state === "submitting";
-
-  function handleDelete(e: React.FormEvent<HTMLFormElement>, artId: number) {
-    e.preventDefault(); // フォームのデフォルトの送信を阻止
-    if (confirm("本当にこの作品を削除しますか？")) {
-      const form = new FormData();
-      form.append("artId", String(artId));
-      form.append("_action", "delete");
-
-      fetch(e.currentTarget.action, {
-        method: "POST",
-        body: form,
-      }).then(() => {
-        window.location.reload(); // ページをリロード
-      });
-    }
-  }
 
   return (
-    <>
-      <div className="container mx-auto">
-        <div className="badge badge-primary">user: {user.displayName}</div>
-
-        <div className="card max-w-lg bg-base-100 shadow-xl m-2">
-          <span>作品を投稿する</span>
-          <Form method="post">
-            <input type="hidden" name="userId" value={user.id} />
-            <input
-              type="text"
-              placeholder="タイトル"
-              className="input input-bordered input-lg w-full max-w-xs m-2"
-              name="title"
-            />
-            <textarea
-              placeholder="作品の詳細"
-              className="textarea textarea-bordered textarea-lg w-full max-w-xs m-2"
-              name="content"
-            ></textarea>
-            <button
-              type="submit"
-              className="btn btn-primary mb-4"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "送信中..." : "ポスト"}
-            </button>
-          </Form>
+    <div className="flex flex-col md:flex-row min-h-screen">
+      {/* サイドバー */}
+      <div className="md:w-64 w-full flex-shrink-0 bg-base-200 max-h-screen overflow-auto hidden md:block">
+        <div className="flex items-center justify-center h-16 shadow-md">
+          <h1 className="text-lg font-semibold">管理画面</h1>
         </div>
+        <div className="p-5">
+          <div className="flex flex-col items-center">
+            <span>
+              ユーザー:
+              <span className="badge badge-primary ml-1">
+                {user.displayName}
+              </span>
+            </span>
+          </div>
+          <div className="mt-5">
+            <ul className="flex flex-col gap-2">
+              <li>
+                <Link
+                  to="/admin"
+                  className="btn btn-sm btn-block btn-secondary"
+                >
+                  ホーム
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/admin/art/new"
+                  className="btn btn-sm btn-block btn-secondary"
+                >
+                  作品を新規作成
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
-        <h1>作品</h1>
-        {arts ? (
-          arts.map((art) => (
-            <div
-              key={art.id}
-              className="card max-w-lg bg-base-100 shadow-xl m-2"
+      {/* メインコンテンツ */}
+      <div className="flex-1 p-5 overflow-auto">
+        <Outlet />
+      </div>
+
+      {/* ナビゲーションバー */}
+      <div className="fixed inset-x-0 bottom-0 bg-base-200 md:hidden p-4">
+        <div className="flex justify-around text-center">
+          <Link
+            to="/admin"
+            className="flex flex-col items-center justify-center gap-2 flex-grow"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <h2 className="card-title">{art.title}</h2>
-              <div className="card-body">
-                <p>{art.content}</p>
-                {art.images?.map((image) => (
-                  <img
-                    key={image.id}
-                    src={image.imageUrl}
-                    alt="作品の画像"
-                    className="m-2"
-                  />
-                ))}
-              </div>
-              <div className="card-actions justify-end">
-                <Link to={`/admin/${art.id}/upload-image`} className="btn">
-                  画像をアップロード
-                </Link>
-                <Link to={`/admin/${art.id}/edit`} className="btn">
-                  編集
-                </Link>
-                <Form method="post" onSubmit={(e) => handleDelete(e, art.id)}>
-                  <input type="hidden" name="artId" value={art.id} />
-                  <button
-                    type="submit"
-                    name="_action"
-                    value="delete"
-                    className="btn btn-error"
-                  >
-                    削除
-                  </button>
-                </Form>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>表示する作品がありません。</p>
-        )}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+              />
+            </svg>
+          </Link>
+          <Link
+            to="/admin/art/new"
+            className="flex flex-col items-center justify-center gap-2 flex-grow"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.043-.025a15.994 15.994 0 0 1 1.622-3.395m3.42 3.42a15.995 15.995 0 0 0 4.764-4.648l3.876-5.814a1.151 1.151 0 0 0-1.597-1.597L14.146 6.32a15.996 15.996 0 0 0-4.649 4.763m3.42 3.42a6.776 6.776 0 0 0-3.42-3.42"
+              />
+            </svg>
+          </Link>
+          <Link
+            to="#"
+            className="flex flex-col items-center justify-center gap-2 flex-grow"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+              />
+            </svg>
+          </Link>
+        </div>
       </div>
 
       {actionData?.message && (
@@ -151,6 +146,6 @@ export default function Admin() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
