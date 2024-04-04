@@ -66,6 +66,22 @@ export default function Admin() {
                   作品を新規作成
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/admin/blogs"
+                  className="btn btn-sm btn-block btn-secondary"
+                >
+                  ブログ
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/admin/blog/new"
+                  className="btn btn-sm btn-block btn-secondary"
+                >
+                  ブログを新規作成
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
@@ -123,7 +139,7 @@ export default function Admin() {
             </svg>
           </NavLink>
           <NavLink
-            to="/admin/settings"
+            to="/admin/blogs"
             className={({ isActive }) =>
               isActive ? "text-primary" : "text-gray-700"
             }
