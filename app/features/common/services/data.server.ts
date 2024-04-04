@@ -18,8 +18,8 @@ type UpdateArt = {
 
 interface Env {
   DB: D1Database;
-  COMAJI_API_BASE_URL: string;
-  COMAJI_AUTH_KEY: string;
+  C_API_BASE_URL: string;
+  C_AUTH_KEY: string;
 }
 
 // api からのレスポンスは imageUrl ではなく url というキーで返る
@@ -226,8 +226,8 @@ export async function uploadArtImage(
   context: AppLoadContext
 ): Promise<UploadResponse> {
   const env = context.env as Env;
-  const apiEndpoint = env.COMAJI_API_BASE_URL;
-  const authKey = env.COMAJI_AUTH_KEY;
+  const apiEndpoint = env.C_API_BASE_URL;
+  const authKey = env.C_AUTH_KEY;
   const uploadFormData = new FormData();
   const imageFile = formData.get("image");
 
