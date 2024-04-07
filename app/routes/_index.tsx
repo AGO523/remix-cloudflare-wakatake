@@ -1,10 +1,8 @@
-import type { MetaFunction } from "@remix-run/cloudflare";
+import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/cloudflare";
 import hero_tora from "../images/hero_tora.jpg";
-import inu from "../images/inu.jpg";
-import kame from "../images/kame.jpg";
-import neko from "../images/neko.jpg";
-import mitumeru from "../images/mitumeru.jpg";
-import { Link } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
+import { json } from "@remix-run/cloudflare";
+import { getArtsWithImages } from "~/features/common/services/data.server";
 
 export const meta: MetaFunction = () => {
   return [
@@ -13,7 +11,14 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export async function loader({ context }: LoaderFunctionArgs) {
+  const arts = await getArtsWithImages(context);
+  return json({ arts });
+}
+
 export default function Index() {
+  const { arts } = useLoaderData<typeof loader>();
+
   return (
     <>
       <section>
@@ -33,33 +38,32 @@ export default function Index() {
       </section>
 
       <section className="container mx-auto flex flex-row items-center justify-center m-4">
-        <div className="card card-compact w-96 bg-base-100 shadow-xl m-2">
-          <figure>
-            <img src={inu} alt="犬の作品" width={400} height={400} />
-          </figure>
-        </div>
-        <div className="card card-compact w-96 bg-base-100 shadow-xl m-2">
-          <figure>
-            <img src={kame} alt="亀の作品" width={400} height={400} />
-          </figure>
-        </div>
-      </section>
-      <section className="container mx-auto flex flex-row items-center justify-center m-4">
-        <div className="card card-compact w-96 bg-base-100 shadow-xl m-2">
-          <figure>
-            <img src={neko} alt="猫の作品" width={400} height={400} />
-          </figure>
-        </div>
-        <div className="card card-compact w-96 bg-base-100 shadow-xl m-2">
-          <figure>
-            <img
-              src={mitumeru}
-              alt="犬が見つめる作品"
-              width={400}
-              height={400}
-            />
-          </figure>
-        </div>
+        <section className="py-6">
+          <div className="container flex flex-col justify-center p-4 mx-auto">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 sm:grid-cols-2">
+              {arts ? (
+                arts.map((art) => (
+                  <div key={art.id}>
+                    {art.images && art.images.length > 0 && (
+                      <figure>
+                        {art.images.map((image) => (
+                          <img
+                            key={image.id}
+                            src={image.imageUrl}
+                            alt="作品の画像"
+                            className="rounded-lg m-2 shadow-xl"
+                          />
+                        ))}
+                      </figure>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <p>作品がありません</p>
+              )}
+            </div>
+          </div>
+        </section>
       </section>
 
       <div className="p-6 sm:p-12 bg-neutral text-gray-100">

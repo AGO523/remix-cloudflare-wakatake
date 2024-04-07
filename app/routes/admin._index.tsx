@@ -48,40 +48,45 @@ export default function Admin() {
     <>
       {arts ? (
         arts.map((art) => (
-          <div
-            key={art.id}
-            className="card max-w-2xl bg-base-100 shadow-xl m-2"
-          >
-            <h2 className="card-title">{art.title}</h2>
+          <div key={art.id} className="card lg:card-side bg-base-100 shadow-xl">
+            {/* 画像を表示 */}
+            {art.images && art.images.length > 0 && (
+              <figure>
+                {art.images.map((image) => (
+                  <img
+                    key={image.id}
+                    src={image.imageUrl}
+                    alt="作品の画像"
+                    className="m-2"
+                  />
+                ))}
+              </figure>
+            )}
             <div className="card-body">
+              <h2 className="card-title">{art.title}</h2>
               <p>{art.content}</p>
-              {art.images?.map((image) => (
-                <img
-                  key={image.id}
-                  src={image.imageUrl}
-                  alt="作品の画像"
-                  className="m-2"
-                />
-              ))}
-            </div>
-            <div className="card-actions justify-end">
-              <Link to={`/admin/${art.id}/upload-image`} className="btn">
-                画像をアップロード
-              </Link>
-              <Link to={`/admin/${art.id}/edit`} className="btn">
-                編集
-              </Link>
-              <Form method="post" onSubmit={(e) => handleDelete(e, art.id)}>
-                <input type="hidden" name="artId" value={art.id} />
-                <button
-                  type="submit"
-                  name="_action"
-                  value="delete"
-                  className="btn btn-error"
+              <div className="card-actions justify-end">
+                <Link
+                  to={`/admin/${art.id}/upload-image`}
+                  className="btn btn-primary"
                 >
-                  削除
-                </button>
-              </Form>
+                  画像をアップロード
+                </Link>
+                <Link to={`/admin/${art.id}/edit`} className="btn btn-primary">
+                  編集
+                </Link>
+                <Form method="post" onSubmit={(e) => handleDelete(e, art.id)}>
+                  <input type="hidden" name="artId" value={art.id} />
+                  <button
+                    type="submit"
+                    name="_action"
+                    value="delete"
+                    className="btn btn-error"
+                  >
+                    削除
+                  </button>
+                </Form>
+              </div>
             </div>
           </div>
         ))

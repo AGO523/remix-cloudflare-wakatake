@@ -54,10 +54,14 @@ export default function Blogs() {
       </button>
       {contents.map((blog) => (
         <article key={blog.id} className="m-4">
-          <div className="card max-w-2xl bg-base-100 shadow-xl">
+          <div className="card lg:card-side bg-base-100 shadow-xl">
             {blog.eyecatch && (
               <figure>
-                <img src={blog.eyecatch.url} alt="Shoes" />
+                <img
+                  src={blog.eyecatch.url}
+                  alt="ブログの画像"
+                  className="max-w-96 max-h-96"
+                />
               </figure>
             )}
             <div className="card-body">
@@ -69,7 +73,7 @@ export default function Blogs() {
                     (blog.content.length > 40 ? "..." : ""),
                 }}
               />
-              <p>記事作成日: {blog.createdAt}</p>
+              <p>記事作成日: {blog.createdAt.slice(0, 10)}</p>
               <div className="card-actions justify-end">
                 <button className="btn btn-primary">
                   <Link to={`/admin/blogs/${blog.id}`}>ブログを読む</Link>
