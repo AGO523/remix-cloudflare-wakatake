@@ -167,16 +167,33 @@ export async function deleteArt(formData: FormData, context: AppLoadContext) {
   const db = createClient(env.DB);
   const artId = Number(formData.get("artId"));
 
-  const response = await db.delete(arts).where(eq(arts.id, artId)).execute();
+  // まず、artIdに紐づくartImagesテーブルのレコードを削除
+  const deleteImagesResponse = await db
+    .delete(artImages)
+    .where(eq(artImages.artId, artId))
+    .execute();
 
-  if (response.success) {
-    return json(
-      { message: "作品が削除されました", success: true },
-      { status: 200 }
-    );
+  // artImagesの削除が成功したら、artsテーブルのレコードを削除
+  if (deleteImagesResponse.success) {
+    const deleteArtResponse = await db
+      .delete(arts)
+      .where(eq(arts.id, artId))
+      .execute();
+
+    if (deleteArtResponse.success) {
+      return json(
+        { message: "作品と関連画像が削除されました", success: true },
+        { status: 200 }
+      );
+    } else {
+      return json(
+        { message: "作品の削除に失敗しました", success: false },
+        { status: 500 }
+      );
+    }
   } else {
     return json(
-      { message: "作品の削除に失敗しました", success: false },
+      { message: "関連画像の削除に失敗しました", success: false },
       { status: 500 }
     );
   }
