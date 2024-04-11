@@ -75,9 +75,15 @@ export default function EditArt() {
                 defaultValue={art.price}
               />
             </div>
+            <p className="text-xs text-gray-500">半角数字で入力してください</p>
             <div className="form-control">
               <label htmlFor="productUrl">商品の販売ページURL</label>
-              <input type="text" id="productUrl" name="productUrl" />
+              <input
+                type="text"
+                id="productUrl"
+                name="productUrl"
+                defaultValue={art.productUrl || ""}
+              />
             </div>
             <input type="hidden" name="artId" value={art.id} />
             <div className="form-control">

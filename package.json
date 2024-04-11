@@ -11,7 +11,8 @@
     "typecheck": "tsc",
     "migrations:gen": "drizzle-kit generate:sqlite",
     "local:migrations:apply": "wrangler d1 migrations apply artora --local",
-    "migrations:apply": "NO_D1_WARNING=true wrangler d1 migrations apply artora"
+    "migrations:apply": "NO_D1_WARNING=true wrangler d1 migrations apply artora",
+    "migrations:remote-apply": "NO_D1_WARNING=true wrangler d1 migrations apply artora --remote"
   },
   "dependencies": {
     "@remix-run/cloudflare": "^2.6.0",
