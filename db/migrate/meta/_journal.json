@@ -29,6 +29,13 @@
       "when": 1710634306065,
       "tag": "0003_perpetual_kingpin",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1712792458827,
+      "tag": "0004_foamy_invisible_woman",
+      "breakpoints": true
     }
   ]
 }

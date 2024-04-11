@@ -43,6 +43,18 @@ export default function Admin() {
             className="textarea textarea-bordered textarea-lg w-full max-w-xs m-2"
             name="content"
           ></textarea>
+          <input
+            type="text"
+            placeholder="価格"
+            className="input input-bordered input-lg w-full max-w-xs m-2"
+            name="price"
+          />
+          <input
+            type="text"
+            placeholder="商品の販売ページURL"
+            className="input input-bordered input-lg w-full max-w-xs m-2"
+            name="productUrl"
+          />
           <button
             type="submit"
             className="btn btn-primary mb-4"

@@ -13,6 +13,8 @@ type createArtImage = InferInsertModel<typeof artImages>;
 type UpdateArt = {
   title: string;
   content: string;
+  price: number;
+  productUrl: string;
   updatedAt: Date;
 };
 
@@ -33,12 +35,16 @@ const createArtSchema = z.object({
   userId: z.number(),
   title: z.string().min(1).max(300),
   content: z.string().min(1).max(10000),
+  price: z.number(),
+  productUrl: z.string().optional(),
 });
 
 const updateArtSchema = z.object({
   artId: z.number(),
   title: z.string().min(1).max(300),
   content: z.string().min(1).max(10000),
+  price: z.number(),
+  productUrl: z.string().optional(),
 });
 
 const createArtImageSchema = z.object({
@@ -94,6 +100,16 @@ export async function getArtBy(artId: number, context: AppLoadContext) {
   return art;
 }
 
+export async function getArtImagesBy(artId: number, context: AppLoadContext) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+  return await db
+    .select()
+    .from(artImages)
+    .where(eq(artImages.artId, artId))
+    .all();
+}
+
 export async function createArt(formData: FormData, context: AppLoadContext) {
   const env = context.env as Env;
   const db = createClient(env.DB);
@@ -103,6 +119,8 @@ export async function createArt(formData: FormData, context: AppLoadContext) {
     userId: Number(formData.get("userId")),
     title: formData.get("title") as string,
     content: formData.get("content") as string,
+    price: Number(formData.get("price")),
+    productUrl: formData.get("productUrl") as string,
   };
   const result = createArtSchema.safeParse(formObject);
   if (!result.success) {
@@ -130,11 +148,14 @@ export async function updateArt(formData: FormData, context: AppLoadContext) {
   const env = context.env as Env;
   const db = createClient(env.DB);
   const currentTime = new Date();
+  console.log(formData);
 
   const formObject = {
     artId: Number(formData.get("artId")),
     title: formData.get("title") as string,
     content: formData.get("content") as string,
+    price: Number(formData.get("price")),
+    productUrl: formData.get("productUrl") as string,
   };
   const result = updateArtSchema.safeParse(formObject);
   if (!result.success) {
@@ -147,6 +168,8 @@ export async function updateArt(formData: FormData, context: AppLoadContext) {
   const updatedArt: UpdateArt = {
     title: result.data.title,
     content: result.data.content,
+    price: result.data.price,
+    productUrl: result.data.productUrl || "",
     updatedAt: currentTime,
   };
 

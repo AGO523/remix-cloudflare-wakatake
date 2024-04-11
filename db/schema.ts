@@ -13,6 +13,8 @@ export const arts = sqliteTable("arts", {
   userId: integer("userId").notNull(),
   title: text("title").notNull().default("アートラの作品"),
   content: text("content").notNull(),
+  price: integer("price").notNull().default(0),
+  productUrl: text("productUrl"),
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
 });
