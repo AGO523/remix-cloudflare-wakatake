@@ -17,9 +17,9 @@ export default function Art() {
   const { art, artImages } = useLoaderData<typeof loader>();
 
   return (
-    <>
+    <div className="flex justify-center items-center">
       {art ? (
-        <div className="card lg:card-side bg-base-100 shadow-xl">
+        <div className="card max-w-2xl bg-base-100 shadow-xl">
           <figure>
             {artImages && artImages.length > 0 && (
               <img src={artImages[0].imageUrl} alt="Album" />
@@ -27,8 +27,10 @@ export default function Art() {
           </figure>
           <div className="card-body">
             <h2 className="card-title">{art.title}</h2>
-            <p>{art.content}</p>
-            <p>価格: {art.price} 円</p>
+            <p>
+              {art.content}
+              <br></br>価格: {art.price} 円
+            </p>
             <div className="card-actions justify-end">
               {art.productUrl && (
                 <Link to={art.productUrl} className="btn btn-primary">
@@ -41,6 +43,6 @@ export default function Art() {
       ) : (
         <div>作品が見つかりませんでした。</div>
       )}
-    </>
+    </div>
   );
 }
