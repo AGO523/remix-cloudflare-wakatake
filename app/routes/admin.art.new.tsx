@@ -49,6 +49,7 @@ export default function Admin() {
             className="input input-bordered input-lg w-full max-w-xs m-2"
             name="price"
           />
+          <p className="text-xs text-gray-500">半角数字で入力してください</p>
           <input
             type="text"
             placeholder="商品の販売ページURL"
