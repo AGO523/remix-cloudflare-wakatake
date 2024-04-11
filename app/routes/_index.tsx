@@ -37,25 +37,26 @@ export default function Index() {
         </div>
       </section>
 
-      <section className="container mx-auto flex flex-row items-center justify-center m-4">
+      <section className="container mx-auto flex flex-row items-center justify-center">
         <section className="py-6">
           <div className="container flex flex-col justify-center p-4 mx-auto">
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 sm:grid-cols-2">
               {arts ? (
                 arts.map((art) => (
                   <div key={art.id}>
-                    {art.images && art.images.length > 0 && (
-                      <figure>
-                        {art.images.map((image) => (
+                    <Link to={`/art/${art.id}`}>
+                      {art.images && art.images.length > 0 && (
+                        <figure>
                           <img
-                            key={image.id}
-                            src={image.imageUrl}
+                            key={art.images[0].id}
+                            src={art.images[0].imageUrl}
                             alt="作品の画像"
-                            className="rounded-lg m-2 shadow-xl"
+                            className="rounded-lg m-1 shadow-xl"
                           />
-                        ))}
-                      </figure>
-                    )}
+                        </figure>
+                      )}
+                      <span className="badge badge-lg">{art.title}</span>
+                    </Link>
                   </div>
                 ))
               ) : (

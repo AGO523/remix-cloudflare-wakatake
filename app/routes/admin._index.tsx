@@ -48,7 +48,10 @@ export default function Admin() {
     <>
       {arts ? (
         arts.map((art) => (
-          <div key={art.id} className="card lg:card-side bg-base-100 shadow-xl">
+          <div
+            key={art.id}
+            className="card lg:card-side bg-base-100 shadow-xl m-2"
+          >
             {/* 画像を表示 */}
             {art.images && art.images.length > 0 && (
               <figure>
@@ -65,7 +68,18 @@ export default function Admin() {
             <div className="card-body">
               <h2 className="card-title">{art.title}</h2>
               <p>{art.content}</p>
+              <p>{art.price} 円</p>
               <div className="card-actions justify-end">
+                {art.productUrl && (
+                  <Link
+                    to={art.productUrl}
+                    className="btn btn-primary"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    商品の販売ページへ
+                  </Link>
+                )}
                 <Link
                   to={`/admin/${art.id}/upload-image`}
                   className="btn btn-primary"

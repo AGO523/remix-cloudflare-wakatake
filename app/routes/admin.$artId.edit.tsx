@@ -26,6 +26,7 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
     throw new Response("Forbidden", { status: 403 });
   }
   const artId = Number(params.artId);
+  console.log(artId);
   const art = await getArtBy(artId, context);
   return json({ art });
 }
@@ -64,6 +65,19 @@ export default function EditArt() {
                 name="content"
                 defaultValue={art.content}
               />
+            </div>
+            <div className="form-control">
+              <label htmlFor="price">価格</label>
+              <input
+                type="text"
+                id="price"
+                name="price"
+                defaultValue={art.price}
+              />
+            </div>
+            <div className="form-control">
+              <label htmlFor="productUrl">商品の販売ページURL</label>
+              <input type="text" id="productUrl" name="productUrl" />
             </div>
             <input type="hidden" name="artId" value={art.id} />
             <div className="form-control">
