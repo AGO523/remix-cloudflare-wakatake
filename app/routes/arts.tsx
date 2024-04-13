@@ -16,7 +16,7 @@ export default function Admin() {
     <div className="flex flex-col justify-center items-center">
       {arts ? (
         arts.map((art) => (
-          <div key={art.id} className="m-2 w-full max-w-md mx-auto">
+          <div key={art.id} className="m-2 w-full max-w-xl mx-auto">
             <ArtCard
               art={{
                 id: art.id,
