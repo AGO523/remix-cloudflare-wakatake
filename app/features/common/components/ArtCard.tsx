@@ -29,7 +29,7 @@ export function ArtCard({ art, artImages, adminPath }: ArtCardProps) {
   };
 
   return (
-    <div className="card max-w-2xl bg-base-100 shadow-xl">
+    <div className="card max-w-xl bg-base-100 shadow-xl">
       <div className="relative">
         {artImages.length > 1 && (
           <>
