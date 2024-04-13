@@ -1,10 +1,11 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { Link, useLoaderData } from "@remix-run/react";
+import { useLoaderData, useLocation } from "@remix-run/react";
 import { json } from "@remix-run/cloudflare";
 import {
   getArtBy,
   getArtImagesBy,
 } from "~/features/common/services/data.server";
+import { ArtCard } from "~/features/common/components/ArtCard";
 
 export async function loader({ context, params }: LoaderFunctionArgs) {
   const artId = Number(params.id);
@@ -15,31 +16,13 @@ export async function loader({ context, params }: LoaderFunctionArgs) {
 
 export default function Art() {
   const { art, artImages } = useLoaderData<typeof loader>();
+  const location = useLocation();
+  const adminPath = location.pathname.includes("admin");
 
   return (
     <div className="flex justify-center items-center">
       {art ? (
-        <div className="card max-w-2xl bg-base-100 shadow-xl">
-          <figure>
-            {artImages && artImages.length > 0 && (
-              <img src={artImages[0].imageUrl} alt="Album" />
-            )}
-          </figure>
-          <div className="card-body">
-            <h2 className="card-title">{art.title}</h2>
-            <p>
-              {art.content}
-              <br></br>価格: {art.price} 円
-            </p>
-            <div className="card-actions justify-end">
-              {art.productUrl && (
-                <Link to={art.productUrl} className="btn btn-primary">
-                  商品の販売ページへ
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
+        <ArtCard art={art} artImages={artImages} adminPath={adminPath} />
       ) : (
         <div>作品が見つかりませんでした。</div>
       )}
