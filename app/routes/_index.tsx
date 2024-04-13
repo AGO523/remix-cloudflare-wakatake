@@ -22,19 +22,35 @@ export default function Index() {
   return (
     <>
       <section>
-        <div
-          className="hero min-h-screen"
-          style={{
-            backgroundImage: `url(${hero_tora})`,
-          }}
-        >
-          <div className="hero-overlay bg-opacity-60"></div>
-          <div className="hero-content text-center text-neutral-content">
-            <div className="max-w-md">
-              <h1 className="mb-5 text-5xl font-bold">artora アートラ</h1>
-            </div>
+        <div className="container flex flex-col items-center px-4 py-16 pb-24 mx-auto text-center lg:pb-56 md:py-32 md:px-10 lg:px-32">
+          <p className="text-5xl font-bold leadi sm:text-6xl xl:max-w-3xl">
+            artora
+          </p>
+          <p className="mt-6 mb-8 text-lg sm:mb-12 xl:max-w-3xl">
+            アートラはポートフォリオサイトです。
+            <br />
+            作品の閲覧、購入などができます。
+          </p>
+          <div className="flex flex-wrap justify-center">
+            <Link to={"/arts"} className="btn btn-primary m-2">
+              作品を見る
+            </Link>
+            <Link
+              to="https://www.instagram.com/kajisac_art/"
+              className="btn btn-secondary m-2"
+              target="_blank"
+              rel="noreferrer"
+            >
+              SNSを見る
+            </Link>
           </div>
         </div>
+
+        <img
+          src={hero_tora}
+          alt="hero"
+          className="w-5/6 mx-auto mb-12 -mt-20 rounded-lg shadow-md lg:-mt-40"
+        />
       </section>
 
       <section className="container mx-auto flex flex-row items-center justify-center">

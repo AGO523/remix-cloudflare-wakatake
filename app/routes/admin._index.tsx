@@ -29,7 +29,7 @@ export const action = async ({ context, request }: LoaderFunctionArgs) => {
 export default function Admin() {
   const { arts } = useLoaderData<typeof loader>();
   const location = useLocation();
-  console.log(location.pathname);
+  const adminPath = location.pathname.includes("admin");
 
   function handleDelete(e: React.FormEvent<HTMLFormElement>, artId: number) {
     e.preventDefault(); // フォームのデフォルトの送信を阻止
@@ -61,7 +61,7 @@ export default function Admin() {
                 productUrl: art.productUrl || undefined,
               }}
               artImages={art.images || []}
-              adminPath={true}
+              adminPath={adminPath}
             />
             <Form method="post" onSubmit={(e) => handleDelete(e, art.id)}>
               <input type="hidden" name="artId" value={art.id} />
