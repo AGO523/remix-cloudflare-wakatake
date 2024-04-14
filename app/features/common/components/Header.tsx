@@ -10,12 +10,9 @@ export const Header: React.FC = () => {
       </div>
       <div className="flex-none">
         <div className="btn btn-ghost ml-2">
-          <Link to="/admin" prefetch="intent">
-            管理画面
+          <Link to="/auth/login" prefetch="intent">
+            ログイン
           </Link>
-        </div>
-        <div className="btn btn-ghost ml-2">
-          <Link to="/auth/logout">ログアウト</Link>
         </div>
       </div>
     </div>
