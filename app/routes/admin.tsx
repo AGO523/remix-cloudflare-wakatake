@@ -74,6 +74,14 @@ export default function Admin() {
                   ブログ
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/auth/logout"
+                  className="btn btn-sm btn-block btn-primary"
+                >
+                  ログアウト
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
