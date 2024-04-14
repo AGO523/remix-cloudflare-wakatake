@@ -11,8 +11,16 @@ import {
 import styles from "./tailwind.css";
 import { Header } from "./features/common/components/Header";
 import LoadingIndicator from "./features/common/components/LoadingIndicator";
+import artora_icon from "./images/artora-icon.png";
 
-export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: styles },
+  {
+    rel: "icon",
+    href: artora_icon,
+    type: "image/png",
+  },
+];
 
 export default function App() {
   const navigation = useNavigation();
