@@ -82,6 +82,11 @@ export default function Admin() {
                   ログアウト
                 </Link>
               </li>
+              <li>
+                <Link to="/dialies" className="btn btn-sm btn-block btn-accent">
+                  護主印日記
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

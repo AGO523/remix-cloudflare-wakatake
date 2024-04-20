@@ -43,6 +43,9 @@ export default function Index() {
             >
               SNSを見る
             </Link>
+            {/* <Link to={"/dialies"} className="btn btn-accent m-2">
+              護主印日記
+            </Link> */}
           </div>
         </div>
 

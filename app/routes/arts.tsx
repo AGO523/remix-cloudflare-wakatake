@@ -9,7 +9,7 @@ export async function loader({ context }: LoaderFunctionArgs) {
   return json({ arts });
 }
 
-export default function Admin() {
+export default function Arts() {
   const { arts } = useLoaderData<typeof loader>();
 
   return (

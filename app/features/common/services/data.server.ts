@@ -261,6 +261,7 @@ export async function uploadAndCreateArtImage(
   return json({ message: "画像の追加に失敗しました", success: false });
 }
 
+// comaji の API を使って画像をアップロード
 export async function uploadArtImage(
   formData: FormData,
   context: AppLoadContext
