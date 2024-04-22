@@ -26,3 +26,11 @@ export const artImages = sqliteTable("artImages", {
   imageUrl: text("imageUrl").notNull(),
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
 });
+
+export const dialies = sqliteTable("dialies", {
+  id: integer("id").primaryKey().notNull(),
+  userId: integer("userId").notNull(),
+  content: text("content").notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+});

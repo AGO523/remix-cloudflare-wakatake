@@ -2,7 +2,7 @@
 // このファイルはデータベースと接続してデータ操作を行う処理を記述する //
 /////////////////////////////////////////////////////////////
 import type { AppLoadContext } from "@remix-run/cloudflare";
-import { arts, artImages } from "db/schema";
+import { arts, artImages, dialies } from "db/schema";
 import { InferInsertModel, eq, desc } from "drizzle-orm";
 import { createClient } from "~/features/common/services/db.server";
 import { json } from "@remix-run/cloudflare";
@@ -10,6 +10,8 @@ import { z } from "zod";
 
 type CreateArt = InferInsertModel<typeof arts>;
 type createArtImage = InferInsertModel<typeof artImages>;
+type CreateDialy = InferInsertModel<typeof dialies>;
+
 type UpdateArt = {
   title: string;
   content: string;
@@ -51,6 +53,11 @@ const createArtImageSchema = z.object({
   artId: z.number(),
   imageUrl: z.string(),
   createdAt: z.date(),
+});
+
+const createDialySchema = z.object({
+  userId: z.number(),
+  content: z.string().min(1).max(100),
 });
 
 export async function getArts(context: AppLoadContext) {
@@ -148,7 +155,6 @@ export async function updateArt(formData: FormData, context: AppLoadContext) {
   const env = context.env as Env;
   const db = createClient(env.DB);
   const currentTime = new Date();
-  console.log(formData);
 
   const formObject = {
     artId: Number(formData.get("artId")),
@@ -304,4 +310,45 @@ export async function uploadArtImage(
     message: "画像がアップロードされました",
     url: data.url,
   };
+}
+
+export async function createDialy(formData: FormData, context: AppLoadContext) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+  const currentTime = new Date();
+
+  const formObject = {
+    userId: Number(formData.get("userId")),
+    content: formData.get("content") as string,
+  };
+  const result = createDialySchema.safeParse(formObject);
+  if (!result.success) {
+    return json(
+      { message: result.error.errors[0].message, errors: result.error },
+      { status: 400 }
+    );
+  }
+
+  const newDialy: CreateDialy = {
+    ...result.data,
+    createdAt: currentTime,
+    updatedAt: currentTime,
+  };
+
+  const response = await db.insert(dialies).values(newDialy).execute();
+  if (response.success) {
+    return json({ message: "日記を投稿しました" }, { status: 201 });
+  } else {
+    return json({ message: "日記の投稿に失敗しました" }, { status: 500 });
+  }
+}
+
+export async function getDialies(context: AppLoadContext) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+  return await db
+    .select()
+    .from(dialies)
+    .orderBy(desc(dialies.updatedAt), desc(dialies.createdAt))
+    .all();
 }

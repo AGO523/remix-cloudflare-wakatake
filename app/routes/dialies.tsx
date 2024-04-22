@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import { json, LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { useLoaderData, useSearchParams } from "@remix-run/react";
-import { getArtsWithImages } from "~/features/common/services/data.server";
+import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import { getDialies } from "~/features/common/services/data.server";
 
 // ローダー関数の型定義
 export async function loader({ context }: LoaderFunctionArgs) {
-  const arts = await getArtsWithImages(context);
-  return json({ arts });
+  const dialies = await getDialies(context);
+  return json({ dialies });
 }
 
 export default function Dialies() {
-  const { arts } = useLoaderData<typeof loader>();
+  const { dialies } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
   const [itemsPerPage, setItemsPerPage] = useState(30); // 初期値はモバイルビュー用の30件
   const [animating, setAnimating] = useState(false);
@@ -34,8 +34,8 @@ export default function Dialies() {
   }, [page, setSearchParams]);
 
   const startIndex = (page - 1) * itemsPerPage;
-  const paginatedArts = arts.slice(startIndex, startIndex + itemsPerPage);
-  const totalPages = Math.ceil(arts.length / itemsPerPage);
+  const paginatedDialies = dialies.slice(startIndex, startIndex + itemsPerPage);
+  const totalPages = Math.ceil(dialies.length / itemsPerPage);
 
   const changePage = (newPage: number) => {
     setAnimating(true);
@@ -47,14 +47,19 @@ export default function Dialies() {
 
   return (
     <div className="flex flex-col items-center justify-center">
+      <div>
+        <Link to="/dialy/new" className="btn btn-sm m-4">
+          護主印日記を書く
+        </Link>
+      </div>
       <div
         className={`grid grid-cols-1 md:grid-cols-2 gap-2 ${
           animating ? "animate-flip-page" : ""
         }`}
       >
-        {paginatedArts.map((art, index) => (
+        {paginatedDialies.map((dialy, index) => (
           <div
-            key={art.id}
+            key={dialy.id}
             className="card max-w-lg bg-base-100 shadow-xl relative"
           >
             {index === 0 && (
@@ -77,8 +82,8 @@ export default function Dialies() {
             )}
             <figure className="relative">
               <img
-                src="https://storage.googleapis.com/prod-artora-arts/dev-images/DE196043-753D-4042-A7E2-9986500B45CD_1_201_a.jpeg"
-                alt={art.title}
+                src="https://storage.googleapis.com/prod-artora-arts/dev-images/goshuin5.png"
+                alt="護主印日記の画像"
               />
               <figcaption className="absolute top-0 left-0 h-full w-full flex items-center justify-center p-4">
                 <span
@@ -88,7 +93,7 @@ export default function Dialies() {
                     textOrientation: "upright",
                   }}
                 >
-                  {art.title}
+                  {dialy.content}
                 </span>
               </figcaption>
             </figure>
