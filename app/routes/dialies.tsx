@@ -47,15 +47,23 @@ export default function Dialies() {
 
   return (
     <div className="flex flex-col items-center justify-center">
+      <style>
+        {`
+          @import url('https://fonts.googleapis.com/css2?family=Tsukimi+Rounded&display=swap');
+          .tsukimi-font {
+            font-family: 'Tsukimi Rounded', sans-serif;
+          }
+        `}
+      </style>
       <div>
-        <Link to="/dialy/new" className="btn btn-sm m-4">
-          護主印日記を書く
+        <Link to="/dialy/new" className="btn btn-sm m-4 tsukimi-font">
+          護主印日記をかく
         </Link>
       </div>
       <div
         className={`grid grid-cols-1 md:grid-cols-2 gap-2 ${
           animating ? "animate-flip-page" : ""
-        }`}
+        } tsukimi-font`}
       >
         {paginatedDialies.map((dialy, index) => (
           <div
@@ -87,7 +95,7 @@ export default function Dialies() {
               />
               <figcaption className="absolute top-0 left-0 h-full w-full flex items-center justify-center p-4">
                 <span
-                  className="text-white text-lg font-bold"
+                  className="m-6 text-lg font-bold"
                   style={{
                     writingMode: "vertical-rl",
                     textOrientation: "upright",
