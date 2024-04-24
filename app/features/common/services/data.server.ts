@@ -352,3 +352,30 @@ export async function getDialies(context: AppLoadContext) {
     .orderBy(desc(dialies.updatedAt), desc(dialies.createdAt))
     .all();
 }
+
+export async function getDialyBy(dialyId: number, context: AppLoadContext) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+  return await db.select().from(dialies).where(eq(dialies.id, dialyId)).get();
+}
+
+export async function deleteDialy(formData: FormData, context: AppLoadContext) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+  const dialyId = Number(formData.get("dialyId"));
+  const response = await db
+    .delete(dialies)
+    .where(eq(dialies.id, dialyId))
+    .execute();
+
+  if (response.success) {
+    return json(
+      { message: "日記が削除されました", success: true },
+      { status: 200 }
+    );
+  }
+  return json(
+    { message: "日記の削除に失敗しました", success: false },
+    { status: 500 }
+  );
+}

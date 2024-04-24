@@ -1,13 +1,20 @@
 import { useState, useEffect } from "react";
 import { json, LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
-import { getDialies } from "~/features/common/services/data.server";
+import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
+import {
+  getDialies,
+  deleteDialy,
+} from "~/features/common/services/data.server";
 
-// ローダー関数の型定義
 export async function loader({ context }: LoaderFunctionArgs) {
   const dialies = await getDialies(context);
   return json({ dialies });
 }
+
+export const action = async ({ context, request }: LoaderFunctionArgs) => {
+  const formData = await request.formData();
+  return await deleteDialy(formData, context);
+};
 
 export default function Dialies() {
   const { dialies } = useLoaderData<typeof loader>();
@@ -70,11 +77,24 @@ export default function Dialies() {
             key={dialy.id}
             className="card max-w-lg bg-base-100 shadow-xl relative"
           >
+            <div>
+              <Form method="post">
+                <input type="hidden" name="dialyId" value={dialy.id} />
+                <button
+                  type="submit"
+                  name="_action"
+                  value="delete"
+                  className="btn btn-circle btn-sm absolute top-0 right-0 z-10"
+                >
+                  &times;
+                </button>
+              </Form>
+            </div>
             {index === 0 && (
               <button
                 onClick={() => changePage(Math.max(1, page - 1))}
                 disabled={page === 1}
-                className="absolute top-1/2 -translate-y-1/2 left-0 btn-circle btn-sm btn-outline z-10"
+                className="absolute top-1/2 -translate-y-1/2 left-0 btn-circle btn-sm z-10"
               >
                 &lt;
               </button>
@@ -83,7 +103,7 @@ export default function Dialies() {
               <button
                 onClick={() => changePage(Math.min(totalPages, page + 1))}
                 disabled={page >= totalPages}
-                className="absolute top-1/2 -translate-y-1/2 right-0 btn-circle btn-sm btn-outline z-10"
+                className="absolute top-1/2 -translate-y-1/2 right-0 btn-circle btn-sm z-10"
               >
                 &gt;
               </button>
