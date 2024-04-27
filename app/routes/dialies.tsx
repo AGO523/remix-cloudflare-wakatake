@@ -19,18 +19,16 @@ export const action = async ({ context, request }: LoaderFunctionArgs) => {
 export default function Dialies() {
   const { dialies } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [itemsPerPage, setItemsPerPage] = useState(30); // 初期値はモバイルビュー用の30件
+  const [itemsPerPage, setItemsPerPage] = useState(30);
   const [animating, setAnimating] = useState(false);
   const [page, setPage] = useState(
     parseInt(searchParams.get("page") || "1", 10)
   );
 
   useEffect(() => {
-    // クライアントサイドでのみ実行されるウィンドウの幅に応じた処理
     const handleResize = () => {
       setItemsPerPage(window.innerWidth >= 768 ? 2 : 30);
     };
-    // 初回マウント時にも実行
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -49,7 +47,7 @@ export default function Dialies() {
     setTimeout(() => {
       setPage(newPage);
       setAnimating(false);
-    }, 2000); // アニメーションの持続時間に合わせる
+    }, 2000);
   };
 
   return (
@@ -121,7 +119,11 @@ export default function Dialies() {
                     textOrientation: "upright",
                   }}
                 >
-                  {dialy.content}
+                  {dialy.content.split("\n").map((line, idx) => (
+                    <span key={idx} style={{ display: "block" }}>
+                      {line}
+                    </span>
+                  ))}
                 </span>
               </figcaption>
             </figure>
