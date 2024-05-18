@@ -26,7 +26,6 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
     throw new Response("Forbidden", { status: 403 });
   }
   const artId = Number(params.artId);
-  console.log(artId);
   const art = await getArtBy(artId, context);
   return json({ art });
 }
