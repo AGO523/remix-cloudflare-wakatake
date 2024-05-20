@@ -7,7 +7,7 @@ import {
   useNavigation,
 } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
-import { createDeck } from "~/features/common/services/data.server";
+import { createDeck } from "~/features/common/services/deck-data.server";
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -55,18 +55,13 @@ export default function DeckNew() {
             className="textarea textarea-bordered textarea-lg w-full max-w-xs m-2"
             name="description"
           ></textarea>
-          {isSubmitting ? (
-            <div className="btn btn-ghost btn-active w-full max-w-xs m-2">
-              デッキを作成しています...
-            </div>
-          ) : (
-            <button
-              type="submit"
-              className="btn btn-primary w-full max-w-xs m-2"
-            >
-              送信
-            </button>
-          )}
+          <button
+            type="submit"
+            className="btn btn-primary w-full max-w-xs m-2"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "デッキを作成しています..." : "送信"}
+          </button>
         </Form>
       </div>
     </>
