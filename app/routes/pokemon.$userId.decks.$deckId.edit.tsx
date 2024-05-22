@@ -11,7 +11,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
   return json({ user });
 }
 
-export default function DecksByUserLayout() {
+export default function EditDeckLayout() {
   return (
     <div className="container mx-auto p-4">
       <Outlet />

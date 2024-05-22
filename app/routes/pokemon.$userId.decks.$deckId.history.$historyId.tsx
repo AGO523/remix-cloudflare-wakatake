@@ -9,12 +9,12 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
   await authenticator.isAuthenticated(request, {
     failureRedirect: "/login",
   });
-
-  const { deckHistoryId } = params;
-  if (!deckHistoryId) {
-    throw new Response("Deck History ID is required", { status: 400 });
+  console.log(params);
+  if (params === undefined || params === null) {
+    throw new Response("Params is required", { status: 400 });
   }
-  const deckHistory = await getDeckHistoryById(Number(deckHistoryId), context);
+  const deckHistoryId = Number(params.historyId);
+  const deckHistory = await getDeckHistoryById(deckHistoryId, context);
   if (!deckHistory) {
     throw new Response("Deck History not found", { status: 404 });
   }

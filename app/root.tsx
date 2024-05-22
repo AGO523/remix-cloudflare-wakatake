@@ -27,7 +27,8 @@ export default function App() {
   const isTransitioning = navigation.state !== "idle";
 
   return (
-    <html lang="ja" data-theme="retro">
+    // <html lang="ja" data-theme="retro">
+    <html lang="ja" data-theme="winter">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
