@@ -43,6 +43,12 @@ const createDeckImageSchema = z.object({
   imageUrl: z.string(),
 });
 
+const updateDeckSchema = z.object({
+  code: z.string().min(1).max(100),
+  title: z.string().min(1).max(300),
+  description: z.string().optional(),
+});
+
 export async function createDeck(formData: FormData, context: AppLoadContext) {
   const env = context.env as Env;
   const db = createClient(env.DB);
@@ -276,4 +282,42 @@ export async function getDeckHistoryById(
     .get();
 
   return deckHistory;
+}
+
+export async function updateDeck(
+  deckId: number,
+  formData: FormData,
+  context: AppLoadContext
+) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  const formObject = {
+    code: formData.get("code") as string,
+    title: formData.get("title") as string,
+    description: formData.get("description") as string,
+  };
+
+  const result = updateDeckSchema.safeParse(formObject);
+  if (!result.success) {
+    return json(
+      { message: result.error.errors[0].message, errors: result.error },
+      { status: 400 }
+    );
+  }
+
+  const updatedDeck = {
+    ...result.data,
+    updatedAt: new Date(),
+  };
+
+  const response = await db
+    .update(decks)
+    .set(updatedDeck)
+    .where(eq(decks.id, deckId))
+    .execute();
+  if (response.success) {
+    return json({ message: "デッキを更新しました" }, { status: 200 });
+  }
+  return json({ message: "デッキの更新に失敗しました" }, { status: 500 });
 }

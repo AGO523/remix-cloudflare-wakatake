@@ -52,6 +52,7 @@ export const deckHistories = sqliteTable("deckHistories", {
   deckId: integer("deckId").notNull(),
   status: text("status").notNull().default("main"),
   content: text("content"),
+  publish_id: text("publish_code").default(""),
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
 });

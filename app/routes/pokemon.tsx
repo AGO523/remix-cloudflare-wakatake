@@ -15,7 +15,7 @@ export async function loader({ context }: LoaderFunctionArgs) {
   return json({ arts });
 }
 
-export default function Index() {
+export default function PokemonLayout() {
   // const { arts } = useLoaderData<typeof loader>();
 
   return (
