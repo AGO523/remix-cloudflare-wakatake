@@ -25,7 +25,7 @@ export default function DecksByUser() {
         デッキを登録する
       </Link>
       <h1 className="text-3xl font-bold mb-6">デッキ</h1>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {decks.map((deck) => (
           <Link
             to={`${deck.id}`}
@@ -38,7 +38,7 @@ export default function DecksByUser() {
               <img
                 src={deck.images[0].imageUrl}
                 alt={deck.title}
-                className="w-full h-64 object-cover rounded-md mb-4"
+                className="object-cover rounded-md mb-4"
               />
             )}
           </Link>
