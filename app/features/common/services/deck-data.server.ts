@@ -321,3 +321,45 @@ export async function updateDeck(
   }
   return json({ message: "デッキの更新に失敗しました" }, { status: 500 });
 }
+
+export async function deleteDeck(deckId: number, context: AppLoadContext) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  try {
+    // Delete images
+    const deleteImagesResponse = await db
+      .delete(deckImages)
+      .where(eq(deckImages.deckId, deckId))
+      .execute();
+
+    if (!deleteImagesResponse.success) {
+      throw new Error("Failed to delete deck images");
+    }
+
+    // Delete histories
+    const deleteHistoriesResponse = await db
+      .delete(deckHistories)
+      .where(eq(deckHistories.deckId, deckId))
+      .execute();
+
+    if (!deleteHistoriesResponse.success) {
+      throw new Error("Failed to delete deck histories");
+    }
+
+    // Delete the deck itself
+    const deleteDeckResponse = await db
+      .delete(decks)
+      .where(eq(decks.id, deckId))
+      .execute();
+
+    if (!deleteDeckResponse.success) {
+      throw new Error("Failed to delete deck");
+    }
+
+    return json({ message: "デッキを削除しました" }, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return json({ message: "デッキの削除に失敗しました" }, { status: 500 });
+  }
+}

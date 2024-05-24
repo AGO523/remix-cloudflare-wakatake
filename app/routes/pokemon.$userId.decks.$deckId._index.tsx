@@ -30,15 +30,19 @@ export default function DeckDetail() {
     <>
       <h1 className="text-3xl font-bold mb-6">{deck.title}</h1>
       <p className="text-gray-700 mb-4">{deck.description}</p>
-      {deck.images.length > 0 && (
-        <img
-          src={deck.images[0].imageUrl}
-          alt={deck.title}
-          className="object-cover rounded-md mb-4"
-        />
-      )}
+      <div className="m-4 flex justify-center">
+        {deck.images.length > 0 && (
+          <img
+            src={deck.images[0].imageUrl}
+            alt={deck.title}
+            className="object-cover rounded-md mb-4"
+          />
+        )}
+      </div>
+      {/* デッキコードをどのテーブルにもたせて、どうやって更新するか考える */}
       <div className="text-gray-600">
         {/* statusがmainを表示 */}
+        {/* スキーマを変更して、デフォルトをsub にする */}
         {/* 下書き、非公開、限定公開 */}
         {/* publish_idを作成する機能 */}
         <h4 className="font-medium">履歴</h4>
@@ -74,9 +78,14 @@ export default function DeckDetail() {
           戻る
         </button>
       </div>
-
-      {/* デッキコードの更新機能、タイトルの変更 */}
-      {/* デッキ削除機能 */}
+      <div>
+        <Link
+          to={`/pokemon/${currentUserId}/decks/${deck.id}/delete`}
+          className="btn btn-error mt-4"
+        >
+          削除
+        </Link>
+      </div>
     </>
   );
 }
