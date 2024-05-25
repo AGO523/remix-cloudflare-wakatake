@@ -51,8 +51,8 @@ export default function NewDeckHistory() {
   const isSubmitting = navigation.state === "submitting";
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
+    <div className="flex justify-center items-center">
+      <div className="bg-base-200 shadow-md rounded-lg p-8 max-w-3xl w-full">
         <h2 className="text-2xl font-semibold text-center mb-6">
           デッキ履歴を作成する
         </h2>

@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { Link, useLoaderData, useNavigate } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import { getDeckById } from "~/features/common/services/deck-data.server";
 
@@ -17,12 +17,12 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
   if (!deck) {
     throw new Response("Deck not found", { status: 404 });
   }
-  return json({ deck, user });
+  const paramsUserId = Number(params.userId);
+  return json({ deck, user, paramsUserId });
 }
 
 export default function DeckDetail() {
-  const { deck, user } = useLoaderData<typeof loader>();
-  const navigate = useNavigate();
+  const { deck, user, paramsUserId } = useLoaderData<typeof loader>();
   const currentUserId = user.id;
 
   // フィルタリングされた履歴を取得
@@ -51,11 +51,8 @@ export default function DeckDetail() {
         <h4 className="font-medium">履歴</h4>
         <div className="grid grid-cols-1 gap-6">
           {visibleHistories.map((history) => (
-            <div key={history.id} className="bg-white shadow-lg rounded-lg p-4">
-              <Link
-                to={`/pokemon/${currentUserId}/decks/${deck.id}/history/${history.id}`}
-                className="block"
-              >
+            <div key={history.id} className="shadow-lg rounded-lg p-4">
+              <Link to={`history/${history.id}`} className="block">
                 <h5 className="text-xl font-semibold mb-2">
                   {history.status === "main" && "公開"}
                   {history.status === "sub" && "非公開"}
@@ -73,35 +70,22 @@ export default function DeckDetail() {
         )}
         {deck.userId === currentUserId && (
           <>
-            <Link
-              to={`/pokemon/${currentUserId}/decks/${deck.id}/history/new`}
-              className="btn btn-primary m-2"
-            >
+            <Link to={`history/new`} className="btn btn-primary m-2">
               履歴を作成
             </Link>
-            <Link
-              to={`/pokemon/${currentUserId}/decks/${deck.id}/edit`}
-              className="btn btn-primary m-2"
-            >
+            <Link to={`edit`} className="btn btn-primary m-2">
               デッキ情報の更新
             </Link>
-            <Link
-              to={`/pokemon/${currentUserId}/decks/${deck.id}/delete`}
-              className="btn btn-error m-2"
-            >
+            <Link to={`delete`} className="btn btn-error m-2">
               削除
             </Link>
           </>
         )}
       </div>
       <div>
-        <button
-          type="button"
-          className="btn btn-error btn-sm m-2"
-          onClick={() => navigate(-1)}
-        >
-          戻る
-        </button>
+        <Link to={`/pokemon/${paramsUserId}/decks`} className="btn btn-primary">
+          デッキ一覧へ
+        </Link>
       </div>
     </>
   );
