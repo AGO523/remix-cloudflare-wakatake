@@ -1,0 +1,1 @@
+ALTER TABLE deckHistories ADD `publish_code` text DEFAULT '';
