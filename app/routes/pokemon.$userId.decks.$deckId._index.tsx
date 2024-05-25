@@ -17,12 +17,11 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
   if (!deck) {
     throw new Response("Deck not found", { status: 404 });
   }
-  const paramsUserId = Number(params.userId);
-  return json({ deck, user, paramsUserId });
+  return json({ deck, user });
 }
 
 export default function DeckDetail() {
-  const { deck, user, paramsUserId } = useLoaderData<typeof loader>();
+  const { deck, user } = useLoaderData<typeof loader>();
   const currentUserId = user.id;
 
   // フィルタリングされた履歴を取得
@@ -83,7 +82,7 @@ export default function DeckDetail() {
         )}
       </div>
       <div>
-        <Link to={`/pokemon/${paramsUserId}/decks`} className="btn btn-primary">
+        <Link to="../" className="btn btn-primary">
           デッキ一覧へ
         </Link>
       </div>

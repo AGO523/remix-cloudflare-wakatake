@@ -49,6 +49,11 @@ const updateDeckSchema = z.object({
   description: z.string().optional(),
 });
 
+const updateDeckHistorySchema = z.object({
+  status: z.string().min(1).max(100),
+  content: z.string().optional(),
+});
+
 export async function createDeck(formData: FormData, context: AppLoadContext) {
   const env = context.env as Env;
   const db = createClient(env.DB);
@@ -369,4 +374,58 @@ export async function deleteDeck(deckId: number, context: AppLoadContext) {
     console.error(error);
     return json({ message: "デッキの削除に失敗しました" }, { status: 500 });
   }
+}
+
+export async function updateDeckHistory(
+  deckHistoryId: number,
+  formData: FormData,
+  context: AppLoadContext
+) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  const formObject = {
+    status: formData.get("status") as string,
+    content: formData.get("content") as string,
+  };
+
+  const result = updateDeckHistorySchema.safeParse(formObject);
+  if (!result.success) {
+    return json(
+      { message: result.error.errors[0].message, errors: result.error },
+      { status: 400 }
+    );
+  }
+
+  const updatedDeckHistory = {
+    ...result.data,
+    updatedAt: new Date(),
+  };
+
+  const response = await db
+    .update(deckHistories)
+    .set(updatedDeckHistory)
+    .where(eq(deckHistories.id, deckHistoryId))
+    .execute();
+  if (response.success) {
+    return json({ message: "デッキ履歴を更新しました" }, { status: 200 });
+  }
+  return json({ message: "デッキ履歴の更新に失敗しました" }, { status: 500 });
+}
+
+export async function deleteDeckHistory(
+  deckHistoryId: number,
+  context: AppLoadContext
+) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  const response = await db
+    .delete(deckHistories)
+    .where(eq(deckHistories.id, deckHistoryId))
+    .execute();
+  if (response.success) {
+    return json({ message: "デッキ履歴を削除しました" }, { status: 200 });
+  }
+  return json({ message: "デッキ履歴の削除に失敗しました" }, { status: 500 });
 }
