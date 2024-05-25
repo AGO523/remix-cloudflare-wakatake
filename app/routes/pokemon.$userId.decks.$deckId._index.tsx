@@ -21,10 +21,18 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
 }
 
 export default function DeckDetail() {
-  const { deck } = useLoaderData<typeof loader>();
-  const { user } = useLoaderData<typeof loader>();
+  const { deck, user } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const currentUserId = user.id;
+
+  // フィルタリングされた履歴を取得
+  const visibleHistories = deck.histories.filter(
+    (history) => history.status === "main" || deck.userId === currentUserId
+  );
+
+  const hasHiddenHistories = deck.histories.some(
+    (history) => history.status !== "main" && deck.userId === currentUserId
+  );
 
   return (
     <>
@@ -39,35 +47,52 @@ export default function DeckDetail() {
           />
         )}
       </div>
-      {/* デッキコードをどのテーブルにもたせて、どうやって更新するか考える */}
       <div className="text-gray-600">
-        {/* statusがmainを表示 */}
-        {/* スキーマを変更して、デフォルトをsub にする */}
-        {/* 下書き、非公開、限定公開 */}
-        {/* publish_idを作成する機能 */}
         <h4 className="font-medium">履歴</h4>
-        {/* 履歴を作成する機能 */}
-        {/* 履歴を更新する機能 */}
-        {/* 履歴を削除する機能 */}
-        <ul className="list-disc pl-5">
-          {deck.histories.map((history) => (
-            <li key={history.id}>
+        <div className="grid grid-cols-1 gap-6">
+          {visibleHistories.map((history) => (
+            <div key={history.id} className="bg-white shadow-lg rounded-lg p-4">
               <Link
                 to={`/pokemon/${currentUserId}/decks/${deck.id}/history/${history.id}`}
+                className="block"
               >
-                {history.status}: {history.content}
+                <h5 className="text-xl font-semibold mb-2">
+                  {history.status === "main" && "公開"}
+                  {history.status === "sub" && "非公開"}
+                  {history.status === "draft" && "下書き"}
+                </h5>
+                <p className="text-gray-700">{history.content}</p>
               </Link>
-            </li>
+            </div>
           ))}
-        </ul>
-      </div>
-      <div>
-        <Link
-          to={`/pokemon/${currentUserId}/decks/${deck.id}/edit`}
-          className="btn btn-primary mt-4"
-        >
-          編集
-        </Link>
+        </div>
+        {hasHiddenHistories && (
+          <p className="text-error mt-4">
+            非公開または下書きの履歴は表示されていません。
+          </p>
+        )}
+        {deck.userId === currentUserId && (
+          <>
+            <Link
+              to={`/pokemon/${currentUserId}/decks/${deck.id}/history/new`}
+              className="btn btn-primary m-2"
+            >
+              履歴を作成
+            </Link>
+            <Link
+              to={`/pokemon/${currentUserId}/decks/${deck.id}/edit`}
+              className="btn btn-primary m-2"
+            >
+              デッキ情報の更新
+            </Link>
+            <Link
+              to={`/pokemon/${currentUserId}/decks/${deck.id}/delete`}
+              className="btn btn-error m-2"
+            >
+              削除
+            </Link>
+          </>
+        )}
       </div>
       <div>
         <button
@@ -77,14 +102,6 @@ export default function DeckDetail() {
         >
           戻る
         </button>
-      </div>
-      <div>
-        <Link
-          to={`/pokemon/${currentUserId}/decks/${deck.id}/delete`}
-          className="btn btn-error mt-4"
-        >
-          削除
-        </Link>
       </div>
     </>
   );
