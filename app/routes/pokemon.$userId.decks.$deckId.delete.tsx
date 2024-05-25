@@ -13,7 +13,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
 export default function DeleteDeckLayout() {
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-2">
       <Outlet />
     </div>
   );
