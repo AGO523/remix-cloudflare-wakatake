@@ -8,30 +8,39 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
   const user = await authenticator.isAuthenticated(request, {
     failureRedirect: "/login",
   });
-  const userId = Number(params.userId);
-  const decks = await getDecksBy(userId, context);
-  return json({ decks, user });
+  const paramsUserId = Number(params.userId);
+  const decks = await getDecksBy(paramsUserId, context);
+  return json({ decks, user, paramsUserId });
 }
 
 export default function DecksByUser() {
-  const { decks } = useLoaderData<typeof loader>();
+  const { decks, user, paramsUserId } = useLoaderData<typeof loader>();
+  const currentUserId = user.id;
 
   return (
     <>
-      <Link
-        to="/pokemon/deck/new"
-        className="btn btn-primary m-2"
-        prefetch="intent"
-      >
-        デッキを登録する
-      </Link>
+      {currentUserId === paramsUserId && (
+        <Link
+          to="/pokemon/deck/new"
+          className="btn btn-primary m-2"
+          prefetch="intent"
+        >
+          デッキを登録する
+        </Link>
+      )}
+
       <h1 className="text-3xl font-bold mb-6">デッキ</h1>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {decks.length === 0 && (
+          <p className="text-gray-700">
+            このユーザーのデッキはまだ登録されていません。
+          </p>
+        )}
         {decks.map((deck) => (
           <Link
             to={`${deck.id}`}
             key={deck.id}
-            className="block bg-white shadow-lg rounded-lg p-4 hover:shadow-xl transition-shadow"
+            className="block shadow-lg rounded-lg p-4 hover:shadow-xl transition-shadow"
           >
             <h3 className="text-xl font-semibold mb-2">{deck.title}</h3>
             <p className="text-gray-700 mb-4">{deck.description}</p>

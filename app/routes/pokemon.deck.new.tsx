@@ -34,19 +34,19 @@ export default function DeckNew() {
 
   return (
     <>
-      <div className="card max-w-lg bg-base-100 shadow-xl m-2">
-        <span>デッキを投稿する</span>
+      <div className="card bg-base-200 max-w-lg shadow-xl m-2">
+        <div className="m-2">デッキを作成する</div>
         <Form method="post">
           <input type="hidden" name="userId" value={user.id} />
           <input
             type="text"
-            placeholder="デッキコード"
+            placeholder="デッキコード（必須）"
             className="input input-bordered input-lg w-full max-w-xs m-2"
             name="code"
           />
           <input
             type="text"
-            placeholder="デッキ名"
+            placeholder="デッキ名（必須）"
             className="input input-bordered input-lg w-full max-w-xs m-2"
             name="title"
           />
