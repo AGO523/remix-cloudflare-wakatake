@@ -123,7 +123,11 @@ export async function createDeck(formData: FormData, context: AppLoadContext) {
   }
 
   // デッキの履歴を登録
-  const createDeckHistoryResponse = await createDeckHistory(newDeckId, db);
+  const createDeckHistoryResponse = await createDeckHistory(
+    newDeckId,
+    formData,
+    context
+  );
   if (createDeckHistoryResponse.status !== 201) {
     return json(
       { message: "デッキの履歴の登録に失敗しました" },
@@ -139,14 +143,17 @@ export async function createDeck(formData: FormData, context: AppLoadContext) {
 
 export async function createDeckHistory(
   deckId: number,
-  db: DrizzleD1Database<Record<string, never>>
+  formData: FormData,
+  context: AppLoadContext
 ) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
   const currentTime = new Date();
 
   const formObject = {
     deckId: deckId,
-    status: "main",
-    content: "内容は空です",
+    status: formData.get("status") as string,
+    content: (formData.get("content") as string) || "",
   };
   const result = createDeckHistorySchema.safeParse(formObject);
   if (!result.success) {
