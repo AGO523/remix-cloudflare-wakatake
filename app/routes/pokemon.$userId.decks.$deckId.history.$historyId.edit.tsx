@@ -74,7 +74,7 @@ export default function EditDeckHistory() {
             name="content"
             placeholder="内容"
             defaultValue={deckHistory.content ?? ""}
-            className="textarea textarea-bordered w-full"
+            className="textarea textarea-bordered w-full min-h-[400px]"
           ></textarea>
         </div>
         <div>

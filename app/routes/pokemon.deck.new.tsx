@@ -41,18 +41,18 @@ export default function DeckNew() {
           <input
             type="text"
             placeholder="デッキコード（必須）"
-            className="input input-bordered input-lg w-full max-w-xs m-2"
+            className="input input-bordered input-lg w-full m-2"
             name="code"
           />
           <input
             type="text"
             placeholder="デッキ名（必須）"
-            className="input input-bordered input-lg w-full max-w-xs m-2"
+            className="input input-bordered input-lg w-full m-2"
             name="title"
           />
           <textarea
             placeholder="デッキの説明"
-            className="textarea textarea-bordered textarea-lg w-full max-w-xs m-2"
+            className="textarea textarea-bordered textarea-lg w-full min-h-[400px] m-2"
             name="description"
           ></textarea>
           <button

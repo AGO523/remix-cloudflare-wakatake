@@ -64,7 +64,7 @@ export default function DeckDetail() {
         </div>
         {hasHiddenHistories && (
           <p className="text-error mt-4">
-            非公開または下書きの履歴は表示されていません。
+            非公開または下書きの履歴はあなたにだけ表示されています
           </p>
         )}
         {deck.userId === currentUserId && (

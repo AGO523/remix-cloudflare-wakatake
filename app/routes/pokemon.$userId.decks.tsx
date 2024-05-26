@@ -13,7 +13,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
 export default function DecksByUserLayout() {
   return (
-    <div className="container mx-auto p-2">
+    <div className="container mx-auto">
       <Outlet />
     </div>
   );
