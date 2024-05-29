@@ -2,7 +2,6 @@ import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import {
   Form,
   json,
-  redirect,
   useLoaderData,
   useNavigation,
   useNavigate,
@@ -12,6 +11,7 @@ import {
   getDeckById,
   updateDeck,
 } from "~/features/common/services/deck-data.server";
+import { redirectWithSuccess, redirectWithError } from "remix-toast";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -36,11 +36,20 @@ export const action = async ({
 }: LoaderFunctionArgs) => {
   const formData = await request.formData();
   const { deckId } = params;
+  const userId = formData.get("userId");
   const response = await updateDeck(Number(deckId), formData, context);
-  if (response && response.status === 200) {
-    return redirect(`/pokemon/${formData.get("userId")}/decks/${deckId}`);
+
+  const responseData = await response.json();
+  if (response.status === 200) {
+    return redirectWithSuccess(
+      `/pokemon/${userId}/decks/${deckId}`,
+      responseData.message
+    );
   }
-  return json({ message: "デッキの更新に失敗しました" }, { status: 500 });
+  return redirectWithError(
+    `/pokemon/${userId}/decks/${deckId}`,
+    responseData.message
+  );
 };
 
 export default function EditDeck() {

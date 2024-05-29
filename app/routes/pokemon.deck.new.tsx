@@ -1,13 +1,8 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
-import {
-  Form,
-  json,
-  redirect,
-  useLoaderData,
-  useNavigation,
-} from "@remix-run/react";
+import { Form, useLoaderData, useNavigation } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import { createDeck } from "~/features/common/services/deck-data.server";
+import { redirectWithSuccess, redirectWithError } from "remix-toast";
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -21,10 +16,14 @@ export const action = async ({ context, request }: LoaderFunctionArgs) => {
   const formData = await request.formData();
   const userId = formData.get("userId");
   const response = await createDeck(formData, context);
-  if (response && response.status === 201) {
-    return redirect(`/pokemon/${userId}/decks`);
+  const responseData = await response.json();
+  if (response.status === 201) {
+    return redirectWithSuccess(
+      `/pokemon/${userId}/decks`,
+      responseData.message
+    );
   }
-  return json({ message: "デッキの投稿に失敗しました" }, { status: 500 });
+  return redirectWithError(`/pokemon/${userId}/decks`, responseData.message);
 };
 
 export default function DeckNew() {

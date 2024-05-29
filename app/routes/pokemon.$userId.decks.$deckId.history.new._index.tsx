@@ -1,16 +1,11 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
-import {
-  Form,
-  json,
-  redirect,
-  useLoaderData,
-  useNavigation,
-} from "@remix-run/react";
+import { Form, json, useLoaderData, useNavigation } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getDeckById,
   createDeckHistory,
 } from "~/features/common/services/deck-data.server";
+import { redirectWithSuccess, redirectWithError } from "remix-toast";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -39,10 +34,18 @@ export const action = async ({
     throw new Response("Deck ID is required", { status: 400 });
   }
   const response = await createDeckHistory(Number(deckId), formData, context);
-  if (response && response.status === 201) {
-    return redirect(`/pokemon/${params.userId}/decks/${deckId}`);
+
+  const responseData = await response.json();
+  if (response.status === 201) {
+    return redirectWithSuccess(
+      `/pokemon/${formData.get("userId")}/decks/${deckId}`,
+      responseData.message
+    );
   }
-  return json({ message: "デッキ履歴の作成に失敗しました" }, { status: 500 });
+  return redirectWithError(
+    `/pokemon/${formData.get("userId")}/decks/${deckId}`,
+    responseData.message
+  );
 };
 
 export default function NewDeckHistory() {

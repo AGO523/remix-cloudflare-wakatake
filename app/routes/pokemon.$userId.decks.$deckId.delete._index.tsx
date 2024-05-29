@@ -2,7 +2,6 @@ import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import {
   Form,
   json,
-  redirect,
   useLoaderData,
   useNavigation,
   useNavigate,
@@ -12,6 +11,7 @@ import {
   getDeckById,
   deleteDeck,
 } from "~/features/common/services/deck-data.server";
+import { redirectWithSuccess, redirectWithError } from "remix-toast";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -35,10 +35,17 @@ export const action = async ({ params, context }: LoaderFunctionArgs) => {
     throw new Response("Deck ID is required", { status: 400 });
   }
   const response = await deleteDeck(Number(deckId), context);
-  if (response && response.status === 200) {
-    return redirect(`/pokemon/${params.userId}/decks`);
+  const responseData = await response.json();
+  if (response.status === 200) {
+    return redirectWithSuccess(
+      `/pokemon/${params.userId}/decks`,
+      responseData.message
+    );
   }
-  return json({ message: "デッキの削除に失敗しました" }, { status: 500 });
+  return redirectWithError(
+    `/pokemon/${params.userId}/decks`,
+    responseData.message
+  );
 };
 
 export default function DeleteDeck() {
