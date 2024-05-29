@@ -1,11 +1,12 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { json, redirect } from "@remix-run/cloudflare";
+import { json } from "@remix-run/cloudflare";
 import { Form, useLoaderData, useNavigation } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getDeckHistoryById,
   updateDeckHistory,
 } from "~/features/common/services/deck-data.server";
+import { redirectWithSuccess, redirectWithError } from "remix-toast";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -39,12 +40,18 @@ export const action = async ({
     formData,
     context
   );
+
+  const responseData = await response.json();
   if (response.status === 200) {
-    return redirect(
-      `/pokemon/${params.userId}/decks/${params.deckId}/history/${historyId}`
+    return redirectWithSuccess(
+      `/pokemon/${params.userId}/decks/${params.deckId}/history/${historyId}`,
+      responseData.message
     );
   }
-  return response;
+  return redirectWithError(
+    `/pokemon/${params.userId}/decks/${params.deckId}/history/${historyId}`,
+    responseData.message
+  );
 };
 
 export default function EditDeckHistory() {
