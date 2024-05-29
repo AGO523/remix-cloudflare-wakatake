@@ -54,6 +54,27 @@ const updateDeckHistorySchema = z.object({
   content: z.string().optional(),
 });
 
+async function fetchDeckImage(code: string): Promise<string | null> {
+  const deckImageUrlResponse = await fetch(
+    "https://pokemon-card-deck-scraper-ghyv6dyl6a-an.a.run.app/fetchDeck",
+    {
+      method: "POST",
+      body: JSON.stringify({ deckCode: code }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!deckImageUrlResponse.ok) {
+    return null;
+  }
+
+  const deckImageUrlJson =
+    (await deckImageUrlResponse.json()) as UploadResponse;
+  return deckImageUrlJson.url;
+}
+
 export async function createDeck(formData: FormData, context: AppLoadContext) {
   const env = context.env as Env;
   const db = createClient(env.DB);
@@ -73,25 +94,11 @@ export async function createDeck(formData: FormData, context: AppLoadContext) {
     );
   }
 
-  // デッキコードを使用して、デッキの画像を取得
-  const deckImageUrlResponse = await fetch(
-    "https://pokemon-card-deck-scraper-ghyv6dyl6a-an.a.run.app/fetchDeck",
-    {
-      method: "POST",
-      body: JSON.stringify({ deckCode: result.data.code }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
-
-  if (!deckImageUrlResponse.ok) {
+  const fetchResult = await fetchDeckImage(result.data.code);
+  if (!fetchResult) {
     return json({ message: "デッキ画像の取得に失敗しました" }, { status: 500 });
   }
-
-  const deckImageUrlJson =
-    (await deckImageUrlResponse.json()) as UploadResponse;
-  const imageUrl = deckImageUrlJson.url;
+  const imageUrl = fetchResult;
 
   const newDeck: CreateDeck = {
     ...result.data,
@@ -156,10 +163,11 @@ export async function createDeckHistory(
   const currentTime = new Date();
 
   const formObject = {
-    deckId: deckId,
-    status: formData.get("status") as string,
+    deckId,
+    status: (formData.get("status") as string) || "main",
     content: (formData.get("content") as string) || "",
   };
+
   const result = createDeckHistorySchema.safeParse(formObject);
   if (!result.success) {
     return json(

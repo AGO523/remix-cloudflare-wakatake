@@ -36,10 +36,8 @@ export const action = async ({ params, context }: LoaderFunctionArgs) => {
   }
   const response = await deleteDeck(Number(deckId), context);
   if (response && response.status === 200) {
-    console.log("Deck deleted successfully");
     return redirect(`/pokemon/${params.userId}/decks`);
   }
-  console.error("Failed to delete deck", response);
   return json({ message: "デッキの削除に失敗しました" }, { status: 500 });
 };
 

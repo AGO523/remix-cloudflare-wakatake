@@ -82,7 +82,7 @@ export default function NewDeckHistory() {
               name="content"
               id="content"
               placeholder="内容"
-              className="textarea textarea-bordered w-full"
+              className="textarea textarea-bordered w-full min-h-[400px]"
             ></textarea>
           </div>
           <div>

@@ -78,6 +78,27 @@
       "when": 1716538044955,
       "tag": "0010_striped_living_mummy",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1716761906024,
+      "tag": "0011_mean_doctor_spectrum",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1716847681671,
+      "tag": "0012_unusual_night_thrasher",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1716848493048,
+      "tag": "0013_flat_tempest",
+      "breakpoints": true
     }
   ]
 }

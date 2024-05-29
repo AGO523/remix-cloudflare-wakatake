@@ -30,7 +30,7 @@ export default function DecksByUser() {
       )}
 
       <h1 className="text-3xl font-bold mb-6">デッキ</h1>
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
         {decks.length === 0 && (
           <p className="text-gray-700">
             このユーザーのデッキはまだ登録されていません。
@@ -40,7 +40,7 @@ export default function DecksByUser() {
           <Link
             to={`${deck.id}`}
             key={deck.id}
-            className="block shadow-lg rounded-lg p-4 hover:shadow-xl transition-shadow"
+            className="block shadow-lg rounded-lg p-2 hover:shadow-xl transition-shadow"
           >
             <h3 className="text-xl font-semibold mb-2">{deck.title}</h3>
             <p className="text-gray-700 mb-4">{deck.description}</p>
