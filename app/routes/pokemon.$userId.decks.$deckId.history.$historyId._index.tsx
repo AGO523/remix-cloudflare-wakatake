@@ -30,7 +30,14 @@ export default function DeckHistoryDetail() {
   return (
     <div className="container mx-auto p-2">
       <h1 className="text-3xl font-bold mb-6">デッキ履歴詳細</h1>
-      <p className="text-gray-700 mb-4">{deckHistory.content}</p>
+      <p className="text-gray-700 mb-4">
+        {deckHistory.content?.split("\n").map((line, index) => (
+          <span key={index}>
+            {line}
+            <br />
+          </span>
+        ))}
+      </p>
       <p className="text-gray-700 mb-4">ステータス: {deckHistory.status}</p>
       <p className="text-gray-700 mb-4">
         作成日時: {new Date(deckHistory.createdAt).toLocaleString()}
