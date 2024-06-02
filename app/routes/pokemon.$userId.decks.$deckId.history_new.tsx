@@ -1,5 +1,12 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { Form, json, useLoaderData, useNavigation } from "@remix-run/react";
+import {
+  Form,
+  Link,
+  Outlet,
+  json,
+  useLoaderData,
+  useNavigation,
+} from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getDeckById,
@@ -55,7 +62,7 @@ export default function NewDeckHistory() {
 
   return (
     <div className="flex justify-center items-center">
-      <div className="bg-base-200 shadow-md rounded-lg p-8 max-w-3xl w-full">
+      <div className="w-full">
         <h2 className="text-2xl font-semibold text-center mb-6">
           デッキ履歴を作成する
         </h2>
@@ -98,6 +105,23 @@ export default function NewDeckHistory() {
             </button>
           </div>
         </Form>
+        <div className="flex justify-between mt-4">
+          <Link
+            to={`images`}
+            className="btn btn-primary w-1/2 mr-1"
+            preventScrollReset
+          >
+            画像を表示
+          </Link>
+          <Link
+            to={`upload`}
+            className="btn btn-primary w-1/2 ml-1"
+            preventScrollReset
+          >
+            画像をアップロード
+          </Link>
+        </div>
+        <Outlet />
       </div>
     </div>
   );

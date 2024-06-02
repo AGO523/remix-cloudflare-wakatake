@@ -59,7 +59,7 @@ export default function EditDeck() {
 
   return (
     <div className="flex justify-center items-center">
-      <div className="bg-base-200 shadow-md max-w-3xl rounded-lg p-8 w-full">
+      <div className="shadow-md rounded-lg p-8 w-full">
         <h2 className="text-2xl font-semibold text-center mb-6">
           デッキを編集する
         </h2>

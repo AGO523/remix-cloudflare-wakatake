@@ -11,7 +11,12 @@ export const Header: React.FC = () => {
       <div className="flex-none">
         <div className="btn btn-ghost ml-2">
           <Link to="/arts" prefetch="intent">
-            作品を見る
+            作品一覧
+          </Link>
+        </div>
+        <div className="btn btn-ghost ml-2">
+          <Link to="/pokemon" prefetch="intent">
+            ポケヒス
           </Link>
         </div>
         <div className="btn btn-ghost ml-2">
