@@ -2,7 +2,7 @@
 // このファイルはデータベースと接続してデータ操作を行う処理を記述する //
 /////////////////////////////////////////////////////////////
 import type { AppLoadContext } from "@remix-run/cloudflare";
-import { decks, deckHistories, deckImages } from "db/schema";
+import { decks, deckHistories, deckImages, cardImages } from "db/schema";
 import { InferInsertModel, eq, desc } from "drizzle-orm";
 import { createClient } from "~/features/common/services/db.server";
 import { json } from "@remix-run/cloudflare";
@@ -12,6 +12,7 @@ import { DrizzleD1Database } from "drizzle-orm/d1";
 type CreateDeck = InferInsertModel<typeof decks>;
 type CreateDeckHistory = InferInsertModel<typeof deckHistories>;
 type CreateDeckImage = InferInsertModel<typeof deckImages>;
+type createCardImage = InferInsertModel<typeof cardImages>;
 
 interface Env {
   DB: D1Database;
@@ -41,6 +42,12 @@ const createDeckHistorySchema = z.object({
 const createDeckImageSchema = z.object({
   deckId: z.number(),
   imageUrl: z.string(),
+});
+
+const createCardImageSchema = z.object({
+  userId: z.number(),
+  imageUrl: z.string(),
+  createdAt: z.date(),
 });
 
 const updateDeckSchema = z.object({
@@ -436,4 +443,102 @@ export async function deleteDeckHistory(
     return json({ message: "デッキ履歴を削除しました" }, { status: 200 });
   }
   return json({ message: "デッキ履歴の削除に失敗しました" }, { status: 500 });
+}
+
+export async function uploadAndCreateCardImage(
+  formData: FormData,
+  context: AppLoadContext
+) {
+  // 画像をGCSにアップロード
+  const uploadResponse = await uploadCardImage(formData, context);
+  if (!uploadResponse.success) {
+    return json({
+      message: uploadResponse.message,
+      status: 500,
+    });
+  }
+
+  const newFormData = {
+    userId: Number(formData.get("userId")),
+    imageUrl: uploadResponse.url,
+    createdAt: new Date(),
+  };
+
+  const result = createCardImageSchema.safeParse(newFormData);
+  if (!result.success) {
+    return json(
+      { message: result.error.errors[0].message, errors: result.error },
+      { status: 400 }
+    );
+  }
+
+  // 画像のURLをDBに保存
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+  const newCardImage: createCardImage = result.data;
+  const response = await db.insert(cardImages).values(newCardImage).execute();
+
+  if (response.success) {
+    return json({ message: "画像を追加しました", status: 201 });
+  }
+  return json({ message: "画像の追加に失敗しました", status: 500 });
+}
+
+// comaji の API を使って画像をアップロード
+export async function uploadCardImage(
+  formData: FormData,
+  context: AppLoadContext
+): Promise<UploadResponse> {
+  const env = context.env as Env;
+  const apiEndpoint = env.C_API_BASE_URL;
+  const authKey = env.C_AUTH_KEY;
+  const uploadFormData = new FormData();
+  const imageFile = formData.get("image");
+
+  if (imageFile && typeof imageFile !== "string") {
+    uploadFormData.append("image", imageFile);
+  } else {
+    return {
+      success: false,
+      message: "画像ファイルが不正です。",
+      url: "",
+    };
+  }
+
+  const response = await fetch(`${apiEndpoint}/upload`, {
+    method: "POST",
+    body: uploadFormData,
+    headers: {
+      "X-Auth-Key": authKey,
+    },
+  });
+
+  if (!response.ok) {
+    return {
+      success: false,
+      message: "画像のアップロードに失敗しました。",
+      url: "",
+    };
+  }
+
+  const data = (await response.json()) as UploadResponse;
+  return {
+    success: true,
+    message: "画像がアップロードされました",
+    url: data.url,
+  };
+}
+
+export async function getCardImagesBy(userId: number, context: AppLoadContext) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  const cardImagesData = await db
+    .select()
+    .from(cardImages)
+    .where(eq(cardImages.userId, userId))
+    .orderBy(desc(cardImages.createdAt))
+    .all();
+
+  return cardImagesData;
 }
