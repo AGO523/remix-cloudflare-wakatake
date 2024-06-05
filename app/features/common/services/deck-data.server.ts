@@ -2,17 +2,16 @@
 // このファイルはデータベースと接続してデータ操作を行う処理を記述する //
 /////////////////////////////////////////////////////////////
 import type { AppLoadContext } from "@remix-run/cloudflare";
-import { decks, deckHistories, deckImages, cardImages } from "db/schema";
+import { decks, deckHistories, cardImages, deckCodes } from "db/schema";
 import { InferInsertModel, eq, desc } from "drizzle-orm";
 import { createClient } from "~/features/common/services/db.server";
 import { json } from "@remix-run/cloudflare";
 import { z } from "zod";
-import { DrizzleD1Database } from "drizzle-orm/d1";
 
 type CreateDeck = InferInsertModel<typeof decks>;
 type CreateDeckHistory = InferInsertModel<typeof deckHistories>;
-type CreateDeckImage = InferInsertModel<typeof deckImages>;
 type createCardImage = InferInsertModel<typeof cardImages>;
+type createDeckCode = InferInsertModel<typeof deckCodes>;
 
 interface Env {
   DB: D1Database;
@@ -28,7 +27,6 @@ interface UploadResponse {
 
 const createDeckSchema = z.object({
   userId: z.number(),
-  code: z.string().min(1).max(100),
   title: z.string().min(1).max(300),
   description: z.string().optional(),
 });
@@ -39,15 +37,18 @@ const createDeckHistorySchema = z.object({
   content: z.string().optional(),
 });
 
-const createDeckImageSchema = z.object({
-  deckId: z.number(),
-  imageUrl: z.string(),
-});
-
 const createCardImageSchema = z.object({
   userId: z.number(),
   imageUrl: z.string(),
   createdAt: z.date(),
+});
+
+const createDeckCodeSchema = z.object({
+  deckId: z.number(),
+  historyId: z.number().optional(),
+  status: z.string().min(1).max(100),
+  code: z.string().min(1).max(100),
+  imageUrl: z.string().optional(),
 });
 
 const updateDeckSchema = z.object({
@@ -82,14 +83,19 @@ async function fetchDeckImage(code: string): Promise<string | null> {
   return deckImageUrlJson.url;
 }
 
+// デッキコードを受け取り外部 API にリクエストを送信
+// URLが返却される
+// decks にレコードを作成
+// deckHistories にレコードを作成
+// deckCodes にレコードを作成
 export async function createDeck(formData: FormData, context: AppLoadContext) {
   const env = context.env as Env;
   const db = createClient(env.DB);
   const currentTime = new Date();
+  const code = formData.get("code") as string;
 
   const formObject = {
     userId: Number(formData.get("userId")),
-    code: formData.get("code") as string,
     title: formData.get("title") as string,
     description: formData.get("description") as string,
   };
@@ -100,12 +106,6 @@ export async function createDeck(formData: FormData, context: AppLoadContext) {
       { status: 400 }
     );
   }
-
-  const fetchResult = await fetchDeckImage(result.data.code);
-  if (!fetchResult) {
-    return json({ message: "デッキ画像の取得に失敗しました" }, { status: 500 });
-  }
-  const imageUrl = fetchResult;
 
   const newDeck: CreateDeck = {
     ...result.data,
@@ -128,19 +128,6 @@ export async function createDeck(formData: FormData, context: AppLoadContext) {
     .execute();
   const newDeckId = insertedRecord[0].id;
 
-  // デッキの画像を登録
-  const createDeckImageResponse = await createDeckImage(
-    newDeckId,
-    imageUrl,
-    db
-  );
-  if (createDeckImageResponse.status !== 201) {
-    return json(
-      { message: "デッキの画像の登録に失敗しました" },
-      { status: 500 }
-    );
-  }
-
   // デッキの履歴を登録
   const createDeckHistoryResponse = await createDeckHistory(
     newDeckId,
@@ -150,6 +137,31 @@ export async function createDeck(formData: FormData, context: AppLoadContext) {
   if (createDeckHistoryResponse.status !== 201) {
     return json(
       { message: "デッキの履歴の登録に失敗しました" },
+      { status: 500 }
+    );
+  }
+
+  // 直前のデッキ履歴のIDを取得
+  const insertedHistoryRecord = await db
+    .select()
+    .from(deckHistories)
+    .where(eq(deckHistories.deckId, newDeckId))
+    .orderBy(desc(deckHistories.createdAt))
+    .limit(1)
+    .execute();
+  const newDeckHistoryId = insertedHistoryRecord[0].id;
+
+  // デッキコードを登録
+  const createDeckCodeResponse = await createDeckCode(
+    newDeckId,
+    newDeckHistoryId,
+    code,
+    true,
+    context
+  );
+  if (createDeckCodeResponse.status !== 201) {
+    return json(
+      { message: "デッキコードの登録に失敗しました" },
       { status: 500 }
     );
   }
@@ -172,7 +184,9 @@ export async function createDeckHistory(
   const formObject = {
     deckId,
     status: (formData.get("status") as string) || "main",
-    content: (formData.get("content") as string) || "",
+    content: (formData.get("content") as string) || "内容は空です",
+    first: formData.get("first") || false,
+    code: (formData.get("code") as string) || "",
   };
 
   const result = createDeckHistorySchema.safeParse(formObject);
@@ -193,28 +207,81 @@ export async function createDeckHistory(
     .insert(deckHistories)
     .values(newDeckHistory)
     .execute();
-  if (response.success) {
-    return json({ message: "デッキの履歴を登録しました" }, { status: 201 });
-  } else {
+  if (!response.success) {
+    return json({ message: "デッキ履歴の登録に失敗しました" }, { status: 500 });
+  }
+
+  // 直前にインサートされたレコードを取得
+  const insertedRecord = await db
+    .select()
+    .from(deckHistories)
+    .where(eq(deckHistories.deckId, deckId))
+    .orderBy(desc(deckHistories.createdAt))
+    .limit(1)
+    .execute();
+
+  // デッキコードを登録
+  const createDeckCodeResponse = await createDeckCode(
+    deckId,
+    insertedRecord[0].id,
+    formObject.code,
+    formObject.first as boolean,
+    context
+  );
+
+  if (createDeckCodeResponse.status !== 201) {
     return json(
-      { message: "デッキの履歴の登録に失敗しました" },
+      { message: "デッキコードの登録に失敗しました" },
       { status: 500 }
     );
   }
+
+  // first が true の場合 deckCodes を main にして、他のデッキコードを sub にする
+  const updateDeckCodeResponse = await updateDeckCoeToMain(
+    deckId,
+    insertedRecord[0].id,
+    context
+  );
+
+  if (updateDeckCodeResponse.status !== 200) {
+    return json(
+      { message: "デッキコードのステータスの更新に失敗しました" },
+      { status: 500 }
+    );
+  }
+
+  return json({ message: "デッキ履歴を登録しました" }, { status: 201 });
 }
 
-export async function createDeckImage(
+// code を受け取り、fetchDeckImage で画像を取得
+// status が main にするか sub にするかパラメーター(first)で判定
+export async function createDeckCode(
   deckId: number,
-  imageUrl: string,
-  db: DrizzleD1Database<Record<string, never>>
+  historyId: number,
+  code: string,
+  first: boolean,
+  context: AppLoadContext
 ) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
   const currentTime = new Date();
+  const codeStatus = first ? "main" : "sub";
+
+  const fetchResult = await fetchDeckImage(code);
+  if (!fetchResult) {
+    return json({ message: "デッキ画像の取得に失敗しました" }, { status: 500 });
+  }
+  const imageUrl = fetchResult;
 
   const formObject = {
-    deckId: deckId,
-    imageUrl: imageUrl,
+    deckId,
+    historyId,
+    status: codeStatus,
+    code,
+    imageUrl,
   };
-  const result = createDeckImageSchema.safeParse(formObject);
+
+  const result = createDeckCodeSchema.safeParse(formObject);
   if (!result.success) {
     return json(
       { message: result.error.errors[0].message, errors: result.error },
@@ -222,18 +289,17 @@ export async function createDeckImage(
     );
   }
 
-  const newDeckImage: CreateDeckImage = {
+  const newDeckCode = {
     ...result.data,
     createdAt: currentTime,
   };
 
-  const response = await db.insert(deckImages).values(newDeckImage).execute();
+  const response = await db.insert(deckCodes).values(newDeckCode).execute();
   if (response.success) {
-    return json({ message: "デッキの画像を登録しました" }, { status: 201 });
+    return json({ message: "デッキコードを登録しました" }, { status: 201 });
   }
-  return json({ message: "デッキの画像の登録に失敗しました" }, { status: 500 });
+  return json({ message: "デッキコードの登録に失敗しました" }, { status: 500 });
 }
-
 export async function getDecksBy(userId: number, context: AppLoadContext) {
   const env = context.env as Env;
   const db = createClient(env.DB);
@@ -247,23 +313,19 @@ export async function getDecksBy(userId: number, context: AppLoadContext) {
 
   const decksWithDetails = await Promise.all(
     decksData.map(async (deck) => {
-      const images = await db
-        .select()
-        .from(deckImages)
-        .where(eq(deckImages.deckId, deck.id))
-        .all();
-
       const histories = await db
         .select()
         .from(deckHistories)
         .where(eq(deckHistories.deckId, deck.id))
         .all();
 
-      return {
-        ...deck,
-        images,
-        histories,
-      };
+      const codes = await db
+        .select()
+        .from(deckCodes)
+        .where(eq(deckCodes.deckId, deck.id))
+        .all();
+
+      return { ...deck, histories, codes };
     })
   );
 
@@ -280,19 +342,19 @@ export async function getDeckById(deckId: number, context: AppLoadContext) {
     return null;
   }
 
-  const images = await db
-    .select()
-    .from(deckImages)
-    .where(eq(deckImages.deckId, deck.id))
-    .all();
-
   const histories = await db
     .select()
     .from(deckHistories)
     .where(eq(deckHistories.deckId, deck.id))
     .all();
 
-  return { ...deck, images, histories };
+  const codes = await db
+    .select()
+    .from(deckCodes)
+    .where(eq(deckCodes.deckId, deck.id))
+    .all();
+
+  return { ...deck, histories, codes };
 }
 
 export async function getDeckHistoryById(
@@ -320,7 +382,6 @@ export async function updateDeck(
   const db = createClient(env.DB);
 
   const formObject = {
-    code: formData.get("code") as string,
     title: formData.get("title") as string,
     description: formData.get("description") as string,
   };
@@ -354,17 +415,15 @@ export async function deleteDeck(deckId: number, context: AppLoadContext) {
   const db = createClient(env.DB);
 
   try {
-    // Delete images
     const deleteImagesResponse = await db
-      .delete(deckImages)
-      .where(eq(deckImages.deckId, deckId))
+      .delete(deckCodes)
+      .where(eq(deckCodes.deckId, deckId))
       .execute();
 
     if (!deleteImagesResponse.success) {
       throw new Error("Failed to delete deck images");
     }
 
-    // Delete histories
     const deleteHistoriesResponse = await db
       .delete(deckHistories)
       .where(eq(deckHistories.deckId, deckId))
@@ -374,7 +433,6 @@ export async function deleteDeck(deckId: number, context: AppLoadContext) {
       throw new Error("Failed to delete deck histories");
     }
 
-    // Delete the deck itself
     const deleteDeckResponse = await db
       .delete(decks)
       .where(eq(decks.id, deckId))
@@ -541,4 +599,68 @@ export async function getCardImagesBy(userId: number, context: AppLoadContext) {
     .all();
 
   return cardImagesData;
+}
+
+export async function getDeckCodeByDeckId(
+  deckId: number,
+  context: AppLoadContext
+) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  const deckCode = await db
+    .select()
+    .from(deckCodes)
+    .where(eq(deckCodes.deckId, deckId))
+    .get();
+
+  return deckCode;
+}
+
+export async function getDeckCodeByHistoryId(
+  historyId: number,
+  context: AppLoadContext
+) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  const deckCode = await db
+    .select()
+    .from(deckCodes)
+    .where(eq(deckCodes.historyId, historyId))
+    .get();
+
+  return deckCode;
+}
+
+export async function updateDeckCoeToMain(
+  deckId: number,
+  historyId: number,
+  context: AppLoadContext
+) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  const response = await db
+    .update(deckCodes)
+    .set({ status: "main" })
+    .where(eq(deckCodes.historyId, historyId))
+    .execute();
+
+  if (response.success) {
+    return json({ message: "デッキコードのステータスを更新しました" }, 200);
+  }
+
+  // 他のdeckIdに紐づくデッキコードのステータスを sub に戻す
+  const resetResponse = await db
+    .update(deckCodes)
+    .set({ status: "sub" })
+    .where(eq(deckCodes.deckId, deckId))
+    .execute();
+
+  if (resetResponse.success) {
+    return json({ message: "デッキコードのステータスを更新しました" }, 200);
+  }
+
+  return json({ message: "デッキコードのステータスの更新に失敗しました" }, 500);
 }

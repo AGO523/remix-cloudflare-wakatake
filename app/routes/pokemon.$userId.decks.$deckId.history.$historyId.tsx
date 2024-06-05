@@ -2,7 +2,10 @@ import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
-import { getDeckHistoryById } from "~/features/common/services/deck-data.server";
+import {
+  getDeckHistoryById,
+  getDeckCodeByHistoryId,
+} from "~/features/common/services/deck-data.server";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -15,16 +18,18 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
   }
 
   const { historyId } = params;
+  // デッキコードがある場合にはデッキコードを取得
   const deckHistory = await getDeckHistoryById(Number(historyId), context);
+  const deckCode = await getDeckCodeByHistoryId(Number(historyId), context);
   if (!deckHistory) {
     throw new Response("Deck History not found", { status: 404 });
   }
 
-  return json({ deckHistory, user });
+  return json({ deckHistory, deckCode, user });
 }
 
 export default function DeckHistoryDetail() {
-  const { deckHistory, user } = useLoaderData<typeof loader>();
+  const { deckHistory, deckCode, user } = useLoaderData<typeof loader>();
   const currentUserId = user.id;
 
   return (
@@ -44,8 +49,18 @@ export default function DeckHistoryDetail() {
         {deckHistory.status === "draft" && "下書き"}
       </p>
       <p className="text-gray-700 mb-4">
-        作成日時: {new Date(deckHistory.createdAt).toLocaleString()}
+        作成日時:{" "}
+        {deckHistory.createdAt
+          ? new Date(deckHistory.createdAt).toLocaleString()
+          : ""}
       </p>
+      {deckCode && deckCode.imageUrl && deckCode.status === "sub" && (
+        <img
+          src={deckCode.imageUrl}
+          alt="デッキの画像"
+          className="object-cover rounded-md mb-4"
+        />
+      )}
       {currentUserId && (
         <>
           <Link to="edit" className="btn btn-primary mt-4" preventScrollReset>
