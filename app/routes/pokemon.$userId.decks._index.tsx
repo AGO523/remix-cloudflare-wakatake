@@ -44,9 +44,9 @@ export default function DecksByUser() {
           >
             <h3 className="text-xl font-semibold mb-2">{deck.title}</h3>
             <p className="text-gray-700 mb-4">{deck.description}</p>
-            {deck.images.length > 0 && (
+            {deck.codes.length > 0 && (
               <img
-                src={deck.images[0].imageUrl}
+                src={deck.codes[0].imageUrl}
                 alt={deck.title}
                 className="object-cover rounded-md mb-4"
               />

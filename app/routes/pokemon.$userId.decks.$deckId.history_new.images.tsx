@@ -41,7 +41,7 @@ export default function NewDeckHistory() {
       {loading ? (
         <p className="text-center">画像を読み込んでいます...</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
           {cardImages.map((cardImage) => (
             <button
               key={cardImage.id}

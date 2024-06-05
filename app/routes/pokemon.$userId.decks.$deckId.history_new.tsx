@@ -96,6 +96,30 @@ export default function NewDeckHistory() {
             ></textarea>
           </div>
           <div>
+            <label htmlFor="content" className="block mb-2">
+              デッキコード
+            </label>
+            <input
+              type="text"
+              name="code"
+              id="code"
+              placeholder="デッキコード"
+              className="input input-bordered w-full"
+            />
+            <p className="text-gray-600 text-sm">
+              履歴にデッキ画像を表示する場合は、デッキコードを入力してください。
+            </p>
+            <input
+              type="checkbox"
+              name="first"
+              id="first"
+              className="checkbox checkbox-primary mt-2"
+            />
+            <p className="text-gray-600 text-sm">
+              デッキのメイン画像にする場合はチェックを入れてください。
+            </p>
+          </div>
+          <div>
             <button
               type="submit"
               className="btn btn-primary w-full"
@@ -103,6 +127,9 @@ export default function NewDeckHistory() {
             >
               {isSubmitting ? "デッキ履歴を作成しています..." : "作成"}
             </button>
+            <p className="text-error text-sm">
+              デッキコードを入力している場合は、作成に時間がかかることがあります。10秒から30秒程度お待ちください。
+            </p>
           </div>
         </Form>
         <div className="flex justify-between mt-4">

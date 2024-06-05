@@ -36,9 +36,9 @@ export default function DeckDetail() {
         ))}
       </p>
       <div className="flex justify-center">
-        {deck.images.length > 0 && (
+        {deck.codes.length > 0 && deck.codes[0].status === "main" && (
           <img
-            src={deck.images[0].imageUrl}
+            src={deck.codes[0].imageUrl}
             alt={deck.title}
             className="object-cover rounded-md mb-4"
           />

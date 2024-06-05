@@ -39,11 +39,24 @@ export const dialies = sqliteTable("dialies", {
 export const decks = sqliteTable("decks", {
   id: integer("id").primaryKey().notNull(),
   userId: integer("userId").notNull(),
-  code: text("code").notNull(),
   title: text("title").notNull().default("新規デッキ"),
   description: text("description"),
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+});
+
+// decks と１対多の関係の deckCodes テーブル
+// status が main の場合、deck のメイン画像として使用する
+// deckHistories で使用するコードを保存する
+// deckHistories で使用する画像を保存する
+export const deckCodes = sqliteTable("deckCodes", {
+  id: integer("id").primaryKey().notNull(),
+  deckId: integer("deckId").notNull(),
+  historyId: integer("historyId"),
+  status: text("status").notNull().default("sub"),
+  code: text("code").notNull(),
+  imageUrl: text("imageUrl").notNull().default(""),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
 });
 
 // decks と１対多の関係の deckHistories テーブル
@@ -57,6 +70,7 @@ export const deckHistories = sqliteTable("deckHistories", {
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
 });
 
+// TODO: remove later
 // decks と１対多の関係の deckImages テーブル
 export const deckImages = sqliteTable("deckImages", {
   id: integer("id").primaryKey().notNull(),
