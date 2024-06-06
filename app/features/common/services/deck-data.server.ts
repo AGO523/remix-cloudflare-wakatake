@@ -29,6 +29,7 @@ const createDeckSchema = z.object({
   userId: z.number(),
   title: z.string().min(1).max(300),
   description: z.string().optional(),
+  code: z.string().min(1).max(100),
 });
 
 const createDeckHistorySchema = z.object({
@@ -52,7 +53,6 @@ const createDeckCodeSchema = z.object({
 });
 
 const updateDeckSchema = z.object({
-  code: z.string().min(1).max(100),
   title: z.string().min(1).max(300),
   description: z.string().optional(),
 });
@@ -92,12 +92,12 @@ export async function createDeck(formData: FormData, context: AppLoadContext) {
   const env = context.env as Env;
   const db = createClient(env.DB);
   const currentTime = new Date();
-  const code = formData.get("code") as string;
 
   const formObject = {
     userId: Number(formData.get("userId")),
     title: formData.get("title") as string,
     description: formData.get("description") as string,
+    code: formData.get("code") as string,
   };
   const result = createDeckSchema.safeParse(formObject);
   if (!result.success) {
@@ -128,6 +128,9 @@ export async function createDeck(formData: FormData, context: AppLoadContext) {
     .execute();
   const newDeckId = insertedRecord[0].id;
 
+  // formData に first: true を追加
+  formData.append("first", "true");
+
   // デッキの履歴を登録
   const createDeckHistoryResponse = await createDeckHistory(
     newDeckId,
@@ -137,31 +140,6 @@ export async function createDeck(formData: FormData, context: AppLoadContext) {
   if (createDeckHistoryResponse.status !== 201) {
     return json(
       { message: "デッキの履歴の登録に失敗しました" },
-      { status: 500 }
-    );
-  }
-
-  // 直前のデッキ履歴のIDを取得
-  const insertedHistoryRecord = await db
-    .select()
-    .from(deckHistories)
-    .where(eq(deckHistories.deckId, newDeckId))
-    .orderBy(desc(deckHistories.createdAt))
-    .limit(1)
-    .execute();
-  const newDeckHistoryId = insertedHistoryRecord[0].id;
-
-  // デッキコードを登録
-  const createDeckCodeResponse = await createDeckCode(
-    newDeckId,
-    newDeckHistoryId,
-    code,
-    true,
-    context
-  );
-  if (createDeckCodeResponse.status !== 201) {
-    return json(
-      { message: "デッキコードの登録に失敗しました" },
       { status: 500 }
     );
   }
@@ -185,7 +163,7 @@ export async function createDeckHistory(
     deckId,
     status: (formData.get("status") as string) || "main",
     content: (formData.get("content") as string) || "内容は空です",
-    first: formData.get("first") || false,
+    first: formData.get("first") === "on" || formData.get("first") === "true",
     code: (formData.get("code") as string) || "",
   };
 
@@ -237,17 +215,19 @@ export async function createDeckHistory(
   }
 
   // first が true の場合 deckCodes を main にして、他のデッキコードを sub にする
-  const updateDeckCodeResponse = await updateDeckCoeToMain(
-    deckId,
-    insertedRecord[0].id,
-    context
-  );
-
-  if (updateDeckCodeResponse.status !== 200) {
-    return json(
-      { message: "デッキコードのステータスの更新に失敗しました" },
-      { status: 500 }
+  if (formObject.first) {
+    const updateDeckCodeResponse = await updateDeckCoeToMain(
+      deckId,
+      insertedRecord[0].id,
+      context
     );
+
+    if (updateDeckCodeResponse.status !== 200) {
+      return json(
+        { message: "デッキコードのステータスの更新に失敗しました" },
+        { status: 500 }
+      );
+    }
   }
 
   return json({ message: "デッキ履歴を登録しました" }, { status: 201 });
@@ -300,6 +280,7 @@ export async function createDeckCode(
   }
   return json({ message: "デッキコードの登録に失敗しました" }, { status: 500 });
 }
+
 export async function getDecksBy(userId: number, context: AppLoadContext) {
   const env = context.env as Env;
   const db = createClient(env.DB);
