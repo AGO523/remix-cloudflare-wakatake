@@ -33,38 +33,42 @@ export default function DeckNew() {
 
   return (
     <>
-      <div className="card bg-base-200 max-w-3xl shadow-xl p-2">
-        <div className="m-4">デッキを作成する</div>
-        <Form method="post">
-          <input type="hidden" name="userId" value={user.id} />
-          <input
-            type="text"
-            placeholder="デッキコード（必須）"
-            className="input input-bordered input-lg w-full mt-2"
-            name="code"
-          />
-          <input
-            type="text"
-            placeholder="デッキ名（必須）"
-            className="input input-bordered input-lg w-full mt-2"
-            name="title"
-          />
-          <textarea
-            placeholder="デッキの説明"
-            className="textarea textarea-bordered textarea-lg w-full min-h-[400px] mt-2"
-            name="description"
-          ></textarea>
-          <button
-            type="submit"
-            className="btn btn-primary w-full max-w-xs mt-2"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "デッキを作成しています..." : "送信"}
-          </button>
-          <p className="text-xs text-error mt-2">
-            通信状況によっては、デッキの作成に時間がかかることがあります。10秒から30秒程度お待ちください。
-          </p>
-        </Form>
+      <div className="flex justify-center items-center">
+        <div className="w-full">
+          <h2 className="text-2xl font-semibold text-center mb-6">
+            デッキを作成する
+          </h2>
+          <Form method="post">
+            <input type="hidden" name="userId" value={user.id} />
+            <input
+              type="text"
+              placeholder="デッキコード（必須）"
+              className="input input-bordered input-lg w-full mt-2"
+              name="code"
+            />
+            <input
+              type="text"
+              placeholder="デッキ名（必須）"
+              className="input input-bordered input-lg w-full mt-2"
+              name="title"
+            />
+            <textarea
+              placeholder="デッキの説明"
+              className="textarea textarea-bordered textarea-lg w-full min-h-[400px] mt-2"
+              name="description"
+            ></textarea>
+            <button
+              type="submit"
+              className="btn btn-primary w-full max-w-xs mt-2"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "デッキを作成しています..." : "送信"}
+            </button>
+            <p className="text-xs text-error mt-2">
+              通信状況によっては、デッキの作成に時間がかかることがあります。10秒から30秒程度お待ちください。
+            </p>
+          </Form>
+        </div>
       </div>
     </>
   );

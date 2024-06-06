@@ -66,17 +66,6 @@ export default function EditDeck() {
         <Form method="post" className="space-y-4">
           <input type="hidden" name="userId" value={user.id} />
           <div>
-            <span className="text-gray-700">デッキコード</span>
-            <input
-              type="text"
-              name="code"
-              placeholder="デッキコード"
-              defaultValue={deck.code || ""}
-              className="input input-bordered w-full"
-              required
-            />
-          </div>
-          <div>
             <span className="text-gray-700">デッキ名</span>
             <input
               type="text"
