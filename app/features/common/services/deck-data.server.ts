@@ -158,6 +158,7 @@ export async function createDeckHistory(
   const env = context.env as Env;
   const db = createClient(env.DB);
   const currentTime = new Date();
+  const isDeckCode = formData.get("code") ? true : false;
 
   const formObject = {
     deckId,
@@ -189,44 +190,46 @@ export async function createDeckHistory(
     return json({ message: "デッキ履歴の登録に失敗しました" }, { status: 500 });
   }
 
-  // 直前にインサートされたレコードを取得
-  const insertedRecord = await db
-    .select()
-    .from(deckHistories)
-    .where(eq(deckHistories.deckId, deckId))
-    .orderBy(desc(deckHistories.createdAt))
-    .limit(1)
-    .execute();
+  if (isDeckCode) {
+    // 直前にインサートされたレコードを取得
+    const insertedRecord = await db
+      .select()
+      .from(deckHistories)
+      .where(eq(deckHistories.deckId, deckId))
+      .orderBy(desc(deckHistories.createdAt))
+      .limit(1)
+      .execute();
 
-  // デッキコードを登録
-  const createDeckCodeResponse = await createDeckCode(
-    deckId,
-    insertedRecord[0].id,
-    formObject.code,
-    formObject.first as boolean,
-    context
-  );
-
-  if (createDeckCodeResponse.status !== 201) {
-    return json(
-      { message: "デッキコードの登録に失敗しました" },
-      { status: 500 }
-    );
-  }
-
-  // first が true の場合 deckCodes を main にして、他のデッキコードを sub にする
-  if (formObject.first) {
-    const updateDeckCodeResponse = await updateDeckCoeToMain(
+    // デッキコードを登録
+    const createDeckCodeResponse = await createDeckCode(
       deckId,
       insertedRecord[0].id,
+      formObject.code,
+      formObject.first as boolean,
       context
     );
 
-    if (updateDeckCodeResponse.status !== 200) {
+    if (createDeckCodeResponse.status !== 201) {
       return json(
-        { message: "デッキコードのステータスの更新に失敗しました" },
+        { message: "デッキコードの登録に失敗しました" },
         { status: 500 }
       );
+    }
+
+    // first が true の場合 deckCodes を main にして、他のデッキコードを sub にする
+    if (formObject.first) {
+      const updateDeckCodeResponse = await updateDeckCoeToMain(
+        deckId,
+        insertedRecord[0].id,
+        context
+      );
+
+      if (updateDeckCodeResponse.status !== 200) {
+        return json(
+          { message: "デッキコードのステータスの更新に失敗しました" },
+          { status: 500 }
+        );
+      }
     }
   }
 
