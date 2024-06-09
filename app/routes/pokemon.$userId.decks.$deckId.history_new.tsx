@@ -70,9 +70,6 @@ export default function NewDeckHistory() {
           <input type="hidden" name="deckId" value={deck.id} />
           <input type="hidden" name="userId" value={user.id} />
           <div>
-            <label htmlFor="status" className="block mb-2">
-              ステータス
-            </label>
             <select
               name="status"
               id="status"
@@ -85,20 +82,14 @@ export default function NewDeckHistory() {
             </select>
           </div>
           <div>
-            <label htmlFor="content" className="block mb-2">
-              内容
-            </label>
             <textarea
               name="content"
               id="content"
               placeholder="内容"
-              className="textarea textarea-bordered w-full min-h-[400px]"
+              className="textarea textarea-bordered w-full min-h-[300px]"
             ></textarea>
           </div>
           <div>
-            <label htmlFor="content" className="block mb-2">
-              デッキコード
-            </label>
             <input
               type="text"
               name="code"

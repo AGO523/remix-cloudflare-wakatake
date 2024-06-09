@@ -49,20 +49,6 @@ export default function DeckDetail() {
         {deck.userId === currentUserId && (
           <>
             <Link
-              to="./"
-              className="btn btn-primary btn-sm m-2"
-              preventScrollReset
-            >
-              履歴一覧
-            </Link>
-            <Link
-              to={`history_new`}
-              className="btn btn-primary btn-sm m-2"
-              preventScrollReset
-            >
-              履歴を作成
-            </Link>
-            <Link
               to={`edit`}
               className="btn btn-primary btn-sm m-2"
               preventScrollReset
@@ -74,13 +60,26 @@ export default function DeckDetail() {
               className="btn btn-error btn-sm m-2"
               preventScrollReset
             >
-              削除
+              デッキの削除
             </Link>
           </>
         )}
-        <Link to="../" className="btn btn-secondary btn-sm">
-          デッキ一覧へ
+      </div>
+      <div className="text-gray-600">
+        <Link to="./" className="btn btn-primary btn-sm m-2" preventScrollReset>
+          履歴一覧
         </Link>
+        {deck.userId === currentUserId && (
+          <>
+            <Link
+              to={`history_new`}
+              className="btn btn-primary btn-sm m-2"
+              preventScrollReset
+            >
+              履歴を作成
+            </Link>
+          </>
+        )}
       </div>
       <Outlet />
     </div>

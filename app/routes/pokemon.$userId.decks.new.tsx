@@ -54,7 +54,7 @@ export default function DeckNew() {
             />
             <textarea
               placeholder="デッキの説明"
-              className="textarea textarea-bordered textarea-lg w-full min-h-[400px] mt-2"
+              className="textarea textarea-bordered textarea-lg w-full min-h-[300px] mt-2"
               name="description"
             ></textarea>
             <button
@@ -62,7 +62,7 @@ export default function DeckNew() {
               className="btn btn-primary w-full max-w-xs mt-2"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "デッキを作成しています..." : "送信"}
+              {isSubmitting ? "デッキを作成しています..." : "作成"}
             </button>
             <p className="text-xs text-error mt-2">
               通信状況によっては、デッキの作成に時間がかかることがあります。10秒から30秒程度お待ちください。

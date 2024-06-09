@@ -82,7 +82,7 @@ export default function EditDeck() {
               name="description"
               placeholder="デッキの説明"
               defaultValue={deck.description || ""}
-              className="textarea textarea-bordered w-full min-h-[400px]"
+              className="textarea textarea-bordered w-full min-h-[300px]"
             ></textarea>
           </div>
           <div>
