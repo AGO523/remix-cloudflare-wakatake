@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { Form, useLoaderData, useNavigation } from "@remix-run/react";
+import { Form, Link, useLoaderData, useNavigation } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getDeckHistoryById,
@@ -60,7 +60,7 @@ export default function EditDeckHistory() {
   const isSubmitting = navigation.state === "submitting";
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="mt-6">
       <h2 className="text-2xl font-semibold text-center mb-6">
         デッキ履歴を編集する
       </h2>
@@ -87,12 +87,15 @@ export default function EditDeckHistory() {
         <div>
           <button
             type="submit"
-            className="btn btn-primary w-full"
+            className="btn btn-primary w-full max-w-xs"
             disabled={isSubmitting}
           >
             {isSubmitting ? "更新中..." : "更新"}
           </button>
         </div>
+        <Link to="../" className="btn mt-4" preventScrollReset>
+          戻る
+        </Link>
       </Form>
     </div>
   );
