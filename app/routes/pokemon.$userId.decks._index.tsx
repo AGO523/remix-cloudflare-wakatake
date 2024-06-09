@@ -19,17 +19,12 @@ export default function DecksByUser() {
 
   return (
     <>
+      <h1 className="text-3xl font-bold mb-6">デッキ</h1>
       {currentUserId === paramsUserId && (
-        <Link
-          to="/pokemon/deck/new"
-          className="btn btn-primary m-2"
-          prefetch="intent"
-        >
-          デッキを登録する
+        <Link to="new" className="btn btn-primary btn-sm m-1" prefetch="intent">
+          デッキを新規作成
         </Link>
       )}
-
-      <h1 className="text-3xl font-bold mb-6">デッキ</h1>
       <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
         {decks.length === 0 && (
           <p className="text-gray-700">
