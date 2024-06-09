@@ -3,6 +3,7 @@ import { json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import { getDeckById } from "~/features/common/services/deck-data.server";
+import { Badge } from "~/features/common/components/Badge";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -49,12 +50,21 @@ export default function DeckDetail() {
               className="block"
               preventScrollReset
             >
-              <h5 className="text-xl font-semibold mb-2">
-                {history.status === "main" && "公開"}
-                {history.status === "sub" && "非公開"}
-                {history.status === "draft" && "下書き"}
-              </h5>
-              <p className="text-gray-700">{history.content}</p>
+              <Badge status={history.status} />
+              <p className="text-gray-700">
+                {history.content &&
+                  (history.content.length > 50
+                    ? history.content.substring(0, 50) + "..."
+                    : history.content
+                  )
+                    .split("\n")
+                    .map((line, index) => (
+                      <span key={index}>
+                        {line}
+                        <br />
+                      </span>
+                    ))}
+              </p>
             </Link>
           </div>
         ))}

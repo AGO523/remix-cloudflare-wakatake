@@ -6,6 +6,7 @@ import {
   getDeckHistoryById,
   getDeckCodeByHistoryId,
 } from "~/features/common/services/deck-data.server";
+import { Badge } from "~/features/common/components/Badge";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -43,11 +44,7 @@ export default function DeckHistoryDetail() {
           </span>
         ))}
       </p>
-      <p className="text-gray-700 mb-4">
-        {deckHistory.status === "main" && "公開"}
-        {deckHistory.status === "sub" && "非公開"}
-        {deckHistory.status === "draft" && "下書き"}
-      </p>
+      <Badge status={deckHistory.status} />
       <p className="text-gray-700 mb-4">
         作成日時:{" "}
         {deckHistory.createdAt
