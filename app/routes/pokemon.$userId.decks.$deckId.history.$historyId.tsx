@@ -51,7 +51,7 @@ export default function DeckHistoryDetail() {
           ? new Date(deckHistory.createdAt).toLocaleString()
           : ""}
       </p>
-      {deckCode && deckCode.imageUrl && deckCode.status === "sub" && (
+      {deckCode && deckCode.imageUrl && (
         <img
           src={deckCode.imageUrl}
           alt="デッキの画像"

@@ -5,6 +5,7 @@ import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getDeckHistoryById,
   updateDeckHistory,
+  getDeckCodeByHistoryId,
 } from "~/features/common/services/deck-data.server";
 import { redirectWithSuccess, redirectWithError } from "remix-toast";
 
@@ -24,7 +25,9 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
     throw new Response("Deck History not found", { status: 404 });
   }
 
-  return json({ deckHistory, user });
+  const deckCode = await getDeckCodeByHistoryId(Number(historyId), context);
+
+  return json({ deckHistory, user, deckCode });
 }
 
 export const action = async ({
@@ -55,7 +58,7 @@ export const action = async ({
 };
 
 export default function EditDeckHistory() {
-  const { deckHistory } = useLoaderData<typeof loader>();
+  const { deckHistory, deckCode } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 
@@ -84,6 +87,23 @@ export default function EditDeckHistory() {
             className="textarea textarea-bordered w-full min-h-[300px]"
           ></textarea>
         </div>
+        {deckCode && deckCode.imageUrl && (
+          <div>
+            <input type="hidden" name="deckId" value={deckCode.deckId} />
+            <input type="hidden" name="currentDeckCodeId" value={deckCode.id} />
+            <input type="hidden" name="status" value={deckCode.status} />
+            <input
+              type="text"
+              name="code"
+              placeholder="デッキコード"
+              defaultValue={deckCode.code ?? ""}
+              className="input input-bordered w-full"
+            />
+            <span className="text-gray-700">
+              履歴に関連付けられたデッキコードがあります。変更する場合は入力してください。
+            </span>
+          </div>
+        )}
         <div>
           <button
             type="submit"
