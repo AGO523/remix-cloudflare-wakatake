@@ -23,6 +23,7 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
 export default function DeckDetail() {
   const { deck, user } = useLoaderData<typeof loader>();
   const currentUserId = user.id;
+  const mainDeckCode = deck.codes.find((code) => code.status === "main");
 
   return (
     <div className="max-w-3xl mx-auto p-4">
@@ -37,9 +38,9 @@ export default function DeckDetail() {
         ))}
       </p>
       <div className="flex justify-center">
-        {deck.codes.length > 0 && deck.codes[0].status === "main" && (
+        {deck.codes.length > 0 && mainDeckCode && (
           <img
-            src={deck.codes[0].imageUrl}
+            src={mainDeckCode.imageUrl}
             alt={deck.title}
             className="object-cover rounded-md mb-4"
           />

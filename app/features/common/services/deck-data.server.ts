@@ -62,6 +62,12 @@ const updateDeckHistorySchema = z.object({
   content: z.string().optional(),
 });
 
+const updateDeckCodeSchema = z.object({
+  deckId: z.number(),
+  status: z.string().min(1).max(100),
+  code: z.string().min(1).max(100),
+});
+
 async function fetchDeckImage(code: string): Promise<string | null> {
   const deckImageUrlResponse = await fetch(
     "https://pokemon-card-deck-scraper-ghyv6dyl6a-an.a.run.app/fetchDeck",
@@ -164,7 +170,10 @@ export async function createDeckHistory(
     deckId,
     status: (formData.get("status") as string) || "main",
     content: (formData.get("content") as string) || "内容は空です",
-    first: formData.get("first") === "on" || formData.get("first") === "true",
+    first:
+      formData.get("first") === "on" ||
+      formData.get("first") === "true" ||
+      false,
     code: (formData.get("code") as string) || "",
   };
 
@@ -440,6 +449,7 @@ export async function updateDeckHistory(
 ) {
   const env = context.env as Env;
   const db = createClient(env.DB);
+  const isDeckCode = formData.get("code") ? true : false;
 
   const formObject = {
     status: formData.get("status") as string,
@@ -464,10 +474,74 @@ export async function updateDeckHistory(
     .set(updatedDeckHistory)
     .where(eq(deckHistories.id, deckHistoryId))
     .execute();
-  if (response.success) {
-    return json({ message: "デッキ履歴を更新しました" }, { status: 200 });
+  if (!response.success) {
+    return json({ message: "デッキ履歴の更新に失敗しました" }, { status: 500 });
   }
-  return json({ message: "デッキ履歴の更新に失敗しました" }, { status: 500 });
+
+  if (isDeckCode) {
+    const currentDeckCodeId = formData.get("currentDeckCodeId");
+    const updateDeckCodeResponse = await updateDeckCode(
+      Number(currentDeckCodeId),
+      Number(deckHistoryId),
+      formData,
+      context
+    );
+    if (updateDeckCodeResponse.status !== 200) {
+      return json(
+        { message: "デッキコードの更新に失敗しました" },
+        { status: 500 }
+      );
+    }
+  }
+
+  return json({ message: "デッキ履歴を更新しました" }, { status: 200 });
+}
+
+export async function updateDeckCode(
+  deckCodeId: number,
+  historyId: number,
+  formData: FormData,
+  context: AppLoadContext
+) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+  const code = formData.get("code") as string;
+
+  const formObject = {
+    deckId: Number(formData.get("deckId")),
+    status: formData.get("status") || "sub",
+    code: formData.get("code") as string,
+  };
+
+  const result = updateDeckCodeSchema.safeParse(formObject);
+  if (!result.success) {
+    return json(
+      { message: result.error.errors[0].message, errors: result.error },
+      { status: 400 }
+    );
+  }
+
+  const imageUrl = await fetchDeckImage(code);
+  if (!imageUrl) {
+    return json({ message: "デッキ画像の取得に失敗しました" }, { status: 500 });
+  }
+
+  const updatedDeckCode = {
+    ...result.data,
+    historyId,
+    imageUrl,
+  };
+
+  const response = await db
+    .update(deckCodes)
+    .set(updatedDeckCode)
+    .where(eq(deckCodes.id, deckCodeId))
+    .execute();
+  if (response.success) {
+    return json({ message: "デッキコードを更新しました" }, { status: 200 });
+  }
+
+  return json({ message: "デッキコードの更新に失敗しました" }, { status: 500 });
 }
 
 export async function deleteDeckHistory(
@@ -625,26 +699,32 @@ export async function updateDeckCoeToMain(
   const env = context.env as Env;
   const db = createClient(env.DB);
 
-  const response = await db
-    .update(deckCodes)
-    .set({ status: "main" })
-    .where(eq(deckCodes.historyId, historyId))
-    .execute();
-
-  if (response.success) {
-    return json({ message: "デッキコードのステータスを更新しました" }, 200);
-  }
-
-  // 他のdeckIdに紐づくデッキコードのステータスを sub に戻す
+  // 一度全てのdeckIdに紐づくデッキコードのステータスを sub に戻す
   const resetResponse = await db
     .update(deckCodes)
     .set({ status: "sub" })
     .where(eq(deckCodes.deckId, deckId))
     .execute();
 
-  if (resetResponse.success) {
-    return json({ message: "デッキコードのステータスを更新しました" }, 200);
+  if (!resetResponse.success) {
+    return json(
+      { message: "デッキコードのステータスのリセットに失敗しました" },
+      500
+    );
   }
 
-  return json({ message: "デッキコードのステータスの更新に失敗しました" }, 500);
+  // 指定したデッキコードを main にする
+  const response = await db
+    .update(deckCodes)
+    .set({ status: "main" })
+    .where(eq(deckCodes.historyId, historyId))
+    .execute();
+
+  if (!response.success) {
+    return json(
+      { message: "デッキコードのステータスの更新に失敗しました" },
+      500
+    );
+  }
+  return json({ message: "デッキコードのステータスを更新しました" }, 200);
 }

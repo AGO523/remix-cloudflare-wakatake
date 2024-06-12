@@ -52,6 +52,7 @@ export const decks = sqliteTable("decks", {
 export const deckCodes = sqliteTable("deckCodes", {
   id: integer("id").primaryKey().notNull(),
   deckId: integer("deckId").notNull(),
+  // notNull にしたい
   historyId: integer("historyId"),
   status: text("status").notNull().default("sub"),
   code: text("code").notNull(),
