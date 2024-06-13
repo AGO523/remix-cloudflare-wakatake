@@ -408,12 +408,12 @@ export async function deleteDeck(deckId: number, context: AppLoadContext) {
   const db = createClient(env.DB);
 
   try {
-    const deleteImagesResponse = await db
+    const deleteCodesResponse = await db
       .delete(deckCodes)
       .where(eq(deckCodes.deckId, deckId))
       .execute();
 
-    if (!deleteImagesResponse.success) {
+    if (!deleteCodesResponse.success) {
       throw new Error("Failed to delete deck images");
     }
 
@@ -551,14 +551,30 @@ export async function deleteDeckHistory(
   const env = context.env as Env;
   const db = createClient(env.DB);
 
-  const response = await db
-    .delete(deckHistories)
-    .where(eq(deckHistories.id, deckHistoryId))
-    .execute();
-  if (response.success) {
-    return json({ message: "デッキ履歴を削除しました" }, { status: 200 });
+  try {
+    const deleteCodesResponse = await db
+      .delete(deckCodes)
+      .where(eq(deckCodes.historyId, deckHistoryId))
+      .execute();
+
+    if (!deleteCodesResponse.success) {
+      throw new Error("Failed to delete deck images");
+    }
+
+    const response = await db
+      .delete(deckHistories)
+      .where(eq(deckHistories.id, deckHistoryId))
+      .execute();
+
+    if (!response.success) {
+      throw new Error("Failed to delete deck histories");
+    }
+
+    return json({ message: "デッキを削除しました" }, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return json({ message: "デッキの削除に失敗しました" }, { status: 500 });
   }
-  return json({ message: "デッキ履歴の削除に失敗しました" }, { status: 500 });
 }
 
 export async function uploadAndCreateCardImage(
