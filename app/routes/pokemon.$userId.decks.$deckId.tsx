@@ -3,6 +3,7 @@ import { json } from "@remix-run/cloudflare";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import { getDeckById } from "~/features/common/services/deck-data.server";
+import defaultDeckImage from "~/images/default_deck_image.png";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -38,12 +39,23 @@ export default function DeckDetail() {
         ))}
       </p>
       <div className="flex justify-center">
-        {deck.codes.length > 0 && mainDeckCode && (
+        {(deck.codes.length > 0 && mainDeckCode && (
           <img
             src={mainDeckCode.imageUrl}
             alt={deck.title}
             className="object-cover rounded-md mb-4"
           />
+        )) || (
+          <div>
+            <img
+              src={defaultDeckImage}
+              alt={deck.title}
+              className="object-cover rounded-md mb-2"
+            />
+            <p className="text-sm text-gray-500 mb-2">
+              メインのデッキ画像がないため、デフォルトのデッキ画像を表示しています
+            </p>
+          </div>
         )}
       </div>
       <div className="text-gray-600">
