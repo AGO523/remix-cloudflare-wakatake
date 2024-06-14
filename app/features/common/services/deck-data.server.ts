@@ -165,16 +165,12 @@ export async function createDeckHistory(
   const db = createClient(env.DB);
   const currentTime = new Date();
   const isDeckCode = formData.get("code") ? true : false;
+  // const isCardImageUrl = formData.get("imageUrl") ? true : false;
 
   const formObject = {
     deckId,
     status: (formData.get("status") as string) || "main",
     content: (formData.get("content") as string) || "内容は空です",
-    first:
-      formData.get("first") === "on" ||
-      formData.get("first") === "true" ||
-      false,
-    code: (formData.get("code") as string) || "",
   };
 
   const result = createDeckHistorySchema.safeParse(formObject);
@@ -200,6 +196,10 @@ export async function createDeckHistory(
   }
 
   if (isDeckCode) {
+    const isFirst =
+      formData.get("first") === "on" ||
+      formData.get("first") === "true" ||
+      false;
     // 直前にインサートされたレコードを取得
     const insertedRecord = await db
       .select()
@@ -213,8 +213,8 @@ export async function createDeckHistory(
     const createDeckCodeResponse = await createDeckCode(
       deckId,
       insertedRecord[0].id,
-      formObject.code,
-      formObject.first as boolean,
+      formData.get("code") as string,
+      isFirst,
       context
     );
 
@@ -226,7 +226,7 @@ export async function createDeckHistory(
     }
 
     // first が true の場合 deckCodes を main にして、他のデッキコードを sub にする
-    if (formObject.first) {
+    if (isFirst) {
       const updateDeckCodeResponse = await updateDeckCoeToMain(
         deckId,
         insertedRecord[0].id,
