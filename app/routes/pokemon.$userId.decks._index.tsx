@@ -2,6 +2,7 @@ import { LoaderFunctionArgs, json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import { getDecksBy } from "~/features/common/services/deck-data.server";
+import defaultDeckImage from "~/images/default_deck_image.png";
 
 export async function loader({ request, context, params }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -31,23 +32,41 @@ export default function DecksByUser() {
             このユーザーのデッキはまだ登録されていません。
           </p>
         )}
-        {decks.map((deck) => (
-          <Link
-            to={`${deck.id}`}
-            key={deck.id}
-            className="block shadow-lg rounded-lg p-2 hover:shadow-xl transition-shadow"
-          >
-            <h3 className="text-xl font-semibold mb-2">{deck.title}</h3>
-            <p className="text-gray-700 mb-4">{deck.description}</p>
-            {deck.codes.length > 0 && (
-              <img
-                src={deck.codes[0].imageUrl}
-                alt={deck.title}
-                className="object-cover rounded-md mb-4"
-              />
-            )}
-          </Link>
-        ))}
+        {decks.map((deck) => {
+          const mainDeckCode = deck.codes.find(
+            (code) => code.status === "main"
+          );
+          return (
+            <Link
+              to={`${deck.id}`}
+              key={deck.id}
+              className="block shadow-lg rounded-lg p-2 hover:shadow-xl transition-shadow"
+            >
+              <h3 className="text-xl font-semibold mb-2">{deck.title}</h3>
+              <p className="text-gray-700 mb-4">{deck.description}</p>
+              <div className="flex justify-center">
+                {(deck.codes.length > 0 && mainDeckCode && (
+                  <img
+                    src={mainDeckCode.imageUrl}
+                    alt={deck.title}
+                    className="object-cover rounded-md mb-4"
+                  />
+                )) || (
+                  <div>
+                    <img
+                      src={defaultDeckImage}
+                      alt={deck.title}
+                      className="object-cover rounded-md mb-2"
+                    />
+                    <p className="text-sm text-gray-500 mb-2">
+                      メインのデッキ画像がないため、デフォルトのデッキ画像を表示しています
+                    </p>
+                  </div>
+                )}
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </>
   );
