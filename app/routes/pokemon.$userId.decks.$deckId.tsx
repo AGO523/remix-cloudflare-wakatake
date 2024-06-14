@@ -78,10 +78,12 @@ export default function DeckDetail() {
           </>
         )}
       </div>
-      <div className="text-gray-600">
+      <div>
         <Link to="./" className="btn btn-primary btn-sm m-2" preventScrollReset>
           履歴一覧
         </Link>
+      </div>
+      <div>
         {deck.userId === currentUserId && (
           <>
             <Link

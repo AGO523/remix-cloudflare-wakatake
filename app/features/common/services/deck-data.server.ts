@@ -450,12 +450,14 @@ export async function updateDeckHistory(
   const env = context.env as Env;
   const db = createClient(env.DB);
   const isDeckCode = formData.get("code") ? true : false;
+  const isNewDeckCode = formData.get("newCode") ? true : false;
 
   const formObject = {
     status: formData.get("status") as string,
     content: formData.get("content") as string,
   };
 
+  // fix
   const result = updateDeckHistorySchema.safeParse(formObject);
   if (!result.success) {
     return json(
@@ -489,6 +491,27 @@ export async function updateDeckHistory(
     if (updateDeckCodeResponse.status !== 200) {
       return json(
         { message: "デッキコードの更新に失敗しました" },
+        { status: 500 }
+      );
+    }
+  }
+
+  if (isNewDeckCode) {
+    const first =
+      formData.get("first") === "on" ||
+      formData.get("first") === "true" ||
+      false;
+
+    const createDeckCodeResponse = await createDeckCode(
+      Number(formData.get("deckId")),
+      Number(deckHistoryId),
+      formData.get("newCode") as string,
+      first,
+      context
+    );
+    if (createDeckCodeResponse.status !== 201) {
+      return json(
+        { message: "デッキコードの登録に失敗しました" },
         { status: 500 }
       );
     }

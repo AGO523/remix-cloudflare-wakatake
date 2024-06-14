@@ -87,7 +87,7 @@ export default function EditDeckHistory() {
             className="textarea textarea-bordered w-full min-h-[300px]"
           ></textarea>
         </div>
-        {deckCode && deckCode.imageUrl && (
+        {(deckCode && deckCode.imageUrl && (
           <div>
             <input type="hidden" name="deckId" value={deckCode.deckId} />
             <input type="hidden" name="currentDeckCodeId" value={deckCode.id} />
@@ -102,6 +102,29 @@ export default function EditDeckHistory() {
             <span className="text-gray-700">
               履歴に関連付けられたデッキコードがあります。変更する場合は入力してください。
             </span>
+          </div>
+        )) || (
+          <div>
+            <input type="hidden" name="deckId" value={deckHistory.deckId} />
+            <input
+              type="text"
+              name="newCode"
+              id="code"
+              placeholder="デッキコード"
+              className="input input-bordered w-full"
+            />
+            <p className="text-gray-600 text-sm">
+              履歴にデッキ画像を表示する場合は、デッキコードを入力してください。
+            </p>
+            <input
+              type="checkbox"
+              name="first"
+              id="first"
+              className="checkbox checkbox-primary mt-2"
+            />
+            <p className="text-gray-600 text-sm">
+              デッキのメイン画像にする場合はチェックを入れてください。
+            </p>
           </div>
         )}
         <div>
