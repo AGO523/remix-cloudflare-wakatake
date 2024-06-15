@@ -89,6 +89,8 @@ export default function NewDeckHistory() {
               className="textarea textarea-bordered w-full min-h-[300px]"
             ></textarea>
           </div>
+
+          {/* 履歴にデッキコードを挿入 */}
           <div>
             <input
               type="text"
@@ -108,6 +110,20 @@ export default function NewDeckHistory() {
             />
             <p className="text-gray-600 text-sm">
               デッキのメイン画像にする場合はチェックを入れてください。
+            </p>
+          </div>
+
+          {/* 履歴に画像を挿入 */}
+          <div>
+            <input
+              type="text"
+              name="cardImageUrl"
+              id="cardImageUrl"
+              placeholder="挿入する画像のURLを貼り付ける"
+              className="input input-bordered w-full"
+            />
+            <p className="text-gray-600 text-sm">
+              履歴に1枚まで画像を添付できます。
             </p>
           </div>
           <div>

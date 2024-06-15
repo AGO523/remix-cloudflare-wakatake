@@ -88,7 +88,7 @@ export default function DeckDetail() {
           <>
             <Link
               to={`history_new`}
-              className="btn btn-primary btn-sm m-2"
+              className="btn btn-success btn-sm m-2"
               preventScrollReset
             >
               履歴を作成

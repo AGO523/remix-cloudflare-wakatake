@@ -36,6 +36,7 @@ const createDeckHistorySchema = z.object({
   deckId: z.number(),
   status: z.string().min(1).max(100),
   content: z.string().optional(),
+  cardImageUrl: z.string().optional(),
 });
 
 const createCardImageSchema = z.object({
@@ -60,6 +61,7 @@ const updateDeckSchema = z.object({
 const updateDeckHistorySchema = z.object({
   status: z.string().min(1).max(100),
   content: z.string().optional(),
+  cardImageUrl: z.string().optional(),
 });
 
 const updateDeckCodeSchema = z.object({
@@ -165,12 +167,12 @@ export async function createDeckHistory(
   const db = createClient(env.DB);
   const currentTime = new Date();
   const isDeckCode = formData.get("code") ? true : false;
-  // const isCardImageUrl = formData.get("imageUrl") ? true : false;
 
   const formObject = {
     deckId,
     status: (formData.get("status") as string) || "main",
     content: (formData.get("content") as string) || "内容は空です",
+    cardImageUrl: (formData.get("cardImageUrl") as string) || "",
   };
 
   const result = createDeckHistorySchema.safeParse(formObject);
