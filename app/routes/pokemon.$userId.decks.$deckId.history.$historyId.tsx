@@ -63,8 +63,9 @@ export default function DeckHistoryDetail() {
       )}
 
       {deckCode && deckCode.imageUrl && (
-        <div className="flex justify-center">
+        <div>
           <p className="text-gray-700 mb-4">デッキの画像</p>
+          <p className="text-gray-700 mb-4">デッキコード:{deckCode.code}</p>
           <img
             src={deckCode.imageUrl}
             alt="デッキの画像"

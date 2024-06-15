@@ -40,11 +40,14 @@ export default function DeckDetail() {
       </p>
       <div className="flex justify-center">
         {(deck.codes.length > 0 && mainDeckCode && (
-          <img
-            src={mainDeckCode.imageUrl}
-            alt={deck.title}
-            className="object-cover rounded-md mb-4"
-          />
+          <div>
+            <p className="text-gray-600">デッキコード: {mainDeckCode?.code}</p>
+            <img
+              src={mainDeckCode.imageUrl}
+              alt={deck.title}
+              className="object-cover rounded-md mb-4"
+            />
+          </div>
         )) || (
           <div>
             <img
