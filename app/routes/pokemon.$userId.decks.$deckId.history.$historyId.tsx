@@ -51,12 +51,26 @@ export default function DeckHistoryDetail() {
           ? new Date(deckHistory.createdAt).toLocaleString()
           : ""}
       </p>
+
+      {deckHistory.cardImageUrl && (
+        <div className="flex justify-center">
+          <img
+            src={deckHistory.cardImageUrl}
+            alt="添付画像"
+            className="object-cover rounded-md mb-4"
+          />
+        </div>
+      )}
+
       {deckCode && deckCode.imageUrl && (
-        <img
-          src={deckCode.imageUrl}
-          alt="デッキの画像"
-          className="object-cover rounded-md mb-4"
-        />
+        <div className="flex justify-center">
+          <p className="text-gray-700 mb-4">デッキの画像</p>
+          <img
+            src={deckCode.imageUrl}
+            alt="デッキの画像"
+            className="object-cover rounded-md mb-4"
+          />
+        </div>
       )}
       {currentUserId && (
         <>

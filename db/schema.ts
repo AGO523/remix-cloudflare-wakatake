@@ -67,6 +67,8 @@ export const deckHistories = sqliteTable("deckHistories", {
   status: text("status").notNull().default("main"),
   content: text("content"),
   publish_id: text("publish_code").default(""),
+  // 履歴に紐づけた cardImages の URL 履歴に対して1つ設定できる仕様
+  cardImageUrl: text("cardImageUrl"),
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
 });
