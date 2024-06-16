@@ -139,9 +139,7 @@ export default function EditDeckHistory() {
             type="text"
             name="cardImageUrl"
             id="cardImageUrl"
-            defaultValue={
-              deckHistory.cardImageUrl ?? "挿入する画像のURLを貼り付ける"
-            }
+            defaultValue={deckHistory.cardImageUrl ?? ""}
             className="input input-bordered w-full"
           />
           <p className="text-gray-600 text-sm">
