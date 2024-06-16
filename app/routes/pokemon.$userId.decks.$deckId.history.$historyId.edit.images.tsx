@@ -14,7 +14,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
   return json({ cardImages });
 }
 
-export default function NewDeckHistory() {
+export default function EditDeckHistory() {
   const { cardImages } = useLoaderData<typeof loader>();
 
   return (

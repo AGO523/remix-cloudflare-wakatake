@@ -1,6 +1,12 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { Form, Link, useLoaderData, useNavigation } from "@remix-run/react";
+import {
+  Form,
+  Link,
+  Outlet,
+  useLoaderData,
+  useNavigation,
+} from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getDeckHistoryById,
@@ -127,6 +133,21 @@ export default function EditDeckHistory() {
             </p>
           </div>
         )}
+        {/* 履歴に画像を挿入 */}
+        <div>
+          <input
+            type="text"
+            name="cardImageUrl"
+            id="cardImageUrl"
+            defaultValue={
+              deckHistory.cardImageUrl ?? "挿入する画像のURLを貼り付ける"
+            }
+            className="input input-bordered w-full"
+          />
+          <p className="text-gray-600 text-sm">
+            履歴に1枚まで画像を添付できます。
+          </p>
+        </div>
         <div>
           <button
             type="submit"
@@ -136,10 +157,24 @@ export default function EditDeckHistory() {
             {isSubmitting ? "更新中..." : "更新"}
           </button>
         </div>
-        <Link to="../" className="btn mt-4" preventScrollReset>
-          戻る
-        </Link>
       </Form>
+      <div className="flex justify-between mt-4">
+        <Link
+          to={`images`}
+          className="btn btn-primary w-1/2 mr-1"
+          preventScrollReset
+        >
+          画像を表示
+        </Link>
+        <Link
+          to={`upload`}
+          className="btn btn-primary w-1/2 ml-1"
+          preventScrollReset
+        >
+          画像をアップロード
+        </Link>
+      </div>
+      <Outlet />
     </div>
   );
 }

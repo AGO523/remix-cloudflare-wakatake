@@ -158,6 +158,9 @@ export async function createDeck(formData: FormData, context: AppLoadContext) {
   );
 }
 
+/////////////////////////////////////////////////
+//////////////////// コア関数 ////////////////////
+/////////////////////////////////////////////////
 export async function createDeckHistory(
   deckId: number,
   formData: FormData,
@@ -457,9 +460,9 @@ export async function updateDeckHistory(
   const formObject = {
     status: formData.get("status") as string,
     content: formData.get("content") as string,
+    cardImageUrl: (formData.get("cardImageUrl") as string) || "",
   };
 
-  // fix
   const result = updateDeckHistorySchema.safeParse(formObject);
   if (!result.success) {
     return json(
