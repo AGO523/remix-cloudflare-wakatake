@@ -7,7 +7,7 @@ import {
   updateDeckCoeToMain,
 } from "~/features/common/services/deck-data.server";
 import { redirectWithSuccess, redirectWithError } from "remix-toast";
-// import { Badge } from "~/features/common/components/Badge";
+import { DeckBadge } from "~/features/common/components/DeckBadge";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -76,6 +76,7 @@ export default function DeckHistoryDetail() {
                 value={deckCode.historyId || ""}
               />
               <p className="text-gray-700">デッキコード:{deckCode.code}</p>
+              <DeckBadge status={deckCode.status} />
               <p className="text-gray-700 text-sm">
                 このデッキコードをデッキのメイン画像に設定しますか？
               </p>

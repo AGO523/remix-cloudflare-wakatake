@@ -7,6 +7,7 @@ import {
   getDeckCodeByHistoryId,
 } from "~/features/common/services/deck-data.server";
 import { Badge } from "~/features/common/components/Badge";
+import { DeckBadge } from "~/features/common/components/DeckBadge";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -65,11 +66,12 @@ export default function DeckHistoryDetail() {
       {deckCode && deckCode.imageUrl && (
         <div>
           <p className="text-gray-700 mb-4">デッキの画像</p>
-          <p className="text-gray-700 mb-4">デッキコード:{deckCode.code}</p>
+          <p className="text-gray-700 mb-2">デッキコード:{deckCode.code}</p>
+          <DeckBadge status={deckCode.status} />
           <img
             src={deckCode.imageUrl}
             alt="デッキの画像"
-            className="object-cover rounded-md mb-4"
+            className="object-cover rounded-md mb-4 mt-4"
           />
         </div>
       )}
