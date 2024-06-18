@@ -719,6 +719,22 @@ export async function getDeckCodeByDeckId(
   return deckCode;
 }
 
+export async function getDeckCodesByDeckId(
+  deckId: number,
+  context: AppLoadContext
+) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  const deckCodesData = await db
+    .select()
+    .from(deckCodes)
+    .where(eq(deckCodes.deckId, deckId))
+    .all();
+
+  return deckCodesData;
+}
+
 export async function getDeckCodeByHistoryId(
   historyId: number,
   context: AppLoadContext
