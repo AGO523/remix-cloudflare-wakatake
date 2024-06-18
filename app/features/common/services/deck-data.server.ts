@@ -549,7 +549,23 @@ export async function updateDeckCode(
     );
   }
 
-  const imageUrl = await fetchDeckImage(code);
+  // 現在のデッキコードを取得
+  // formDataの code が異なる場合、新しいデッキコードを取得
+  // 同じ場合は imageUrl に現在のデッキコードの imageUrl をセット
+  const currentDeckCode = await db
+    .select()
+    .from(deckCodes)
+    .where(eq(deckCodes.id, deckCodeId))
+    .get();
+
+  if (!currentDeckCode) {
+    return json({ message: "デッキコードが見つかりません" }, { status: 404 });
+  }
+
+  const isNewCode = code !== currentDeckCode.code;
+  const imageUrl = isNewCode
+    ? await fetchDeckImage(code)
+    : currentDeckCode.imageUrl;
   if (!imageUrl) {
     return json({ message: "デッキ画像の取得に失敗しました" }, { status: 500 });
   }
