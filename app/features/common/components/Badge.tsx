@@ -1,8 +1,6 @@
-// components/Badge.tsx
 import React from "react";
 
 type BadgeProps = {
-  // status: "main" | "sub" | "draft";
   status: string;
 };
 
