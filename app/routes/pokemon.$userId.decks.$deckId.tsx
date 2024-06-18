@@ -85,6 +85,13 @@ export default function DeckDetail() {
         <Link to="./" className="btn btn-primary btn-sm m-2" preventScrollReset>
           履歴一覧
         </Link>
+        <Link
+          to={`codes`}
+          className="btn btn-primary btn-sm m-2"
+          preventScrollReset
+        >
+          デッキコード一覧
+        </Link>
       </div>
       <div>
         {deck.userId === currentUserId && (
