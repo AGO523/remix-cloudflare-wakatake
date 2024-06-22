@@ -534,10 +534,12 @@ export async function updateDeckCode(
   const env = context.env as Env;
   const db = createClient(env.DB);
   const code = formData.get("code") as string;
+  const isMain =
+    formData.get("first") === "on" || formData.get("first") === "true" || false;
 
   const formObject = {
     deckId: Number(formData.get("deckId")),
-    status: formData.get("status") || "sub",
+    status: isMain ? "main" : "sub",
     code: formData.get("code") as string,
   };
 
