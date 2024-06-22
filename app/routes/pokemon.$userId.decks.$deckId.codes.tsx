@@ -11,17 +11,20 @@ import { DeckBadge } from "~/features/common/components/DeckBadge";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
-  await authenticator.isAuthenticated(request, {
+  const user = await authenticator.isAuthenticated(request, {
     failureRedirect: "/login",
   });
 
-  if (params === undefined || params === null) {
-    throw new Response("Params is required", { status: 400 });
+  const { deckId, userId } = params;
+
+  if (Number(userId) !== user.id) {
+    return redirectWithError(
+      `/pokemon/${userId}/decks`,
+      "アクセス権限がありません"
+    );
   }
 
-  const deckId = Number(params.deckId);
-
-  const deckCodes = await getDeckCodesByDeckId(deckId, context);
+  const deckCodes = await getDeckCodesByDeckId(Number(deckId), context);
   if (!deckCodes) {
     throw new Response("Deck Codes not found", { status: 404 });
   }

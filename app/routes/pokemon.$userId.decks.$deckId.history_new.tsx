@@ -19,10 +19,15 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const user = await authenticator.isAuthenticated(request, {
     failureRedirect: "/login",
   });
-  const { deckId } = params;
-  if (!deckId) {
-    throw new Response("Deck ID is required", { status: 400 });
+  const { deckId, userId } = params;
+
+  if (Number(userId) !== user.id) {
+    return redirectWithError(
+      `/pokemon/${userId}/decks`,
+      "アクセス権限がありません"
+    );
   }
+
   const deck = await getDeckById(Number(deckId), context);
   if (!deck) {
     throw new Response("Deck not found", { status: 404 });

@@ -18,16 +18,12 @@ export type AuthUser = {
 };
 
 type CreateUser = InferInsertModel<typeof users>;
-
 let _authenticator: Authenticator<AuthUser> | undefined;
 export function getAuthenticator(
   context: AppLoadContext
 ): Authenticator<AuthUser> {
-  // console.log("getAuthenticator called");
   if (_authenticator == null) {
-    // console.log("Initializing _authenticator");
     const env = context.env as Env;
-    // console.log("Environment: ", env);
     const cookie = createCookie("__session", {
       secrets: [env.SESSION_SECRET],
       path: "/",
@@ -48,15 +44,13 @@ export function getAuthenticator(
         callbackURL: env.GOOGLE_AUTH_CALLBACK_URL,
       },
       async ({ profile }) => {
-        // console.log("Google Strategy Callback: ", profile); // Google認証情報のデバッグ情報
         const db = createClient(env.DB);
-        // console.log("DB client initialized"); // DBクライアントの初期化デバッグ情報
         const user = await db
           .select()
           .from(users)
           .where(eq(users.profileId, profile.id))
           .get();
-        // console.log("User found: ", user);
+
         if (user) return user as AuthUser;
 
         const newUser: CreateUser = {
@@ -67,7 +61,6 @@ export function getAuthenticator(
         };
 
         const ret = await db.insert(users).values(newUser).returning().get();
-        // console.log("New user created: ", ret); // 新規ユーザー作成結果のデバッグ情報
 
         return {
           id: ret.id,
