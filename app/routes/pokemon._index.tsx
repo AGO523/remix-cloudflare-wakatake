@@ -23,16 +23,24 @@ export default function PokemonDecks() {
         デッキの変遷を記録し、共有することができます。
       </p>
       <div className="flex flex-wrap justify-center">
-        <Link to="deck/new" className="btn btn-primary m-2" prefetch="intent">
-          デッキを登録する
-        </Link>
-        <Link
-          to={`${currentUserId}/decks`}
-          className="btn btn-accent m-2"
-          prefetch="intent"
-        >
-          自分のデッキを見る
-        </Link>
+        {(currentUserId && (
+          <>
+            <Link to="deck/new" className="btn btn-primary m-2">
+              デッキを登録する
+            </Link>
+            <Link
+              to={`${currentUserId}/decks`}
+              className="btn btn-accent m-2"
+              prefetch="intent"
+            >
+              自分のデッキを見る
+            </Link>
+          </>
+        )) || (
+          <Link to="/login" className="btn btn-primary m-2">
+            ログイン
+          </Link>
+        )}
         <Link to="decks" className="btn btn-secondary m-2" prefetch="intent">
           みんなのデッキを見る
         </Link>

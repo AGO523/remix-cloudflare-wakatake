@@ -7,13 +7,9 @@ import defaultDeckImage from "~/images/default_deck_image.png";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
+  const user = await authenticator.isAuthenticated(request);
   const { deckId } = params;
-  if (!deckId) {
-    throw new Response("Deck ID is required", { status: 400 });
-  }
+
   const deck = await getDeckById(Number(deckId), context);
   if (!deck) {
     throw new Response("Deck not found", { status: 404 });
@@ -23,7 +19,7 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
 
 export default function DeckDetail() {
   const { deck, user } = useLoaderData<typeof loader>();
-  const currentUserId = user.id;
+  const currentUserId = user?.id;
   const mainDeckCode = deck.codes.find((code) => code.status === "main");
 
   return (
