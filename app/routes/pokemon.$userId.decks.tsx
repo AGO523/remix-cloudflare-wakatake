@@ -5,15 +5,13 @@ import { getAuthenticator } from "~/features/common/services/auth.server";
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
+  const user = await authenticator.isAuthenticated(request);
   return json({ user });
 }
 
 export default function DecksByUserLayout() {
   const { user } = useLoaderData<typeof loader>();
-  const userId = user.id;
+  const userId = user?.id;
 
   return (
     <div className="container mx-auto">

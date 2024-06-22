@@ -20,9 +20,10 @@ export const Header: React.FC = () => {
           </Link>
         </div>
         <div className="btn btn-ghost ml-2">
-          <Link to="/login" prefetch="intent">
-            ログイン
-          </Link>
+          <Link to="/login">ログイン</Link>
+        </div>
+        <div className="btn btn-ghost ml-2">
+          <Link to="/auth/logout">ログアウト</Link>
         </div>
       </div>
     </div>

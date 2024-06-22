@@ -11,15 +11,10 @@ import { DeckBadge } from "~/features/common/components/DeckBadge";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
-
-  if (params === undefined || params === null) {
-    throw new Response("Params is required", { status: 400 });
-  }
+  const user = await authenticator.isAuthenticated(request);
 
   const { historyId } = params;
+  const paramsUserId = Number(params.userId);
   // デッキコードがある場合にはデッキコードを取得
   const deckHistory = await getDeckHistoryById(Number(historyId), context);
   const deckCode = await getDeckCodeByHistoryId(Number(historyId), context);
@@ -27,12 +22,13 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
     throw new Response("Deck History not found", { status: 404 });
   }
 
-  return json({ deckHistory, deckCode, user });
+  return json({ deckHistory, deckCode, user, paramsUserId });
 }
 
 export default function DeckHistoryDetail() {
-  const { deckHistory, deckCode, user } = useLoaderData<typeof loader>();
-  const currentUserId = user.id;
+  const { deckHistory, deckCode, user, paramsUserId } =
+    useLoaderData<typeof loader>();
+  const currentUserId = user?.id;
 
   return (
     <div className="container mx-auto p-2">
@@ -75,7 +71,7 @@ export default function DeckHistoryDetail() {
           />
         </div>
       )}
-      {currentUserId && (
+      {currentUserId && currentUserId === paramsUserId && (
         <>
           <Link to="edit" className="btn btn-primary mt-4" preventScrollReset>
             編集
@@ -83,11 +79,11 @@ export default function DeckHistoryDetail() {
           <Link to="delete" className="btn btn-error mt-4" preventScrollReset>
             削除
           </Link>
-          <Link to="../" className="btn mt-4" preventScrollReset>
-            戻る
-          </Link>
         </>
       )}
+      <Link to="../" className="btn mt-4" preventScrollReset>
+        戻る
+      </Link>
 
       <Outlet />
     </div>

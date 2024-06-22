@@ -6,9 +6,7 @@ import defaultDeckImage from "~/images/default_deck_image.png";
 
 export async function loader({ request, context, params }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
+  const user = await authenticator.isAuthenticated(request);
   const paramsUserId = Number(params.userId);
   const decks = await getDecksBy(paramsUserId, context);
   return json({ decks, user, paramsUserId });
@@ -16,7 +14,7 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
 
 export default function DecksByUser() {
   const { decks, user, paramsUserId } = useLoaderData<typeof loader>();
-  const currentUserId = user.id;
+  const currentUserId = user?.id;
 
   return (
     <>

@@ -4,15 +4,13 @@ import { Link, useLoaderData } from "@remix-run/react";
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
+  const user = await authenticator.isAuthenticated(request);
   return { user };
 }
 
 export default function PokemonDecks() {
   const { user } = useLoaderData<typeof loader>();
-  const currentUserId = user.id;
+  const currentUserId = user?.id;
 
   return (
     <>

@@ -14,9 +14,13 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
     failureRedirect: "/login",
   });
 
-  const { historyId } = params;
-  if (!historyId) {
-    throw new Response("History ID is required", { status: 400 });
+  const { historyId, userId } = params;
+
+  if (Number(userId) !== user.id) {
+    return redirectWithError(
+      `/pokemon/${userId}/decks`,
+      "アクセス権限がありません"
+    );
   }
 
   const deckHistory = await getDeckHistoryById(Number(historyId), context);
