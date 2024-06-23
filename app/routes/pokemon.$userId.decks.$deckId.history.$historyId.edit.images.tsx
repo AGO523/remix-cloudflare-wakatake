@@ -10,11 +10,11 @@ export async function loader({ context, request, params }: LoaderFunctionArgs) {
   const user = await authenticator.isAuthenticated(request, {
     failureRedirect: "/login",
   });
-  const userId = params;
+  const { userId } = params;
 
   if (Number(userId) !== user.id) {
     return redirectWithError(
-      `/pokemon/${userId}/decks`,
+      `/pokemon/${Number(userId)}/decks`,
       "アクセス権限がありません"
     );
   }

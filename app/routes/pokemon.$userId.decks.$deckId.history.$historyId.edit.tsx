@@ -109,9 +109,18 @@ export default function EditDeckHistory() {
               defaultValue={deckCode.code ?? ""}
               className="input input-bordered w-full"
             />
-            <span className="text-gray-700">
+            <p className="text-gray-700">
               履歴に関連付けられたデッキコードがあります。変更する場合は入力してください。
-            </span>
+            </p>
+            <input
+              type="checkbox"
+              name="first"
+              id="first"
+              className="checkbox checkbox-primary mt-2"
+            />
+            <p className="text-gray-600 text-sm">
+              デッキのメイン画像にする場合はチェックを入れてください。
+            </p>
           </div>
         )) || (
           <div>
@@ -176,7 +185,9 @@ export default function EditDeckHistory() {
           画像をアップロード
         </Link>
       </div>
-      <Outlet />
+      <div className="mt-8">
+        <Outlet />
+      </div>
     </div>
   );
 }
