@@ -6,7 +6,7 @@ export const loader = () => redirect("/login");
 export const action = ({ request, context }: ActionFunctionArgs) => {
   const authenticator = getAuthenticator(context);
   return authenticator.authenticate("google", request, {
-    successRedirect: "/",
+    successRedirect: "/pokemon",
     failureRedirect: "/login",
   });
 };

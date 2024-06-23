@@ -26,7 +26,7 @@ export function getAuthenticator(
     const env = context.env as Env;
     const cookie = createCookie("__session", {
       secrets: [env.SESSION_SECRET],
-      path: "/",
+      path: "/pokemon",
       sameSite: "lax",
       httpOnly: true,
       secure: process.env.NODE_ENV == "production",
