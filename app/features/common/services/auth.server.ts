@@ -30,6 +30,7 @@ export function getAuthenticator(
       sameSite: "lax",
       httpOnly: true,
       secure: process.env.NODE_ENV == "production",
+      maxAge: 60 * 60 * 24 * 7, // セッションの寿命を1週間に設定
     });
 
     const sessionStorage = createWorkersKVSessionStorage({
