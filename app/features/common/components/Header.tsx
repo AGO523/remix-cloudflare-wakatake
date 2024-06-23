@@ -4,7 +4,7 @@ export const Header: React.FC = () => {
   return (
     <div className="navbar bg-base-100">
       <div className="flex-1">
-        <Link to="/" className="btn btn-ghost normal-case text-xl">
+        <Link to="/pokemon" className="btn btn-ghost normal-case text-xl">
           artora
         </Link>
       </div>
@@ -21,9 +21,6 @@ export const Header: React.FC = () => {
         </div>
         <div className="btn btn-ghost ml-2">
           <Link to="/login">ログイン</Link>
-        </div>
-        <div className="btn btn-ghost ml-2">
-          <Link to="/auth/logout">ログアウト</Link>
         </div>
       </div>
     </div>
