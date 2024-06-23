@@ -185,7 +185,9 @@ export default function EditDeckHistory() {
           画像をアップロード
         </Link>
       </div>
-      <Outlet />
+      <div className="mt-8">
+        <Outlet />
+      </div>
     </div>
   );
 }

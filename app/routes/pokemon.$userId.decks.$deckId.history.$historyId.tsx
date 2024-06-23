@@ -85,7 +85,9 @@ export default function DeckHistoryDetail() {
         戻る
       </Link>
 
-      <Outlet />
+      <div className="mt-8">
+        <Outlet />
+      </div>
     </div>
   );
 }

@@ -104,7 +104,9 @@ export default function DeckDetail() {
           </>
         )}
       </div>
-      <Outlet />
+      <div className="mt-8">
+        <Outlet />
+      </div>
     </div>
   );
 }

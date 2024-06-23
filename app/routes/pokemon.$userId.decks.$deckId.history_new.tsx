@@ -160,7 +160,9 @@ export default function NewDeckHistory() {
             画像をアップロード
           </Link>
         </div>
-        <Outlet />
+        <div className="mt-8">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

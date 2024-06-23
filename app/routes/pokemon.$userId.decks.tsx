@@ -15,7 +15,9 @@ export default function DecksByUserLayout() {
 
   return (
     <div className="container mx-auto">
-      <Outlet />
+      <div className="mt-8">
+        <Outlet />
+      </div>
 
       {/* ナビゲーションバー */}
       <div className="fixed inset-x-0 bottom-0 bg-base-100 p-2">
