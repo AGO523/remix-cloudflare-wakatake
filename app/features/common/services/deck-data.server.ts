@@ -3,7 +3,7 @@
 /////////////////////////////////////////////////////////////
 import type { AppLoadContext } from "@remix-run/cloudflare";
 import { decks, deckHistories, cardImages, deckCodes } from "db/schema";
-import { InferInsertModel, eq, desc } from "drizzle-orm";
+import { InferInsertModel, eq, desc, sql } from "drizzle-orm";
 import { createClient } from "~/features/common/services/db.server";
 import { json } from "@remix-run/cloudflare";
 import { z } from "zod";
@@ -805,4 +805,53 @@ export async function updateDeckCoeToMain(
     );
   }
   return json({ message: "デッキコードのステータスを更新しました" }, 200);
+}
+
+// 全てのデッキコードを取得
+export async function getDecks(
+  context: AppLoadContext,
+  page: number,
+  limit: number
+) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  const decksData = await db
+    .select()
+    .from(decks)
+    .orderBy(desc(decks.createdAt))
+    .limit(limit)
+    .offset((page - 1) * limit)
+    .all();
+
+  if (!decksData) {
+    return null;
+  }
+
+  // deckCodesのstatusがmain のものを取得
+  const decksWithCodes = await Promise.all(
+    decksData.map(async (deck) => {
+      const codes = await db
+        .select()
+        .from(deckCodes)
+        .where(eq(deckCodes.deckId, deck.id))
+        .all();
+
+      return { ...deck, codes };
+    })
+  );
+
+  return decksWithCodes;
+}
+
+export async function getDeckCount(context: AppLoadContext) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  const countResult = await db
+    .select({ count: sql`COUNT(*)` })
+    .from(decks)
+    .all();
+
+  return countResult.length > 0 ? Number(countResult[0].count) : 0;
 }
