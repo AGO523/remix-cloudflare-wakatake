@@ -21,8 +21,6 @@ export async function loader({ context }: LoaderFunctionArgs) {
 }
 
 export default function PokemonLayout() {
-  // const { arts } = useLoaderData<typeof loader>();
-
   return (
     <>
       <section>
