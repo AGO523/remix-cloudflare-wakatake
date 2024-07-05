@@ -1,7 +1,5 @@
-import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/cloudflare";
+import type { MetaFunction } from "@remix-run/cloudflare";
 import { Link, Outlet } from "@remix-run/react";
-import { json } from "@remix-run/cloudflare";
-import { getArtsWithImages } from "~/features/common/services/data.server";
 
 export const meta: MetaFunction = () => {
   return [
@@ -14,11 +12,6 @@ export const meta: MetaFunction = () => {
     },
   ];
 };
-
-export async function loader({ context }: LoaderFunctionArgs) {
-  const arts = await getArtsWithImages(context);
-  return json({ arts });
-}
 
 export default function PokemonLayout() {
   return (
