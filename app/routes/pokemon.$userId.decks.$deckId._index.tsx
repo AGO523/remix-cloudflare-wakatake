@@ -47,7 +47,7 @@ export default function DeckDetail() {
               preventScrollReset
             >
               <Badge status={history.status} />
-              <p className="text-gray-700">
+              <p className="text-gray-700 text-left mt-2">
                 {history.content &&
                   (history.content.length > 50
                     ? history.content.substring(0, 50) + "..."
