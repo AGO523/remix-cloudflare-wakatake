@@ -57,34 +57,34 @@ export default function DeckDetail() {
           </div>
         )}
       </div>
-      <div className="text-gray-600">
+      <div className="flex justify-between mt-4">
         {deck.userId === currentUserId && (
           <>
             <Link
               to={`edit`}
-              className="btn btn-primary btn-sm m-2"
+              className="btn btn-primary w-1/2 mr-2"
               preventScrollReset
             >
-              デッキ情報の更新
+              デッキ情報更新
             </Link>
             <Link
               to={`delete`}
-              className="btn btn-error btn-sm m-2"
+              className="btn btn-error w-1/2"
               preventScrollReset
             >
-              デッキの削除
+              デッキ削除
             </Link>
           </>
         )}
       </div>
-      <div>
-        <Link to="./" className="btn btn-primary btn-sm m-2" preventScrollReset>
+      <div className="flex justify-between mt-4">
+        <Link to="./" className="btn btn-primary mr-2 w-1/2" preventScrollReset>
           履歴一覧
         </Link>
         {deck.userId === currentUserId && (
           <Link
             to={`codes`}
-            className="btn btn-primary btn-sm m-2"
+            className="btn btn-primary w-1/2"
             preventScrollReset
           >
             デッキコード一覧
@@ -96,7 +96,7 @@ export default function DeckDetail() {
           <>
             <Link
               to={`history_new`}
-              className="btn btn-success btn-sm m-2"
+              className="btn btn-success w-1/2 mt-4"
               preventScrollReset
             >
               履歴を作成
