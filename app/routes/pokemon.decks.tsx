@@ -30,7 +30,7 @@ export default function Decks() {
       {currentUserId && (
         <Link
           to={`/pokemon/${currentUserId}/decks/new`}
-          className="btn btn-primary btn-sm m-1"
+          className="btn btn-primary m-1"
           prefetch="intent"
         >
           デッキを新規作成

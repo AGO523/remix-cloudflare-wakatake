@@ -20,7 +20,7 @@ export default function DecksByUser() {
     <>
       <h1 className="text-3xl font-bold mb-6">デッキ</h1>
       {currentUserId === paramsUserId && (
-        <Link to="new" className="btn btn-primary btn-sm m-1" prefetch="intent">
+        <Link to="new" className="btn btn-primary m-1" prefetch="intent">
           デッキを新規作成
         </Link>
       )}
