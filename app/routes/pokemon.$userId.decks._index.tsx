@@ -66,9 +66,6 @@ export default function DecksByUser() {
           );
         })}
       </div>
-      <div className="btn btn-error mt-8">
-        <Link to="/auth/logout">ログアウト</Link>
-      </div>
     </>
   );
 }
