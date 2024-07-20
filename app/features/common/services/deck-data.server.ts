@@ -70,6 +70,12 @@ const updateDeckCodeSchema = z.object({
   code: z.string().min(1).max(100),
 });
 
+const updateUserProfileSchema = z.object({
+  nickname: z.string().min(1).max(100).optional(),
+  bio: z.string().optional(),
+  avatarUrl: z.string().optional(),
+});
+
 async function fetchDeckImage(code: string): Promise<string | null> {
   const deckImageUrlResponse = await fetch(
     "https://pokemon-card-deck-scraper-ghyv6dyl6a-an.a.run.app/fetchDeck",
@@ -863,4 +869,42 @@ export async function getUserBy(userId: number, context: AppLoadContext) {
   const user = await db.select().from(users).where(eq(users.id, userId)).get();
 
   return user;
+}
+
+export async function updateUserProfile(
+  userId: number,
+  formData: FormData,
+  context: AppLoadContext
+) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  const formObject = {
+    // avatarUrl: formData.get("avatarUrl") as string,
+    nickname: formData.get("nickname") as string,
+    bio: formData.get("bio") as string,
+  };
+
+  const result = updateUserProfileSchema.safeParse(formObject);
+  if (!result.success) {
+    return json(
+      { message: result.error.errors[0].message, errors: result.error },
+      { status: 400 }
+    );
+  }
+
+  const updatedProfile = {
+    ...result.data,
+  };
+
+  const response = await db
+    .update(users)
+    .set(updatedProfile)
+    .where(eq(users.id, userId))
+    .execute();
+
+  if (response.success) {
+    return json({ message: "プロフィールを更新しました" }, { status: 200 });
+  }
+  return json({ message: "プロフィールの更新に失敗しました" }, { status: 500 });
 }

@@ -1,12 +1,12 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { Link, NavLink, useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import { getUserBy } from "~/features/common/services/deck-data.server";
 
 export async function loader({ params, request, context }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
-  await authenticator.isAuthenticated(request, {
+  const currentUser = await authenticator.isAuthenticated(request, {
     failureRedirect: "/login",
   });
 
@@ -15,20 +15,20 @@ export async function loader({ params, request, context }: LoaderFunctionArgs) {
   if (!user) {
     throw new Response("User not found", { status: 404 });
   }
-  return json({ user });
+  return json({ user, currentUser });
 }
 
-export default function UserProfile() {
-  const { user } = useLoaderData<typeof loader>();
+export default function UserProfileLayout() {
+  const { user, currentUser } = useLoaderData<typeof loader>();
 
   return (
     <div className="card bg-base-200 shadow-md mb-4 max-w-2xl w-full p-4">
       <div className="flex flex-col items-center">
         <div className="avatar mb-4">
-          {user.iconUrl && (
+          {user.avatarUrl && (
             <img
-              src={user.iconUrl}
-              alt="ユーザーアイコン"
+              src={user?.avatarUrl}
+              alt="アバターの画像"
               className="w-16 h-16 rounded-full"
             />
           )}
@@ -36,22 +36,21 @@ export default function UserProfile() {
 
         <div className="card-body items-center mb-4">
           <p className="card-title">
-            {user.displayName.length > 0 ? user.displayName : ""}
+            {user.nickname ? user.nickname : `トレーナー_${user.id}`}
           </p>
           <p className="card-subtitle text-gray-500">
             {"自己紹介が設定されていません"}
           </p>
         </div>
 
-        {user && (
+        {user && user.id === currentUser.id && (
           <>
-            <div className="btn btn-primary m-2">プロフィールの変更</div>
-            <NavLink
-              to={`/pokemon/${user.id}/settings`}
-              className="btn btn-ghost"
+            <Link
+              to={`/pokemon/${user.id}/profile/edit`}
+              className="btn btn-primary"
             >
-              アカウント設定
-            </NavLink>
+              プロフィールの変更
+            </Link>
           </>
         )}
       </div>
@@ -66,6 +65,8 @@ export default function UserProfile() {
           ログアウト
         </Link>
       </div>
+
+      <Outlet />
     </div>
   );
 }
