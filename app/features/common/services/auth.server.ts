@@ -14,6 +14,9 @@ export type AuthUser = {
   profileId: string;
   iconUrl: string;
   displayName: string;
+  nickname?: string;
+  avatarUrl?: string;
+  bio?: string;
 };
 type CreateUser = InferInsertModel<typeof users>;
 

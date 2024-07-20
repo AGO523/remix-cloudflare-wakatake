@@ -5,7 +5,10 @@ export const users = sqliteTable("users", {
   profileId: text("profileId").notNull(),
   iconUrl: text("iconUrl"),
   displayName: text("displayName").notNull(),
-  // nickname: text("nickname"),
+  nickname: text("nickname"),
+  // アバターはユーザーがアップするのではなく、用意されたアバターを選択する
+  avatarUrl: text("avatarUrl"),
+  bio: text("bio"),
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
 });
 
