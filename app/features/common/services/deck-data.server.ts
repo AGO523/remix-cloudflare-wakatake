@@ -127,27 +127,19 @@ export async function createDeck(formData: FormData, context: AppLoadContext) {
     updatedAt: currentTime,
   };
 
-  const response = await db.insert(decks).values(newDeck).execute();
-  if (!response.success) {
+  // インサートしながら、自身レコードを取得
+  const response = await db.insert(decks).values(newDeck).returning().get();
+
+  if (!response) {
     return json({ message: "デッキの登録に失敗しました" }, { status: 500 });
   }
-
-  // 直前にインサートされたレコードを取得
-  const insertedRecord = await db
-    .select()
-    .from(decks)
-    .where(eq(decks.userId, newDeck.userId))
-    .orderBy(desc(decks.createdAt))
-    .limit(1)
-    .execute();
-  const newDeckId = insertedRecord[0].id;
 
   // formData に first: true を追加
   formData.append("first", "true");
 
   // デッキの履歴を登録
   const createDeckHistoryResponse = await createDeckHistory(
-    newDeckId,
+    response.id,
     formData,
     context
   );
@@ -159,7 +151,7 @@ export async function createDeck(formData: FormData, context: AppLoadContext) {
   }
 
   return json(
-    { message: "デッキを投稿しました", id: newDeckId },
+    { message: "デッキを投稿しました", id: response.id },
     { status: 201 }
   );
 }
@@ -198,11 +190,14 @@ export async function createDeckHistory(
     updatedAt: currentTime,
   };
 
+  // インサートしながら、自身レコードを取得
   const response = await db
     .insert(deckHistories)
     .values(newDeckHistory)
-    .execute();
-  if (!response.success) {
+    .returning()
+    .get();
+
+  if (!response) {
     return json({ message: "デッキ履歴の登録に失敗しました" }, { status: 500 });
   }
 
@@ -211,19 +206,11 @@ export async function createDeckHistory(
       formData.get("first") === "on" ||
       formData.get("first") === "true" ||
       false;
-    // 直前にインサートされたレコードを取得
-    const insertedRecord = await db
-      .select()
-      .from(deckHistories)
-      .where(eq(deckHistories.deckId, deckId))
-      .orderBy(desc(deckHistories.createdAt))
-      .limit(1)
-      .execute();
 
     // デッキコードを登録
     const createDeckCodeResponse = await createDeckCode(
       deckId,
-      insertedRecord[0].id,
+      response.id,
       formData.get("code") as string,
       isFirst,
       context
@@ -240,7 +227,7 @@ export async function createDeckHistory(
     if (isFirst) {
       const updateDeckCodeResponse = await updateDeckCoeToMain(
         deckId,
-        insertedRecord[0].id,
+        response.id,
         context
       );
 
