@@ -28,15 +28,10 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
   return json({ user });
 }
 
-export const action = async ({
-  params,
-  context,
-  request,
-}: LoaderFunctionArgs) => {
+export const action = async ({ context, request }: LoaderFunctionArgs) => {
   const formData = await request.formData();
-  const { deckId } = params;
   const userId = formData.get("userId");
-  const response = await updateUserProfile(Number(deckId), formData, context);
+  const response = await updateUserProfile(Number(userId), formData, context);
 
   const responseData = await response.json();
   if (response.status === 200) {
