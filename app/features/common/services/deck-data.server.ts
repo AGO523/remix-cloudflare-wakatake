@@ -71,8 +71,8 @@ const updateDeckCodeSchema = z.object({
 });
 
 const updateUserProfileSchema = z.object({
-  nickname: z.string().min(1).max(100).optional(),
-  bio: z.string().optional(),
+  nickname: z.string().max(100).optional(),
+  bio: z.string().max(300).optional(),
   avatarUrl: z.string().optional(),
 });
 

@@ -6,9 +6,7 @@ import { getUserBy } from "~/features/common/services/deck-data.server";
 
 export async function loader({ params, request, context }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
-  const currentUser = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
+  const currentUser = await authenticator.isAuthenticated(request);
 
   const paramsUserId = Number(params.userId);
   const user = await getUserBy(paramsUserId, context);
@@ -39,11 +37,11 @@ export default function UserProfileLayout() {
             {user.nickname ? user.nickname : `トレーナー_${user.id}`}
           </p>
           <p className="card-subtitle text-gray-500">
-            {"自己紹介が設定されていません"}
+            {user.bio ? user.bio : "自己紹介が設定されていません"}
           </p>
         </div>
 
-        {user && user.id === currentUser.id && (
+        {user && user.id === currentUser?.id && (
           <>
             <Link
               to={`/pokemon/${user.id}/profile/edit`}

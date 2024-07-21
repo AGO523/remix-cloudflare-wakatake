@@ -7,21 +7,25 @@ import {
   Link,
 } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
-import { updateUserProfile } from "~/features/common/services/deck-data.server";
+import {
+  getUserBy,
+  updateUserProfile,
+} from "~/features/common/services/deck-data.server";
 import { redirectWithSuccess, redirectWithError } from "remix-toast";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request, {
+  const currentUser = await authenticator.isAuthenticated(request, {
     failureRedirect: "/login",
   });
   const paramsUserId = Number(params.userId);
-  if (Number(paramsUserId) !== user.id) {
+  if (Number(paramsUserId) !== currentUser.id) {
     return redirectWithError(
       `/pokemon/${paramsUserId}/profile`,
       "アクセス権限がありません"
     );
   }
+  const user = await getUserBy(currentUser.id, context);
   if (!user) {
     throw new Response("User not found", { status: 404 });
   }
@@ -73,7 +77,7 @@ export default function EditProfile() {
             placeholder="ユーザー名"
             className="input input-bordered input-lg w-full max-w-lg mt-2"
             name="nickname"
-            defaultValue={user?.nickname || ""}
+            defaultValue={user.nickname || ""}
           />
           <div>
             <textarea
