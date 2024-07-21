@@ -52,14 +52,12 @@ export default function UserProfileLayout() {
           </>
         )}
       </div>
-      <div>
-        <Link className="btn mt-2" to={`/pokemon/${user.id}/decks`}>
+      <div className="mt-2">
+        <Link className="btn" to={`/pokemon/${user.id}/decks`}>
           デッキ一覧
         </Link>
-      </div>
 
-      <div>
-        <Link className="btn btn-error mt-2" to="/auth/logout">
+        <Link className="btn" to="/auth/logout">
           ログアウト
         </Link>
       </div>
