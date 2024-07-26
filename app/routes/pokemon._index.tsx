@@ -25,7 +25,10 @@ export default function PokemonDecks() {
       <div className="flex flex-wrap justify-center">
         {(currentUserId && (
           <>
-            <Link to="deck/new" className="btn btn-primary m-2">
+            <Link
+              to={`${currentUserId}/decks/new`}
+              className="btn btn-primary m-2"
+            >
               デッキを登録する
             </Link>
             <Link
