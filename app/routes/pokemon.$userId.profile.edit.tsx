@@ -58,7 +58,7 @@ export default function EditProfile() {
   return (
     <div className="flex justify-center items-center">
       <div className="p-8 w-full">
-        <h2 className="text-2xl font-semibold text-center mb-6">
+        <h2 className="text-xl font-semibold text-center mb-6">
           プロフィールの変更
         </h2>
         <Form method="post" className="space-y-4">
@@ -75,14 +75,14 @@ export default function EditProfile() {
           <input
             type="text"
             placeholder="ユーザー名"
-            className="input input-bordered input-lg w-full max-w-lg mt-2"
+            className="input input-bordered w-full max-w-lg mt-2"
             name="nickname"
             defaultValue={user.nickname || ""}
           />
           <div>
             <textarea
               placeholder="自己紹介"
-              className="textarea textarea-bordered textarea-lg w-full max-w-lg mt-2"
+              className="textarea textarea-bordered w-full max-w-lg mt-2"
               name="bio"
               defaultValue={user.bio || ""}
             />
@@ -94,9 +94,11 @@ export default function EditProfile() {
           >
             {isSubmitting ? "更新中..." : "更新"}
           </button>
-          <Link to="../" className="btn btn-error mt-4">
-            キャンセル
-          </Link>
+          <div className="mt-2">
+            <Link to="../" className="btn btn-ghost">
+              キャンセル
+            </Link>
+          </div>
         </Form>
       </div>
     </div>
