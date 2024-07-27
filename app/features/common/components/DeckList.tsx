@@ -6,7 +6,7 @@ type DeckListProps = {
   decks: Deck[];
   currentUserId?: number;
   userPageId?: number | null;
-  userNickname?: string | null; // プロパティ名の修正
+  userNickname?: string | null;
 };
 
 export function DeckList({
