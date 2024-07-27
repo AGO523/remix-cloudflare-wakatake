@@ -302,7 +302,7 @@ export async function getDecksBy(userId: number, context: AppLoadContext) {
     .orderBy(desc(decks.updatedAt), desc(decks.createdAt))
     .all();
 
-  const decksWithDetails = await Promise.all(
+  const decksWithDetailsAndUsers = await Promise.all(
     decksData.map(async (deck) => {
       const histories = await db
         .select()
@@ -316,11 +316,19 @@ export async function getDecksBy(userId: number, context: AppLoadContext) {
         .where(eq(deckCodes.deckId, deck.id))
         .all();
 
-      return { ...deck, histories, codes };
+      const usersData = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, deck.userId))
+        .all();
+
+      const user = usersData.length > 0 ? usersData[0] : null;
+
+      return { ...deck, histories, codes, user };
     })
   );
 
-  return decksWithDetails;
+  return decksWithDetailsAndUsers;
 }
 
 export async function getDeckById(deckId: number, context: AppLoadContext) {
@@ -821,8 +829,7 @@ export async function getDecks(
     return null;
   }
 
-  // deckCodesのstatusがmain のものを取得
-  const decksWithCodes = await Promise.all(
+  const decksWithCodesAndUsers = await Promise.all(
     decksData.map(async (deck) => {
       const codes = await db
         .select()
@@ -830,11 +837,19 @@ export async function getDecks(
         .where(eq(deckCodes.deckId, deck.id))
         .all();
 
-      return { ...deck, codes };
+      const usersData = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, deck.userId))
+        .all();
+
+      const user = usersData.length > 0 ? usersData[0] : null;
+
+      return { ...deck, codes, user };
     })
   );
 
-  return decksWithCodes;
+  return decksWithCodesAndUsers;
 }
 
 export async function getDeckCount(context: AppLoadContext) {

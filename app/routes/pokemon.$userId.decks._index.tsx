@@ -10,6 +10,7 @@ type LoaderData = {
   decks: Deck[];
   user: { id: number } | null;
   paramsUserId: number;
+  nickname: string | null;
 };
 
 export async function loader({ request, context, params }: LoaderFunctionArgs) {
@@ -17,12 +18,18 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
   const user = await authenticator.isAuthenticated(request);
   const paramsUserId = Number(params.userId);
   const decksData = await getDecksBy(paramsUserId, context);
-  const decks = decksData.map(parseDeckDates); // ここで変換
-  return json<LoaderData>({ decks, user, paramsUserId });
+  const decks = decksData.map(parseDeckDates);
+
+  let nickname = null;
+  if (decksData.length > 0 && decksData[0].user) {
+    nickname = decksData[0].user.nickname || null;
+  }
+
+  return json<LoaderData>({ decks, user, paramsUserId, nickname });
 }
 
 export default function DecksByUser() {
-  const { decks, user, paramsUserId } = useLoaderData<LoaderData>();
+  const { decks, user, paramsUserId, nickname } = useLoaderData<LoaderData>();
   const currentUserId = user?.id;
 
   return (
@@ -31,6 +38,7 @@ export default function DecksByUser() {
         decks={decks}
         currentUserId={currentUserId}
         userPageId={paramsUserId}
+        userNickname={nickname}
       />
     </>
   );

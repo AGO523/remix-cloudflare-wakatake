@@ -6,9 +6,15 @@ type DeckListProps = {
   decks: Deck[];
   currentUserId?: number;
   userPageId?: number | null;
+  userNickname?: string | null;
 };
 
-export function DeckList({ decks, currentUserId, userPageId }: DeckListProps) {
+export function DeckList({
+  decks,
+  currentUserId,
+  userPageId,
+  userNickname,
+}: DeckListProps) {
   return (
     <>
       <h1 className="text-3xl font-bold mb-6">デッキ</h1>
@@ -39,6 +45,12 @@ export function DeckList({ decks, currentUserId, userPageId }: DeckListProps) {
               key={deck.id}
               className="block shadow-lg rounded-lg p-2 hover:shadow-xl transition-shadow"
             >
+              {userNickname && (
+                <div className="badge badge-ghost mb-1">
+                  作成者: {userNickname}
+                </div>
+              )}
+
               <h3 className="text-xl font-semibold mb-2">{deck.title}</h3>
               <p className="text-gray-700 mb-4">{deck.description}</p>
               <div className="flex justify-center">

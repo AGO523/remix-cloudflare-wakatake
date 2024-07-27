@@ -14,6 +14,7 @@ type LoaderData = {
   user: { id: number } | null;
   totalDecks: number;
   page: number;
+  nickname: string | null;
 };
 
 export async function loader({ request, context, params }: LoaderFunctionArgs) {
@@ -26,17 +27,29 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
     throw new Response("Decks not found", { status: 404 });
   }
   const decks = decksData.map(parseDeckDates) as Deck[]; // 型アサーション
-  return json<LoaderData>({ decks, user, totalDecks, page });
+
+  let nickname = null;
+  if (decksData.length > 0 && decksData[0].user) {
+    nickname = decksData[0].user.nickname || null;
+  }
+
+  return json<LoaderData>({ decks, user, totalDecks, page, nickname });
 }
 
 export default function Decks() {
-  const { decks, user, totalDecks, page } = useLoaderData<LoaderData>();
+  const { decks, user, totalDecks, page, nickname } =
+    useLoaderData<LoaderData>();
   const currentUserId = user?.id;
   const totalPages = Math.ceil(totalDecks / 10);
 
   return (
     <>
-      <DeckList decks={decks} currentUserId={currentUserId} userPageId={null} />
+      <DeckList
+        decks={decks}
+        currentUserId={currentUserId}
+        userPageId={null}
+        userNickname={nickname}
+      />
       <div className="flex justify-center mt-6">
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
           <Link
