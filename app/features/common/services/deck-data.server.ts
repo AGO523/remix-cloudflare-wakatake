@@ -73,6 +73,8 @@ const updateDeckCodeSchema = z.object({
 const updateUserProfileSchema = z.object({
   nickname: z.string().max(100).optional(),
   bio: z.string().max(300).optional(),
+});
+const updateUserAvatarSchema = z.object({
   avatarUrl: z.string().optional(),
 });
 
@@ -882,7 +884,6 @@ export async function updateUserProfile(
   const db = createClient(env.DB);
 
   const formObject = {
-    // avatarUrl: formData.get("avatarUrl") as string,
     nickname: formData.get("nickname") as string,
     bio: formData.get("bio") as string,
   };
@@ -902,6 +903,42 @@ export async function updateUserProfile(
   const response = await db
     .update(users)
     .set(updatedProfile)
+    .where(eq(users.id, userId))
+    .execute();
+
+  if (response.success) {
+    return json({ message: "プロフィールを更新しました" }, { status: 200 });
+  }
+  return json({ message: "プロフィールの更新に失敗しました" }, { status: 500 });
+}
+
+export async function updateUserAvatar(
+  userId: number,
+  formData: FormData,
+  context: AppLoadContext
+) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  const formObject = {
+    avatarUrl: formData.get("avatarUrl") as string,
+  };
+
+  const result = updateUserAvatarSchema.safeParse(formObject);
+  if (!result.success) {
+    return json(
+      { message: result.error.errors[0].message, errors: result.error },
+      { status: 400 }
+    );
+  }
+
+  const updatedAvatar = {
+    ...result.data,
+  };
+
+  const response = await db
+    .update(users)
+    .set(updatedAvatar)
     .where(eq(users.id, userId))
     .execute();
 
