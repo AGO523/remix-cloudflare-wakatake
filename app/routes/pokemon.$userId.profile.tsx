@@ -20,14 +20,14 @@ export default function UserProfileLayout() {
   const { user, currentUser } = useLoaderData<typeof loader>();
 
   return (
-    <div className="card bg-base-200 shadow-md mb-4 max-w-2xl w-full p-4">
+    <div className="card bg-base-200 shadow-md mb-4 max-w-3xl w-full p-4">
       <div className="flex flex-col items-center">
-        <div className="avatar mb-4">
+        <div className="mb-2">
           {user.avatarUrl && (
             <img
               src={user?.avatarUrl}
               alt="アバターの画像"
-              className="w-16 h-16 rounded-full"
+              className="w-24 h-24 rounded-full"
             />
           )}
         </div>
@@ -40,7 +40,9 @@ export default function UserProfileLayout() {
             {user.bio ? user.bio : "自己紹介が設定されていません"}
           </p>
         </div>
+      </div>
 
+      <div className="">
         {user && user.id === currentUser?.id && (
           <>
             <Link
@@ -48,6 +50,12 @@ export default function UserProfileLayout() {
               className="btn btn-primary"
             >
               プロフィールの変更
+            </Link>
+            <Link
+              to={`/pokemon/${user.id}/profile/avatar_edit`}
+              className="btn btn-primary ml-2"
+            >
+              アバターの変更
             </Link>
           </>
         )}

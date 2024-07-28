@@ -1,4 +1,8 @@
-import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/cloudflare";
+import type {
+  MetaFunction,
+  LoaderFunctionArgs,
+  LinksFunction,
+} from "@remix-run/cloudflare";
 import { Outlet, NavLink, useLoaderData } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import { json } from "@remix-run/cloudflare";
@@ -14,6 +18,14 @@ export const meta: MetaFunction = () => {
     },
   ];
 };
+
+export const links: LinksFunction = () => [
+  {
+    rel: "icon",
+    href: "https://storage.googleapis.com/prod-artora-arts/dev-images/dorapa_aka_icon.png",
+    type: "image/png",
+  },
+];
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -34,9 +46,9 @@ export default function PokemonLayout() {
       <div className="p-6 sm:p-12 bg-neutral text-gray-100">
         <div className="flex flex-col space-y-4 md:space-y-0 md:space-x-6 md:flex-row">
           <img
-            src="https://storage.googleapis.com/prod-artora-arts/dev-images/artora-icon.png"
+            src="https://storage.googleapis.com/prod-artora-arts/dev-images/dorapa_aka_icon.png"
             alt="アートラのアイコン"
-            className="self-center flex-shrink-0 w-24 h-24 border rounded-full md:justify-self-start dark:bg-secondary dark:border-gray-700"
+            className="self-center flex-shrink-0 w-24 h-24 border rounded-full md:justify-self-start bg-base-100 border-gray-700"
           />
           <div className="flex flex-col">
             <h4 className="text-lg font-semibold text-center md:text-left">

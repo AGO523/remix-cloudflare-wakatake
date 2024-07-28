@@ -26,7 +26,6 @@ export default function CardImages({
 
   return (
     <div className="mt-4">
-      <h2 className="text-2xl font-semibold text-center mb-6">デッキの画像</h2>
       {loading ? (
         <p className="text-center">画像を読み込んでいます...</p>
       ) : (

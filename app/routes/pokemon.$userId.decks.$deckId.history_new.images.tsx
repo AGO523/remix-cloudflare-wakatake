@@ -7,20 +7,22 @@ import { redirectWithError } from "remix-toast";
 
 export async function loader({ context, request, params }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request, {
+  const currentUser = await authenticator.isAuthenticated(request, {
     failureRedirect: "/login",
   });
 
-  const userId = params;
+  const userId = params.userId;
 
-  if (Number(userId) !== user.id) {
+  console.log(userId);
+
+  if (Number(userId) !== currentUser.id) {
     return redirectWithError(
       `/pokemon/${userId}/decks`,
       "アクセス権限がありません"
     );
   }
 
-  const cardImages = await getCardImagesBy(user.id, context);
+  const cardImages = await getCardImagesBy(currentUser.id, context);
   return json({ cardImages });
 }
 
