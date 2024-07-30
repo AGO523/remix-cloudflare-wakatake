@@ -45,6 +45,15 @@ export function DeckList({
               key={deck.id}
               className="block shadow-lg rounded-lg p-2 hover:shadow-xl transition-shadow"
             >
+              {/* {user.avatarUrl && (
+              <div className="mb-2">
+            <img
+              src={user?.avatarUrl}
+              alt="アバターの画像"
+              className="w-24 h-24 rounded-full"
+            />
+        </div>
+          )} */}
               {userNickname && (
                 <div className="badge badge-ghost mb-1">
                   作成者: {userNickname}

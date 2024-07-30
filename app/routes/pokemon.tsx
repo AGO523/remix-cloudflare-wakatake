@@ -22,7 +22,7 @@ export const meta: MetaFunction = () => {
 export const links: LinksFunction = () => [
   {
     rel: "icon",
-    href: "https://storage.googleapis.com/prod-artora-arts/dev-images/dorapa_aka_icon.png",
+    href: "https://storage.googleapis.com/prod-artora-arts/dev-images/hura_icon2.png",
     type: "image/png",
   },
 ];
