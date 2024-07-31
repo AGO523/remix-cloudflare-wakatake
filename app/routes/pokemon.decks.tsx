@@ -15,6 +15,7 @@ type LoaderData = {
   totalDecks: number;
   page: number;
   nickname: string | null;
+  avatarUrl: string | null;
 };
 
 export async function loader({ request, context, params }: LoaderFunctionArgs) {
@@ -29,15 +30,24 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
   const decks = decksData.map(parseDeckDates) as Deck[]; // 型アサーション
 
   let nickname = null;
+  let avatarUrl = null;
   if (decksData.length > 0 && decksData[0].user) {
     nickname = decksData[0].user.nickname || null;
+    avatarUrl = decksData[0].user.avatarUrl || null;
   }
 
-  return json<LoaderData>({ decks, user, totalDecks, page, nickname });
+  return json<LoaderData>({
+    decks,
+    user,
+    totalDecks,
+    page,
+    nickname,
+    avatarUrl,
+  });
 }
 
 export default function Decks() {
-  const { decks, user, totalDecks, page, nickname } =
+  const { decks, user, totalDecks, page, nickname, avatarUrl } =
     useLoaderData<LoaderData>();
   const currentUserId = user?.id;
   const totalPages = Math.ceil(totalDecks / 10);
@@ -49,6 +59,7 @@ export default function Decks() {
         currentUserId={currentUserId}
         userPageId={null}
         userNickname={nickname}
+        userAvatarUrl={avatarUrl}
       />
       <div className="flex justify-center mt-6">
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
