@@ -34,7 +34,7 @@ export default function UserProfileLayout() {
 
         <div className="card-body items-center mb-4">
           <p className="card-title">
-            {user.nickname ? user.nickname : `トレーナー_${user.id}`}
+            {user.nickname ? user.nickname : `ユーザー_${user.id}`}
           </p>
           <p className="card-subtitle text-gray-500">
             {user.bio ? user.bio : "自己紹介が設定されていません"}

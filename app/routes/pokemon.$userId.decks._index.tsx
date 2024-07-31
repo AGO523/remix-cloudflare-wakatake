@@ -11,6 +11,7 @@ type LoaderData = {
   user: { id: number } | null;
   paramsUserId: number;
   nickname: string | null;
+  avatarUrl: string | null;
 };
 
 export async function loader({ request, context, params }: LoaderFunctionArgs) {
@@ -21,15 +22,18 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
   const decks = decksData.map(parseDeckDates);
 
   let nickname = null;
+  let avatarUrl = null;
   if (decksData.length > 0 && decksData[0].user) {
     nickname = decksData[0].user.nickname || null;
+    avatarUrl = decksData[0].user.avatarUrl || null;
   }
 
-  return json<LoaderData>({ decks, user, paramsUserId, nickname });
+  return json<LoaderData>({ decks, user, paramsUserId, nickname, avatarUrl });
 }
 
 export default function DecksByUser() {
-  const { decks, user, paramsUserId, nickname } = useLoaderData<LoaderData>();
+  const { decks, user, paramsUserId, nickname, avatarUrl } =
+    useLoaderData<LoaderData>();
   const currentUserId = user?.id;
 
   return (
@@ -39,6 +43,7 @@ export default function DecksByUser() {
         currentUserId={currentUserId}
         userPageId={paramsUserId}
         userNickname={nickname}
+        userAvatarUrl={avatarUrl}
       />
     </>
   );
