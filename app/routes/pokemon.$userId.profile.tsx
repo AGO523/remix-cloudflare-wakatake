@@ -61,14 +61,18 @@ export default function UserProfileLayout() {
         )}
       </div>
       <div className="mt-2">
-        <Link className="btn" to={`/pokemon/${user.id}/decks`}>
-          デッキ一覧
-        </Link>
-
-        <Link className="btn" to="/auth/logout">
-          ログアウト
+        <Link className="btn btn-secondary" to={`/pokemon/${user.id}/decks`}>
+          このユーザーのデッキを見る
         </Link>
       </div>
+
+      {user && user.id === currentUser?.id && (
+        <div className="mt-2">
+          <Link className="btn" to="/auth/logout">
+            ログアウト
+          </Link>
+        </div>
+      )}
 
       <Outlet />
     </div>
