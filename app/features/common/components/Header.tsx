@@ -27,10 +27,12 @@ export const Header: React.FC = () => {
           </div>
         ) : (
           <></>
+          // <div className="btn btn-ghost ml-2">
+          //   <Link to="/pokemon/decks" prefetch="intent">
+          //     みんなのデッキ
+          //   </Link>
+          // </div>
         )}
-        {/* <div className="btn btn-ghost ml-2">
-          <Link to="/login">ログイン</Link>
-        </div> */}
       </div>
     </div>
   );
