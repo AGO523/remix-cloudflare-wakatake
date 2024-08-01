@@ -26,11 +26,12 @@ export const Header: React.FC = () => {
             </Link>
           </div>
         ) : (
-          <div className="btn btn-ghost ml-2">
-            <Link to="/pokemon/decks" prefetch="intent">
-              みんなのデッキ
-            </Link>
-          </div>
+          <></>
+          // <div className="btn btn-ghost ml-2">
+          //   <Link to="/pokemon/decks" prefetch="intent">
+          //     みんなのデッキ
+          //   </Link>
+          // </div>
         )}
       </div>
     </div>

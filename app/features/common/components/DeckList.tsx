@@ -19,7 +19,7 @@ export function DeckList({
 }: DeckListProps) {
   return (
     <>
-      <h1 className="text-3xl font-bold mb-6">デッキ</h1>
+      <h1 className="text-3xl font-bold mb-6">デッキ一覧</h1>
       {currentUserId === userPageId && (
         <Link to="new" className="btn btn-primary m-1" prefetch="intent">
           デッキを新規作成
