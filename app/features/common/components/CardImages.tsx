@@ -29,26 +29,31 @@ export default function CardImages({
       {loading ? (
         <p className="text-center">画像を読み込んでいます...</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
-          {cardImages.map((cardImage) => (
-            <button
-              key={cardImage.id}
-              onClick={() => copyToClipboard(cardImage.imageUrl)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  copyToClipboard(cardImage.imageUrl);
-                }
-              }}
-              className="focus:outline-none"
-              aria-label="画像のURLをコピー"
-            >
-              <img
-                src={cardImage.imageUrl}
-                alt={`デッキの画像 ${cardImage.id}`}
-                className="object-cover rounded-md max-h-40 max-w-40"
-              />
-            </button>
-          ))}
+        <div>
+          <p className="text-center">
+            画像をクリックすると画像のURLがコピーできます
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 justify-center">
+            {cardImages.map((cardImage) => (
+              <button
+                key={cardImage.id}
+                onClick={() => copyToClipboard(cardImage.imageUrl)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    copyToClipboard(cardImage.imageUrl);
+                  }
+                }}
+                className="flex justify-center items-center"
+                aria-label="画像のURLをコピー"
+              >
+                <img
+                  src={cardImage.imageUrl}
+                  alt={`デッキの画像 ${cardImage.id}`}
+                  className="object-cover rounded-sm max-h-40 max-w-40"
+                />
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
