@@ -9,7 +9,10 @@ export const Header: React.FC = () => {
     <div className="navbar bg-base-100">
       <div className="flex-1">
         {isPokemonPath || isLoginPath ? (
-          <Link to="/pokemon" className="btn btn-ghost normal-case text-bold">
+          <Link
+            to="/pokemon"
+            className="btn btn-ghost normal-case text-lg text-bold"
+          >
             ポケヒス
           </Link>
         ) : (

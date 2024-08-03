@@ -62,7 +62,7 @@ export default function PokemonDecks() {
         <br />
         デッキの変遷を記録し、共有することができます。
       </p>
-      <div className="flex flex-wrap justify-center mb-4">
+      <div className="flex flex-wrap justify-center mb-8">
         {(currentUserId && (
           <>
             <Link
@@ -85,6 +85,8 @@ export default function PokemonDecks() {
           </Link>
         )}
       </div>
+
+      <div className="divider"></div>
 
       <DeckList
         decks={decks}

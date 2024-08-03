@@ -32,8 +32,8 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
     throw new Response("User not found", { status: 404 });
   }
 
-  // user_id が 1（管理者）の cardImages を取得して返す
-  const cardImages = await getCardImagesBy(1, context);
+  // user_id が 2（管理者）の cardImages を取得して返す
+  const cardImages = await getCardImagesBy(2, context);
   return json({ user, cardImages });
 }
 

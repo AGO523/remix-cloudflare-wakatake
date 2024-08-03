@@ -96,41 +96,55 @@ export default function NewDeckHistory() {
           </div>
 
           {/* 履歴にデッキコードを挿入 */}
-          <div>
+
+          <div className="divider">デッキ画像挿入</div>
+
+          <div className="mt-4 mb-4">
             <input
               type="text"
               name="code"
               id="code"
-              placeholder="デッキコード"
+              placeholder="デッキコードを入力(任意)"
               className="input input-bordered w-full"
             />
             <p className="text-gray-600 text-sm">
-              履歴にデッキ画像を表示する場合は、デッキコードを入力してください。
+              この履歴にデッキ画像を表示することができます
             </p>
+
             <input
               type="checkbox"
               name="first"
               id="first"
-              className="checkbox checkbox-primary mt-2"
+              className="checkbox checkbox-secondary border-4 mt-2"
             />
-            <p className="text-gray-600 text-sm">
-              デッキのメイン画像にする場合はチェックを入れてください。
+            <p className="text-gray-600 text-sm pb-2">
+              ↑のデッキコードをメインのデッキ画像に設定する（後から変更可）
             </p>
           </div>
 
           {/* 履歴に画像を挿入 */}
+
+          <div className="divider">その他の画像挿入</div>
+
           <div>
             <input
               type="text"
               name="cardImageUrl"
               id="cardImageUrl"
-              placeholder="挿入する画像のURLを貼り付ける"
+              placeholder="挿入する画像のURLを貼り付ける(任意)"
               className="input input-bordered w-full"
             />
             <p className="text-gray-600 text-sm">
-              履歴に1枚まで画像を添付できます。
+              デッキ画像とは別に、この履歴に1枚まで画像を添付できます
+              <br />
+              「画像を表示」ボタンから、画像を選んでURLをコピーできます
+              <br />
+              「画像をアップロード」ボタンから、新しい画像をアップロードできます
             </p>
           </div>
+
+          <div className="divider"></div>
+
           <div>
             <button
               type="submit"
@@ -144,17 +158,20 @@ export default function NewDeckHistory() {
             </p>
           </div>
         </Form>
+
+        <div className="divider">画像取得・アップロード</div>
+
         <div className="flex justify-between mt-4">
           <Link
             to={`images`}
-            className="btn btn-primary w-1/2 mr-1"
+            className="btn btn-secondary w-1/2 mr-1"
             preventScrollReset
           >
             画像を表示
           </Link>
           <Link
             to={`upload`}
-            className="btn btn-primary w-1/2 ml-1"
+            className="btn btn-secondary w-1/2 ml-1"
             preventScrollReset
           >
             画像をアップロード
