@@ -7,11 +7,9 @@ import { Deck } from "~/features/common/types/deck";
 import { parseDeckDates } from "~/features/common/utils/parseDates";
 
 type LoaderData = {
-  decks: Deck[];
+  decks: (Deck & { nickname: string | null; avatarUrl: string | null })[];
   user: { id: number } | null;
   paramsUserId: number;
-  nickname: string | null;
-  avatarUrl: string | null;
 };
 
 export async function loader({ request, context, params }: LoaderFunctionArgs) {
@@ -19,21 +17,17 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
   const user = await authenticator.isAuthenticated(request);
   const paramsUserId = Number(params.userId);
   const decksData = await getDecksBy(paramsUserId, context);
-  const decks = decksData.map(parseDeckDates);
+  const decks = decksData.map((deck) => ({
+    ...parseDeckDates(deck),
+    nickname: deck.user ? deck.user.nickname || null : null,
+    avatarUrl: deck.user ? deck.user.avatarUrl || null : null,
+  }));
 
-  let nickname = null;
-  let avatarUrl = null;
-  if (decksData.length > 0 && decksData[0].user) {
-    nickname = decksData[0].user.nickname || null;
-    avatarUrl = decksData[0].user.avatarUrl || null;
-  }
-
-  return json<LoaderData>({ decks, user, paramsUserId, nickname, avatarUrl });
+  return json<LoaderData>({ decks, user, paramsUserId });
 }
 
 export default function DecksByUser() {
-  const { decks, user, paramsUserId, nickname, avatarUrl } =
-    useLoaderData<LoaderData>();
+  const { decks, user, paramsUserId } = useLoaderData<LoaderData>();
   const currentUserId = user?.id;
 
   return (
@@ -42,8 +36,6 @@ export default function DecksByUser() {
         decks={decks}
         currentUserId={currentUserId}
         userPageId={paramsUserId}
-        userNickname={nickname}
-        userAvatarUrl={avatarUrl}
       />
     </>
   );
