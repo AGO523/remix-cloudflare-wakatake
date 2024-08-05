@@ -134,6 +134,13 @@
       "when": 1721349021363,
       "tag": "0018_yummy_hairball",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1722897153552,
+      "tag": "0019_chilly_dragon_man",
+      "breakpoints": true
     }
   ]
 }
