@@ -12,6 +12,7 @@ import { createClient } from "~/features/common/services/db.server";
 export type AuthUser = {
   id: number;
   profileId: string;
+  email: string;
   iconUrl: string;
   displayName: string;
   nickname?: string;
@@ -87,6 +88,7 @@ function setupGoogleStrategy(env: Env, authenticator: Authenticator<AuthUser>) {
       // 新規ユーザーを作成
       const newUser: CreateUser = {
         profileId: profile.id,
+        email: profile.emails?.[0].value,
         iconUrl: profile.photos?.[0].value,
         displayName: profile.displayName,
         createdAt: new Date(),
@@ -96,6 +98,7 @@ function setupGoogleStrategy(env: Env, authenticator: Authenticator<AuthUser>) {
       return {
         id: ret.id,
         profileId: profile.id,
+        email: profile.emails?.[0].value,
         iconUrl: profile.photos?.[0].value,
         displayName: profile.displayName,
       };
