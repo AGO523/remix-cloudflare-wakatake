@@ -1,12 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import {
-  Form,
-  Link,
-  Outlet,
-  useLoaderData,
-  useNavigation,
-} from "@remix-run/react";
+import { Link, Outlet, useLoaderData, useNavigation } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getDeckHistoryById,
@@ -14,6 +8,7 @@ import {
   getDeckCodeByHistoryId,
 } from "~/features/common/services/deck-data.server";
 import { redirectWithSuccess, redirectWithError } from "remix-toast";
+import DeckHistoryForm from "~/features/common/components/DeckHistoryForm";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -77,109 +72,29 @@ export default function EditDeckHistory() {
       <h2 className="text-2xl font-semibold text-center mb-6">
         デッキ履歴を編集する
       </h2>
-      <Form method="post" className="space-y-4">
-        <div>
-          <select
-            name="status"
-            defaultValue={deckHistory.status}
-            className="input input-bordered w-full"
-          >
-            <option value="main">公開</option>
-            <option value="sub">非公開</option>
-            <option value="draft">下書き</option>
-          </select>
-        </div>
-        <div>
-          <textarea
-            name="content"
-            placeholder="内容"
-            defaultValue={deckHistory.content ?? ""}
-            className="textarea textarea-bordered w-full min-h-[300px]"
-          ></textarea>
-        </div>
-        {(deckCode && deckCode.imageUrl && (
-          <div>
-            <input type="hidden" name="deckId" value={deckCode.deckId} />
-            <input type="hidden" name="currentDeckCodeId" value={deckCode.id} />
-            <input type="hidden" name="status" value={deckCode.status} />
-            <input
-              type="text"
-              name="code"
-              placeholder="デッキコード"
-              defaultValue={deckCode.code ?? ""}
-              className="input input-bordered w-full"
-            />
-            <p className="text-gray-700">
-              履歴に関連付けられたデッキコードがあります。変更する場合は入力してください。
-            </p>
-            <input
-              type="checkbox"
-              name="first"
-              id="first"
-              className="checkbox checkbox-primary mt-2"
-            />
-            <p className="text-gray-600 text-sm">
-              デッキのメイン画像にする場合はチェックを入れてください。
-            </p>
-          </div>
-        )) || (
-          <div>
-            <input type="hidden" name="deckId" value={deckHistory.deckId} />
-            <input
-              type="text"
-              name="newCode"
-              id="code"
-              placeholder="デッキコード"
-              className="input input-bordered w-full"
-            />
-            <p className="text-gray-600 text-sm">
-              履歴にデッキ画像を表示する場合は、デッキコードを入力してください。
-            </p>
-            <input
-              type="checkbox"
-              name="first"
-              id="first"
-              className="checkbox checkbox-primary mt-2"
-            />
-            <p className="text-gray-600 text-sm">
-              デッキのメイン画像にする場合はチェックを入れてください。
-            </p>
-          </div>
-        )}
-        {/* 履歴に画像を挿入 */}
-        <div>
-          <input
-            type="text"
-            name="cardImageUrl"
-            id="cardImageUrl"
-            defaultValue={deckHistory.cardImageUrl ?? ""}
-            className="input input-bordered w-full"
-          />
-          <p className="text-gray-600 text-sm">
-            履歴に1枚まで画像を添付できます。
-          </p>
-        </div>
-        <div>
-          <button
-            type="submit"
-            className="btn btn-primary w-full max-w-xs"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "更新中..." : "更新"}
-          </button>
-        </div>
-      </Form>
+      <DeckHistoryForm
+        method="post"
+        action=""
+        isSubmitting={isSubmitting}
+        defaultValues={{
+          deckId: deckHistory.deckId,
+          status: deckHistory.status,
+          content: deckHistory.content ?? "",
+          code: deckCode?.code ?? "",
+          cardImageUrl: deckHistory.cardImageUrl ?? "",
+        }}
+      />
       <div className="flex justify-between mt-4">
         <Link
           to={`images`}
-          className="btn btn-primary w-1/2 mr-1"
+          className="btn btn-secondary w-1/2 mr-1"
           preventScrollReset
         >
           画像を表示
         </Link>
         <Link
           to={`upload`}
-          className="btn btn-primary w-1/2 ml-1"
+          className="btn btn-secondary w-1/2 ml-1"
           preventScrollReset
         >
           画像をアップロード
