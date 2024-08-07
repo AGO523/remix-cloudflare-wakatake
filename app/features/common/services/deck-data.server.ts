@@ -26,56 +26,90 @@ interface UploadResponse {
 }
 
 const createDeckSchema = z.object({
-  userId: z.number(),
-  title: z.string().min(1).max(300),
+  userId: z.number().nonnegative(),
+  title: z
+    .string()
+    .min(1, "タイトルは必須です")
+    .max(300, "タイトルは300文字以内で入力してください"),
   description: z.string().optional(),
-  code: z.string().min(1).max(100),
+  code: z
+    .string()
+    .min(1, "デッキコードは必須です")
+    .max(100, "デッキコードは100文字以内で入力してください"),
 });
 
 const createDeckHistorySchema = z.object({
-  deckId: z.number(),
-  status: z.string().min(1).max(100),
+  deckId: z.number().nonnegative(),
+  status: z
+    .string()
+    .min(1, "公開ステータスは必須です")
+    .max(100, "公開ステータスは100文字以内で入力してください"),
   content: z.string().optional(),
   cardImageUrl: z.string().optional(),
 });
 
 const createCardImageSchema = z.object({
-  userId: z.number(),
-  imageUrl: z.string(),
+  userId: z.number().nonnegative(),
+  imageUrl: z.string().url("URLの形式が不正です"),
   createdAt: z.date(),
 });
 
 const createDeckCodeSchema = z.object({
-  deckId: z.number(),
+  deckId: z.number().nonnegative(),
   historyId: z.number().optional(),
-  status: z.string().min(1).max(100),
-  code: z.string().min(1).max(100),
+  status: z
+    .string()
+    .min(1, "公開ステータスは必須です")
+    .max(100, "公開ステータスは100文字以内で入力してください"),
+  code: z
+    .string()
+    .min(1, "デッキコードは必須です")
+    .max(100, "デッキコードは100文字以内で入力してください"),
   imageUrl: z.string().optional(),
 });
 
 const updateDeckSchema = z.object({
-  title: z.string().min(1).max(300),
+  title: z
+    .string()
+    .min(1, "タイトルは必須です")
+    .max(300, "タイトルは300文字以内で入力してください"),
   description: z.string().optional(),
 });
 
 const updateDeckHistorySchema = z.object({
-  status: z.string().min(1).max(100),
+  status: z
+    .string()
+    .min(1, "公開ステータスは必須です")
+    .max(100, "公開ステータスは100文字以内で入力してください"),
   content: z.string().optional(),
   cardImageUrl: z.string().optional(),
 });
 
 const updateDeckCodeSchema = z.object({
-  deckId: z.number(),
-  status: z.string().min(1).max(100),
-  code: z.string().min(1).max(100),
+  deckId: z.number().nonnegative(),
+  status: z
+    .string()
+    .min(1, "公開ステータスは必須です")
+    .max(100, "公開ステータスは100文字以内で入力してください"),
+  code: z
+    .string()
+    .min(1, "デッキコードは必須です")
+    .max(100, "デッキコードは100文字以内で入力してください"),
 });
 
 const updateUserProfileSchema = z.object({
-  nickname: z.string().max(100).optional(),
-  bio: z.string().max(300).optional(),
+  nickname: z
+    .string()
+    .max(100, "ニックネームは100文字以内で入力してください")
+    .optional(),
+  bio: z
+    .string()
+    .max(300, "自己紹介は300文字以内で入力してください")
+    .optional(),
 });
+
 const updateUserAvatarSchema = z.object({
-  avatarUrl: z.string().optional(),
+  avatarUrl: z.string().url("正しいURLを入力してください").optional(),
 });
 
 async function fetchDeckImage(code: string): Promise<string | null> {
