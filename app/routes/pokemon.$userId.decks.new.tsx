@@ -2,7 +2,11 @@ import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { Form, useLoaderData, useNavigation } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import { createDeck } from "~/features/common/services/deck-data.server";
-import { redirectWithSuccess, redirectWithError } from "remix-toast";
+import {
+  jsonWithError,
+  redirectWithError,
+  redirectWithSuccess,
+} from "remix-toast";
 
 export async function loader({ request, context, params }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -32,7 +36,7 @@ export const action = async ({ context, request }: LoaderFunctionArgs) => {
       responseData.message
     );
   }
-  return redirectWithError(`/pokemon/${userId}/decks`, responseData.message);
+  return jsonWithError({}, responseData.message);
 };
 
 export default function DeckNew() {

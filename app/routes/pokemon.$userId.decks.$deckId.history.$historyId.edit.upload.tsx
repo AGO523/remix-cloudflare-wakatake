@@ -1,6 +1,6 @@
 import { LoaderFunctionArgs, json } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
-import { redirectWithError, redirectWithSuccess } from "remix-toast";
+import { jsonWithError, jsonWithSuccess, redirectWithError } from "remix-toast";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import { uploadAndCreateCardImage } from "~/features/common/services/deck-data.server";
 import UploadImageForm from "~/features/common/components/UploadImageForm";
@@ -27,9 +27,10 @@ export async function action({ context, request }: LoaderFunctionArgs) {
   const response = await uploadAndCreateCardImage(formData, context);
   const responseData = await response.json();
   if (response.status === 201 || response.status === 200) {
-    return redirectWithSuccess(`./`, responseData.message);
+    return jsonWithSuccess({}, responseData.message);
+  } else {
+    return jsonWithError({}, responseData.message);
   }
-  return redirectWithError(`./`, responseData.message);
 }
 
 export default function UploadImage() {
