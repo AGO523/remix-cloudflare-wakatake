@@ -75,9 +75,7 @@ export default function UserProfileLayout() {
           )}
         </div>
 
-        <div className="text-center">
-          <Outlet />
-        </div>
+        <Outlet />
       </div>
     </>
   );

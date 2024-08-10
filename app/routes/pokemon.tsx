@@ -39,7 +39,7 @@ export default function PokemonLayout() {
   return (
     <>
       <section>
-        <div className="flex flex-col justify-center items-center">
+        <div className="flex flex-col justify-center items-center text-center">
           <Outlet />
         </div>
       </section>
