@@ -66,8 +66,8 @@ export default function NewDeckHistory() {
   const isSubmitting = navigation.state === "submitting";
 
   return (
-    <div className="flex justify-center items-center">
-      <div className="w-full">
+    <div className="p-4 bg-base-300 flex justify-center">
+      <div className="w-full max-w-3xl min-w-0 px-2">
         <h2 className="text-2xl font-semibold text-center mb-6">
           デッキ履歴を作成する
         </h2>
@@ -84,14 +84,14 @@ export default function NewDeckHistory() {
         <div className="flex justify-between mt-4">
           <Link
             to={`images`}
-            className="btn btn-secondary w-1/2 mr-1"
+            className="btn btn-info w-1/2 mr-1"
             preventScrollReset
           >
             画像を表示
           </Link>
           <Link
             to={`upload`}
-            className="btn btn-secondary w-1/2 ml-1"
+            className="btn btn-info w-1/2 ml-1"
             preventScrollReset
           >
             画像をアップロード

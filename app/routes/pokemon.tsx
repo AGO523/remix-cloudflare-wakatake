@@ -39,28 +39,32 @@ export default function PokemonLayout() {
   return (
     <>
       <section>
-        <div className="container flex flex-col items-center px-2 py-2 pb-12 mx-auto text-center">
+        <div className="flex flex-col justify-center items-center text-center">
           <Outlet />
         </div>
       </section>
-      <div className="p-6 sm:p-12 bg-neutral text-gray-100">
-        <div className="flex flex-col space-y-4 md:space-y-0 md:space-x-6 md:flex-row">
-          <img
-            src="https://storage.googleapis.com/prod-artora-arts/dev-images/dorapa_aka_icon.png"
-            alt="アートラのアイコン"
-            className="self-center flex-shrink-0 w-24 h-24 border rounded-full md:justify-self-start bg-base-100 border-gray-700"
-          />
-          <div className="flex flex-col">
-            <h4 className="text-lg font-semibold text-center md:text-left">
-              ポケヒス
-            </h4>
-            <p className="dark:text-gray-400">
-              ポケモンカードのデッキを管理することができます。デッキ構築の履歴を残したり、他の人に共有したりできます。
-            </p>
+
+      <section>
+        <div className="p-6 sm:p-12 bg-neutral text-gray-100">
+          <div className="flex flex-col space-y-4 md:space-y-0 md:space-x-6 md:flex-row">
+            <img
+              src="https://storage.googleapis.com/prod-artora-arts/dev-images/dorapa_aka_icon.png"
+              alt="アートラのアイコン"
+              className="self-center flex-shrink-0 w-24 h-24 border rounded-full md:justify-self-start bg-base-100 border-gray-700"
+            />
+            <div className="flex flex-col">
+              <h4 className="text-lg font-semibold text-center md:text-left">
+                ポケヒス
+              </h4>
+              <p className="dark:text-gray-400">
+                ポケモンカードのデッキを管理することができます。デッキ構築の履歴を残したり、他の人に共有したりできます。
+              </p>
+            </div>
           </div>
+          <div className="flex justify-center pt-4 space-x-4 align-center"></div>
         </div>
-        <div className="flex justify-center pt-4 space-x-4 align-center"></div>
-      </div>
+      </section>
+
       {/* ナビゲーションバー */}
       {user ? (
         <div className="fixed inset-x-0 bottom-0 bg-base-100 p-2 bg-opacity-60">
