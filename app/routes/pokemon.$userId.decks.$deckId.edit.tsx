@@ -63,8 +63,8 @@ export default function EditDeck() {
   const isSubmitting = navigation.state === "submitting";
 
   return (
-    <div className="flex justify-center items-center">
-      <div className="shadow-md rounded-lg p-8 w-full">
+    <div className="p-4 bg-base-100 flex justify-center">
+      <div className="w-full max-w-3xl min-w-0 px-2">
         <h2 className="text-2xl font-semibold text-center mb-6">
           デッキを編集する
         </h2>

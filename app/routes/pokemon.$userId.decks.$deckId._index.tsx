@@ -32,38 +32,43 @@ export default function DeckDetail() {
 
   return (
     <>
-      <h4 className="font-medium">履歴</h4>
-      <div className="grid grid-cols-1 gap-6">
-        {hasHiddenHistories && (
-          <p className="text-error mt-4">
-            非公開または下書きの履歴はあなたにだけ表示されています
-          </p>
-        )}
-        {visibleHistories.map((history) => (
-          <div key={history.id} className="shadow-lg rounded-lg p-4">
-            <Link
-              to={`history/${history.id}`}
-              className="block"
-              preventScrollReset
-            >
-              <Badge status={history.status} />
-              <p className="text-gray-700 text-left mt-2">
-                {history.content &&
-                  (history.content.length > 50
-                    ? history.content.substring(0, 50) + "..."
-                    : history.content
-                  )
-                    .split("\n")
-                    .map((line, index) => (
-                      <span key={index}>
-                        {line}
-                        <br />
-                      </span>
-                    ))}
+      <div className="p-4 mt-4 bg-base-100 flex justify-center">
+        <div className="w-full max-w-3xl min-w-0 px-2">
+          <h4 className="font-medium text-center">履歴</h4>
+
+          <div className="grid grid-cols-1 gap-6 mb-4">
+            {hasHiddenHistories && (
+              <p className="text-error mt-4">
+                非公開または下書きの履歴はあなたにだけ表示されています
               </p>
-            </Link>
+            )}
+            {visibleHistories.map((history) => (
+              <div key={history.id} className="shadow-lg rounded-lg p-4">
+                <Link
+                  to={`history/${history.id}`}
+                  className="block"
+                  preventScrollReset
+                >
+                  <Badge status={history.status} />
+                  <p className="text-gray-700 text-left mt-2">
+                    {history.content &&
+                      (history.content.length > 50
+                        ? history.content.substring(0, 50) + "..."
+                        : history.content
+                      )
+                        .split("\n")
+                        .map((line, index) => (
+                          <span key={index}>
+                            {line}
+                            <br />
+                          </span>
+                        ))}
+                  </p>
+                </Link>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </>
   );

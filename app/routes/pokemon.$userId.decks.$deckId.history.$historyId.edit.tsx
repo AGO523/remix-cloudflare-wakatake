@@ -68,41 +68,41 @@ export default function EditDeckHistory() {
   const isSubmitting = navigation.state === "submitting";
 
   return (
-    <div className="mt-6">
-      <h2 className="text-2xl font-semibold text-center mb-6">
-        デッキ履歴を編集する
-      </h2>
-      <DeckHistoryForm
-        method="post"
-        action=""
-        isSubmitting={isSubmitting}
-        defaultValues={{
-          deckId: deckHistory.deckId,
-          status: deckHistory.status,
-          content: deckHistory.content ?? "",
-          code: deckCode?.code ?? "",
-          cardImageUrl: deckHistory.cardImageUrl ?? "",
-        }}
-      />
-      <div className="flex justify-between mt-4">
-        <Link
-          to={`images`}
-          className="btn btn-secondary w-1/2 mr-1"
-          preventScrollReset
-        >
-          画像を表示
-        </Link>
-        <Link
-          to={`upload`}
-          className="btn btn-secondary w-1/2 ml-1"
-          preventScrollReset
-        >
-          画像をアップロード
-        </Link>
+    <>
+      <div className="mt-6">
+        <h2 className="text-2xl font-semibold mb-6">デッキ履歴を編集する</h2>
+        <DeckHistoryForm
+          method="post"
+          action=""
+          isSubmitting={isSubmitting}
+          defaultValues={{
+            deckId: deckHistory.deckId,
+            status: deckHistory.status,
+            content: deckHistory.content ?? "",
+            code: deckCode?.code ?? "",
+            cardImageUrl: deckHistory.cardImageUrl ?? "",
+          }}
+        />
+        <div className="flex justify-between mt-4">
+          <Link
+            to={`images`}
+            className="btn btn-info w-1/2 mr-1"
+            preventScrollReset
+          >
+            画像を表示
+          </Link>
+          <Link
+            to={`upload`}
+            className="btn btn-info w-1/2 ml-1"
+            preventScrollReset
+          >
+            画像をアップロード
+          </Link>
+        </div>
       </div>
       <div className="mt-8">
         <Outlet />
       </div>
-    </div>
+    </>
   );
 }

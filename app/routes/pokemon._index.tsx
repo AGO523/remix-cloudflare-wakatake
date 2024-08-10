@@ -54,7 +54,7 @@ export default function PokemonDecks() {
         <br />
         デッキの変遷を記録し、共有することができます。
       </p>
-      <div className="flex flex-wrap justify-center mb-8">
+      <div className="flex flex-wrap justify-center mb-4">
         {currentUserId ? (
           <>
             <Link
@@ -78,16 +78,15 @@ export default function PokemonDecks() {
         )}
       </div>
 
-      <div className="divider"></div>
-
       <DeckList decks={decks} currentUserId={currentUserId} />
-      <div className="flex justify-center mt-6">
+
+      <div className="flex justify-center mt-6 mb-4">
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
           <Link
             key={pageNum}
             to={`/pokemon/decks?page=${pageNum}`}
             className={`btn ${
-              page === pageNum ? "btn-primary" : "btn-secondary"
+              page === pageNum ? "btn-primary" : "btn-info"
             } btn-sm mx-1`}
           >
             {pageNum}
