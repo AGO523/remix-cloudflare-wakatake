@@ -1,6 +1,7 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { useEffect, useRef } from "react";
+import { Link, Outlet, useLoaderData, useLocation } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import { getDeckById } from "~/features/common/services/deck-data.server";
 import defaultDeckImage from "~/images/sakusei2.png";
@@ -22,6 +23,22 @@ export default function DeckDetail() {
   const currentUserId = user?.id;
   const mainDeckCode = deck.codes.find((code) => code.status === "main");
 
+  const outletRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (
+      location.pathname.endsWith("edit") ||
+      location.pathname.endsWith("delete") ||
+      location.pathname.endsWith("codes") ||
+      location.pathname.endsWith("history_new") ||
+      location.pathname === "/" ||
+      location.search === ""
+    ) {
+      outletRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [location.pathname, location.search]);
+
   return (
     <>
       <div className="p-4 bg-base-200 flex justify-center items-center">
@@ -31,12 +48,7 @@ export default function DeckDetail() {
           </div>
           {deck.userId === currentUserId && (
             <div className="flex justify-end mt-2 space-x-2">
-              <Link
-                to={`edit`}
-                className="btn btn-sm btn-success"
-                preventScrollReset
-                unstable_viewTransition
-              >
+              <Link to={`edit`} className="btn btn-sm btn-success">
                 <svg
                   data-slot="icon"
                   fill="none"
@@ -54,12 +66,7 @@ export default function DeckDetail() {
                   ></path>
                 </svg>
               </Link>
-              <Link
-                to={`delete`}
-                className="btn btn-sm btn-error btn-active"
-                preventScrollReset
-                unstable_viewTransition
-              >
+              <Link to={`delete`} className="btn btn-sm btn-error btn-active">
                 <svg
                   data-slot="icon"
                   fill="none"
@@ -117,11 +124,7 @@ export default function DeckDetail() {
           <div className="fixed right-2 bottom-14">
             <ul className="menu bg-base-100 bg-opacity-60 rounded-box shadow-lg flex flex-col space-y-1">
               <li>
-                <Link
-                  to="./"
-                  className="btn btn-sm btn-info bg-opacity-60"
-                  preventScrollReset
-                >
+                <Link to="./" className="btn btn-sm btn-info bg-opacity-60">
                   履歴
                 </Link>
               </li>
@@ -131,7 +134,6 @@ export default function DeckDetail() {
                     <Link
                       to={`codes`}
                       className="btn btn-sm btn-info bg-opacity-60"
-                      preventScrollReset
                     >
                       デッキコード
                     </Link>
@@ -140,7 +142,6 @@ export default function DeckDetail() {
                     <Link
                       to={`history_new`}
                       className="btn btn-sm btn-success bg-opacity-60"
-                      preventScrollReset
                     >
                       履歴作成
                     </Link>
@@ -152,7 +153,7 @@ export default function DeckDetail() {
         </div>
       </div>
 
-      <div>
+      <div ref={outletRef}>
         <Outlet />
       </div>
     </>
