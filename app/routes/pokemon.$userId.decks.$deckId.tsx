@@ -28,12 +28,13 @@ export default function DeckDetail() {
 
   useEffect(() => {
     if (
-      location.pathname.endsWith("edit") ||
-      location.pathname.endsWith("delete") ||
-      location.pathname.endsWith("codes") ||
       location.pathname.endsWith("history_new") ||
-      location.pathname === "/" ||
-      location.search === ""
+      (!location.pathname.includes("history") &&
+        (location.pathname.endsWith("edit") ||
+          location.pathname.endsWith("delete") ||
+          location.pathname.endsWith("codes") ||
+          location.pathname === "/" ||
+          location.search === ""))
     ) {
       outletRef.current?.scrollIntoView({ behavior: "smooth" });
     }
