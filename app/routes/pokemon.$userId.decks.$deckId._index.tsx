@@ -34,16 +34,20 @@ export default function DeckDetail() {
     <>
       <div className="p-4 mt-4 bg-base-100 flex justify-center">
         <div className="w-full max-w-3xl min-w-0 px-2">
-          <h4 className="font-medium text-center">履歴</h4>
+          <h1 className="text-3xl font-bold mb-6">履歴</h1>
 
-          <div className="grid grid-cols-1 gap-6 mb-4">
+          <div className="grid grid-cols-1 gap-4 mb-4">
             {hasHiddenHistories && (
               <p className="text-error mt-4">
-                非公開または下書きの履歴はあなたにだけ表示されています
+                非公開/下書きの履歴はあなたにだけ表示されています
               </p>
             )}
+
             {visibleHistories.map((history) => (
-              <div key={history.id} className="shadow-lg rounded-lg p-4">
+              <div
+                key={history.id}
+                className="shadow-lg rounded-lg p-6 bg-base-200"
+              >
                 <Link
                   to={`history/${history.id}`}
                   className="block"
@@ -52,8 +56,8 @@ export default function DeckDetail() {
                   <Badge status={history.status} />
                   <p className="text-gray-700 text-left mt-2">
                     {history.content &&
-                      (history.content.length > 50
-                        ? history.content.substring(0, 50) + "..."
+                      (history.content.length > 200
+                        ? history.content.substring(0, 200) + "..."
                         : history.content
                       )
                         .split("\n")

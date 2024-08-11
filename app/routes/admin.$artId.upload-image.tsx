@@ -40,7 +40,7 @@ export default function UploadImage() {
         <input type="hidden" name="artId" value={artId || ""} />
         <button
           type="submit"
-          className="btn btn-primary m-2"
+          className="btn btn-info m-2"
           disabled={isSubmitting}
         >
           {isSubmitting ? "送信中..." : "画像をアップロード"}

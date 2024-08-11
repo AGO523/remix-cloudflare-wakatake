@@ -91,7 +91,7 @@ export default function DeckHistoryForm({
       <div>
         <button
           type="submit"
-          className="btn btn-primary w-full"
+          className="btn btn-info w-full"
           disabled={isSubmitting}
         >
           {isSubmitting ? "送信中..." : "送信"}

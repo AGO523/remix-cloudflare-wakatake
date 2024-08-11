@@ -101,7 +101,7 @@ export default function DeckHistoryDetail() {
             <div className="flex justify-between mt-4">
               <Link
                 to="edit"
-                className="btn btn-primary w-1/2 mr-1"
+                className="btn btn-info w-1/2 mr-1"
                 preventScrollReset
               >
                 編集

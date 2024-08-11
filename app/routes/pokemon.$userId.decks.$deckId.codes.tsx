@@ -61,7 +61,7 @@ export default function DeckHistoryDetail() {
   return (
     <div className="p-4 mt-4 bg-base-100 flex justify-center">
       <div className="w-full max-w-3xl min-w-0 px-2">
-        <h1 className="text-3xl font-bold mb-6">デッキコード一覧</h1>
+        <h1 className="text-3xl font-bold mb-6">デッキコード</h1>
         <p className="text-gray-600">
           デッキID: {deckId} に登録されているデッキコード一覧です
         </p>
@@ -84,7 +84,7 @@ export default function DeckHistoryDetail() {
                 <p className="text-gray-700 text-sm">
                   このデッキコードをデッキのメイン画像に設定しますか？
                 </p>
-                <button type="submit" className="btn btn-primary btn-sm m-2">
+                <button type="submit" className="btn btn-info btn-sm m-2">
                   メインに設定する
                 </button>
               </Form>

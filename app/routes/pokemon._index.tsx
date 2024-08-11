@@ -59,7 +59,7 @@ export default function PokemonDecks() {
           <>
             <Link
               to={`${currentUserId}/decks/new`}
-              className="btn btn-primary m-2"
+              className="btn btn-info m-2"
             >
               デッキを登録する
             </Link>
@@ -72,7 +72,7 @@ export default function PokemonDecks() {
             </Link>
           </>
         ) : (
-          <Link to="/login" className="btn btn-primary m-2">
+          <Link to="/login" className="btn btn-info m-2">
             ログイン
           </Link>
         )}
@@ -86,7 +86,7 @@ export default function PokemonDecks() {
             key={pageNum}
             to={`/pokemon/decks?page=${pageNum}`}
             className={`btn ${
-              page === pageNum ? "btn-primary" : "btn-info"
+              page === pageNum ? "btn-info" : "btn-info"
             } btn-sm mx-1`}
           >
             {pageNum}

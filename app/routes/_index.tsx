@@ -32,7 +32,7 @@ export default function Index() {
             作品の閲覧、購入などができます。
           </p>
           <div className="flex flex-wrap justify-center">
-            <Link to="/arts" className="btn btn-primary m-2" prefetch="intent">
+            <Link to="/arts" className="btn btn-info m-2" prefetch="intent">
               作品を見る
             </Link>
             <Link

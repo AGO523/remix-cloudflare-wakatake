@@ -47,13 +47,13 @@ export default function UserProfileLayout() {
               <>
                 <Link
                   to={`/pokemon/${user.id}/profile/edit`}
-                  className="btn btn-primary"
+                  className="btn btn-info"
                 >
                   プロフィールの変更
                 </Link>
                 <Link
                   to={`/pokemon/${user.id}/profile/avatar_edit`}
-                  className="btn btn-primary ml-2"
+                  className="btn btn-info ml-2"
                 >
                   アバターの変更
                 </Link>

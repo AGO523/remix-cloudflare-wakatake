@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react";
-import defaultDeckImage from "~/images/default_deck_image.png";
+import defaultDeckImage from "~/images/sakusei2.png";
 import { Deck } from "~/features/common/types/deck";
 
 type DeckListProps = {
@@ -11,12 +11,17 @@ type DeckListProps = {
 export function DeckList({ decks, currentUserId, userPageId }: DeckListProps) {
   return (
     <>
-      {/* 下記はフローティングに変更する */}
+      {/* フローティング */}
       {currentUserId === userPageId && (
-        <Link to="new" className="btn btn-primary m-1" prefetch="intent">
-          デッキを新規作成
+        <Link
+          to="new"
+          className="btn btn-info fixed bottom-20 right-6 m-1"
+          prefetch="intent"
+        >
+          デッキ作成
         </Link>
       )}
+
       <div className="p-4 bg-base-200 flex justify-center">
         <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
           {decks.length === 0 && (
@@ -35,7 +40,11 @@ export function DeckList({ decks, currentUserId, userPageId }: DeckListProps) {
                 key={deck.id}
                 className="block shadow-lg rounded-lg p-2 hover:shadow-xl transition-shadow bg-base-100"
               >
-                <Link to={`/pokemon/${deck.userId}/profile`} key={deck.userId}>
+                <Link
+                  to={`/pokemon/${deck.userId}/profile`}
+                  key={deck.userId}
+                  unstable_viewTransition
+                >
                   <div className="flex items-center m-2">
                     {deck.avatarUrl ? (
                       <img
@@ -64,6 +73,7 @@ export function DeckList({ decks, currentUserId, userPageId }: DeckListProps) {
                       : `/pokemon/${deck.userId}/decks/${deck.id}`
                   }
                   key={deck.id}
+                  unstable_viewTransition
                 >
                   <h3 className="text-xl font-semibold mb-2">{deck.title}</h3>
                   <p className="text-gray-700 mb-4">{deck.description}</p>
@@ -75,15 +85,12 @@ export function DeckList({ decks, currentUserId, userPageId }: DeckListProps) {
                         className="object-cover rounded-md mb-4"
                       />
                     ) : (
-                      <div>
+                      <div className="flex justify-center items-center">
                         <img
                           src={defaultDeckImage}
                           alt={deck.title}
-                          className="object-cover rounded-md mb-2"
+                          className="object-cover mb-2 max-h-[280px]"
                         />
-                        <p className="text-sm text-gray-500 mb-2">
-                          メインのデッキ画像がないため、デフォルトのデッキ画像を表示しています
-                        </p>
                       </div>
                     )}
                   </div>

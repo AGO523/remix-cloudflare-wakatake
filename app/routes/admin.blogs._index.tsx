@@ -43,7 +43,7 @@ export default function Blogs() {
 
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }}>
-      <button className="btn btn-primary btn-sm">
+      <button className="btn btn-info btn-sm">
         <Link
           to="https://artora.microcms.io/apis/artora"
           target="_blank"
@@ -75,7 +75,7 @@ export default function Blogs() {
               />
               <p>記事作成日: {blog.createdAt.slice(0, 10)}</p>
               <div className="card-actions justify-end">
-                <button className="btn btn-primary">
+                <button className="btn btn-info">
                   <Link to={`/admin/blogs/${blog.id}`}>ブログを読む</Link>
                 </button>
               </div>
