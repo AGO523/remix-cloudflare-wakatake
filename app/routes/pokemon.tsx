@@ -78,7 +78,7 @@ export default function PokemonLayout() {
             >
               <div className="flex flex-col items-center">
                 <svg
-                  className="h-6 w-6"
+                  className="h-4 w-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -104,7 +104,7 @@ export default function PokemonLayout() {
               <div className="flex flex-col items-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
+                  className="h-4 w-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -130,7 +130,7 @@ export default function PokemonLayout() {
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
-                  className="h-6 w-6"
+                  className="h-4 w-4"
                   xmlns="http://www.w3.org/2000/svg"
                   aria-hidden="true"
                 >

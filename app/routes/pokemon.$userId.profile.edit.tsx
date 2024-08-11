@@ -80,7 +80,7 @@ export default function EditProfile() {
           </div>
           <button
             type="submit"
-            className="btn btn-primary w-full max-w-xs"
+            className="btn btn-info w-full max-w-xs"
             disabled={isSubmitting}
           >
             {isSubmitting ? "更新中..." : "更新"}

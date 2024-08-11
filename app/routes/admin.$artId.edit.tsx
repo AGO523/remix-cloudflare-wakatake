@@ -88,7 +88,7 @@ export default function EditArt() {
             <div className="form-control">
               <button
                 type="submit"
-                className="btn btn-primary m-2"
+                className="btn btn-info m-2"
                 disabled={isSubmitting}
               >
                 作品を更新

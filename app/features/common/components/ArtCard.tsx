@@ -73,7 +73,7 @@ export function ArtCard({ art, artImages, adminPath }: ArtCardProps) {
         </p>
         <div className="card-actions justify-end">
           {art.productUrl && (
-            <Link to={art.productUrl} className="btn btn-primary">
+            <Link to={art.productUrl} className="btn btn-info">
               商品の販売ページへ
             </Link>
           )}
@@ -81,11 +81,11 @@ export function ArtCard({ art, artImages, adminPath }: ArtCardProps) {
             <div>
               <Link
                 to={`/admin/${art.id}/upload-image`}
-                className="btn btn-primary mr-2"
+                className="btn btn-info mr-2"
               >
                 画像をアップロード
               </Link>
-              <Link to={`/admin/${art.id}/edit`} className="btn btn-primary">
+              <Link to={`/admin/${art.id}/edit`} className="btn btn-info">
                 編集
               </Link>
             </div>

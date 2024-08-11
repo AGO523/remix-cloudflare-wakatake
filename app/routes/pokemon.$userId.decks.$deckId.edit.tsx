@@ -87,13 +87,13 @@ export default function EditDeck() {
               name="description"
               placeholder="デッキの説明"
               defaultValue={deck.description || ""}
-              className="textarea textarea-bordered w-full min-h-[300px]"
+              className="textarea textarea-bordered w-full min-h-[200px]"
             ></textarea>
           </div>
           <div>
             <button
               type="submit"
-              className="btn btn-primary w-full p-4"
+              className="btn btn-info p-4 w-1/3"
               disabled={isSubmitting}
             >
               {isSubmitting ? "デッキを更新しています..." : "更新"}

@@ -77,7 +77,7 @@ export default function Admin() {
               <li>
                 <Link
                   to="/auth/logout"
-                  className="btn btn-sm btn-block btn-primary"
+                  className="btn btn-sm btn-block btn-info"
                 >
                   ログアウト
                 </Link>

@@ -37,7 +37,7 @@ export default function DialyNew() {
             ></textarea>
             <button
               type="submit"
-              className="btn btn-primary mb-4"
+              className="btn btn-info mb-4"
               disabled={isSubmitting}
             >
               {isSubmitting ? "送信中..." : "作成"}

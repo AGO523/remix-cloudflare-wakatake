@@ -69,13 +69,13 @@ export default function DeckNew() {
           <div>
             <textarea
               placeholder="デッキの説明"
-              className="textarea textarea-bordered textarea-lg w-full max-w-lg min-h-[300px] mt-2"
+              className="textarea textarea-bordered textarea-lg w-full max-w-lg min-h-[200px] mt-2"
               name="description"
             />
           </div>
           <button
             type="submit"
-            className="btn btn-primary w-full max-w-xs mt-2"
+            className="btn btn-info w-full max-w-xs mt-2"
             disabled={isSubmitting}
           >
             {isSubmitting ? "デッキを作成しています..." : "作成"}
