@@ -46,14 +46,17 @@ export default function PokemonDecks() {
 
   return (
     <>
-      <p className="text-5xl font-bold leading-tight pt-12 sm:text-6xl xl:max-w-3xl">
-        Pokemon Card
-      </p>
-      <p className="mt-6 mb-8 text-lg sm:mb-12 xl:max-w-3xl">
-        ポケモンカードのデッキ構築をサポートするアプリです。
-        <br />
-        デッキの変遷を記録し、共有することができます。
-      </p>
+      <div>
+        <p className="text-5xl font-bold leading-tight pt-12 sm:text-6xl xl:max-w-3xl">
+          Pokemon Card
+        </p>
+        <p className="mt-6 mb-8 text-lg sm:mb-12 xl:max-w-3xl">
+          ポケモンカードのデッキ構築をサポートするアプリです。
+          <br />
+          デッキの変遷を記録し、共有することができます。
+        </p>
+      </div>
+
       <div className="flex flex-wrap justify-center mb-4">
         {currentUserId ? (
           <>

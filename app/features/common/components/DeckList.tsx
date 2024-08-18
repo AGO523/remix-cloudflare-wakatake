@@ -77,21 +77,19 @@ export function DeckList({ decks, currentUserId, userPageId }: DeckListProps) {
                 >
                   <h3 className="text-xl font-semibold mb-2">{deck.title}</h3>
                   <p className="text-gray-700 mb-4">{deck.description}</p>
-                  <div className="flex justify-center">
+                  <div className="flex justify-center items-center">
                     {mainDeckCode ? (
                       <img
                         src={mainDeckCode.imageUrl}
                         alt={deck.title}
-                        className="object-cover rounded-md mb-4"
+                        className="object-cover rounded-md"
                       />
                     ) : (
-                      <div className="flex justify-center items-center">
-                        <img
-                          src={defaultDeckImage}
-                          alt={deck.title}
-                          className="object-cover mb-2 max-h-[280px]"
-                        />
-                      </div>
+                      <img
+                        src={defaultDeckImage}
+                        alt={deck.title}
+                        className="object-cover max-h-[340px]"
+                      />
                     )}
                   </div>
                 </Link>
