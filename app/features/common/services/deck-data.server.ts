@@ -112,26 +112,55 @@ const updateUserAvatarSchema = z.object({
   avatarUrl: z.string().url("正しいURLを入力してください").optional(),
 });
 
-async function fetchDeckImage(code: string): Promise<string | null> {
-  const deckImageUrlResponse = await fetch(
-    "https://pokemon-card-deck-scraper-ghyv6dyl6a-an.a.run.app/fetchDeck",
-    {
-      method: "POST",
-      body: JSON.stringify({ deckCode: code }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+// comaji の API を使って pubsub に deckId, code を publish
+async function publishDeckCode(
+  deckCodeId: number,
+  code: string,
+  context: AppLoadContext
+): Promise<boolean> {
+  const env = context.env as Env;
+  const apiEndpoint = env.C_API_BASE_URL;
+  const authKey = env.C_AUTH_KEY;
 
-  if (!deckImageUrlResponse.ok) {
-    return null;
+  const response = await fetch(`${apiEndpoint}/publish`, {
+    method: "POST",
+    body: JSON.stringify({ deckCodeId, code }),
+    headers: {
+      "X-Auth-Key": authKey,
+    },
+  });
+
+  if (!response.ok) {
+    return false;
   }
 
-  const deckImageUrlJson =
-    (await deckImageUrlResponse.json()) as UploadResponse;
-  return deckImageUrlJson.url;
+  return true;
 }
+
+// これは不要になる
+// async function fetchDeckImage(
+//   code: string,
+//   deckId: number
+// ): Promise<string | null> {
+//   const deckImageUrlResponse = await fetch(
+//     "https://pokemon-card-deck-scraper-ghyv6dyl6a-an.a.run.app/fetchDeck",
+//     {
+//       method: "POST",
+//       body: JSON.stringify({ deckCode: code, deckId: deckId }),
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//     }
+//   );
+
+//   if (!deckImageUrlResponse.ok) {
+//     return null;
+//   }
+
+//   const deckImageUrlJson =
+//     (await deckImageUrlResponse.json()) as UploadResponse;
+//   return deckImageUrlJson.url;
+// }
 
 // デッキコードを受け取り外部 API にリクエストを送信
 // URLが返却される
@@ -279,7 +308,8 @@ export async function createDeckHistory(
   return json({ message: "デッキ履歴を登録しました" }, { status: 201 });
 }
 
-// code を受け取り、fetchDeckImage で画像を取得
+// code を受け取り、pubsub に deckId, code を publish
+// deckCodes の imageUrl は デフォルトの画像をセットしておく
 // status が main にするか sub にするかパラメーター(first)で判定
 export async function createDeckCode(
   deckId: number,
@@ -293,11 +323,14 @@ export async function createDeckCode(
   const currentTime = new Date();
   const codeStatus = first ? "main" : "sub";
 
-  const fetchResult = await fetchDeckImage(code);
-  if (!fetchResult) {
-    return json({ message: "デッキ画像の取得に失敗しました" }, { status: 500 });
-  }
-  const imageUrl = fetchResult;
+  // const fetchResult = await fetchDeckImage(code);
+  // if (!fetchResult) {
+  //   return json({ message: "デッキ画像の取得に失敗しました" }, { status: 500 });
+  // }
+
+  // pubsub で画像を遅延保存する。それまでは下記のデフォルトを入れておく
+  const imageUrl =
+    "https://storage.googleapis.com/prod-artora-arts/images/sakusei2.png";
 
   const formObject = {
     deckId,
@@ -320,11 +353,35 @@ export async function createDeckCode(
     createdAt: currentTime,
   };
 
-  const response = await db.insert(deckCodes).values(newDeckCode).execute();
-  if (response.success) {
-    return json({ message: "デッキコードを登録しました" }, { status: 201 });
+  // const response = await db.insert(deckCodes).values(newDeckCode).execute();
+
+  const deckCode = await db
+    .insert(deckCodes)
+    .values(newDeckCode)
+    .returning()
+    .get();
+
+  if (!deckCode) {
+    return json(
+      { message: "デッキコードの登録に失敗しました" },
+      { status: 500 }
+    );
   }
-  return json({ message: "デッキコードの登録に失敗しました" }, { status: 500 });
+
+  const publishResult = await publishDeckCode(
+    deckCode.id,
+    deckCode.code,
+    context
+  );
+
+  if (!publishResult) {
+    return json(
+      { message: "デッキコードの登録に失敗しました" },
+      { status: 500 }
+    );
+  }
+
+  return json({ message: "デッキコードを登録しました" }, { status: 201 });
 }
 
 export async function getDecksBy(userId: number, context: AppLoadContext) {
@@ -602,12 +659,30 @@ export async function updateDeckCode(
   }
 
   const isNewCode = code !== currentDeckCode.code;
-  const imageUrl = isNewCode
-    ? await fetchDeckImage(code)
-    : currentDeckCode.imageUrl;
-  if (!imageUrl) {
-    return json({ message: "デッキ画像の取得に失敗しました" }, { status: 500 });
+  // const imageUrl = isNewCode
+  //   ? await fetchDeckImage(code)
+  //   : currentDeckCode.imageUrl;
+  // if (!imageUrl) {
+  //   return json({ message: "デッキ画像の取得に失敗しました" }, { status: 500 });
+  // }
+  if (isNewCode) {
+    const publishResult = await publishDeckCode(
+      // result.data.deckId,
+      currentDeckCode.id,
+      code,
+      context
+    );
+    if (!publishResult) {
+      return json(
+        { message: "デッキコードの登録に失敗しました" },
+        { status: 500 }
+      );
+    }
   }
+
+  const imageUrl = isNewCode
+    ? "https://storage.googleapis.com/prod-artora-arts/images/sakusei2.png"
+    : currentDeckCode.imageUrl;
 
   const updatedDeckCode = {
     ...result.data,

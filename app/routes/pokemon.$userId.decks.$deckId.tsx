@@ -107,7 +107,7 @@ export default function DeckDetail() {
                 <img
                   src={mainDeckCode.imageUrl}
                   alt={deck.title}
-                  className="object-cover rounded-md mb-4"
+                  className="object-cover rounded-md max-h-[340px]"
                 />
               </div>
             )) || (
@@ -115,7 +115,7 @@ export default function DeckDetail() {
                 <img
                   src={defaultDeckImage}
                   alt={deck.title}
-                  className="object-cover mb-2 max-h-[280px]"
+                  className="object-cover max-h-[340px]"
                 />
               </div>
             )}
