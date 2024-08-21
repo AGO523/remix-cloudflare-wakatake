@@ -322,15 +322,15 @@ export async function createDeckCode(
   const db = createClient(env.DB);
   const currentTime = new Date();
   const codeStatus = first ? "main" : "sub";
+  const isProduction = env.C_API_BASE_URL !== "http://localhost:8080";
+  // pubsub で画像を遅延保存する。それまでは下記のデフォルトを入れておく
+  const imageUrl =
+    "https://storage.googleapis.com/prod-artora-arts/images/sakusei2.png";
 
   // const fetchResult = await fetchDeckImage(code);
   // if (!fetchResult) {
   //   return json({ message: "デッキ画像の取得に失敗しました" }, { status: 500 });
   // }
-
-  // pubsub で画像を遅延保存する。それまでは下記のデフォルトを入れておく
-  const imageUrl =
-    "https://storage.googleapis.com/prod-artora-arts/images/sakusei2.png";
 
   const formObject = {
     deckId,
@@ -368,17 +368,36 @@ export async function createDeckCode(
     );
   }
 
-  const publishResult = await publishDeckCode(
-    deckCode.id,
-    deckCode.code,
-    context
-  );
-
-  if (!publishResult) {
-    return json(
-      { message: "デッキコードの登録に失敗しました" },
-      { status: 500 }
+  if (isProduction) {
+    const publishResult = await publishDeckCode(
+      deckCode.id,
+      deckCode.code,
+      context
     );
+
+    if (!publishResult) {
+      return json(
+        { message: "デッキコードの登録に失敗しました" },
+        { status: 500 }
+      );
+    }
+  } else {
+    // 開発環境では publish しない
+    // 代わりに deckCode.id, deckCode.code をデッキの description に保存
+    const updateDescriptionResponse = await db
+      .update(decks)
+      .set({
+        description: `[開発環境]デッキ画像を検索して、手動でSQLを実行して登録してください。${deckCode.id}, ${deckCode.code}`,
+      })
+      .where(eq(decks.id, deckId))
+      .execute();
+
+    if (!updateDescriptionResponse.success) {
+      return json(
+        { message: "デッキの説明の更新に失敗しました" },
+        { status: 500 }
+      );
+    }
   }
 
   return json({ message: "デッキコードを登録しました" }, { status: 201 });
@@ -541,6 +560,9 @@ export async function deleteDeck(deckId: number, context: AppLoadContext) {
   }
 }
 
+//////////////////////////////////////////////////
+//////////////////// コア関数 /////////////////////
+//////////////////////////////////////////////////
 export async function updateDeckHistory(
   deckHistoryId: number,
   formData: FormData,
@@ -548,8 +570,6 @@ export async function updateDeckHistory(
 ) {
   const env = context.env as Env;
   const db = createClient(env.DB);
-  const isDeckCode = formData.get("code") ? true : false;
-  const isNewDeckCode = formData.get("newCode") ? true : false;
 
   const formObject = {
     status: formData.get("status") as string,
@@ -575,52 +595,28 @@ export async function updateDeckHistory(
     .set(updatedDeckHistory)
     .where(eq(deckHistories.id, deckHistoryId))
     .execute();
+
   if (!response.success) {
     return json({ message: "デッキ履歴の更新に失敗しました" }, { status: 500 });
   }
 
-  if (isDeckCode) {
-    const currentDeckCodeId = formData.get("currentDeckCodeId");
-    const updateDeckCodeResponse = await updateDeckCode(
-      Number(currentDeckCodeId),
-      Number(deckHistoryId),
-      formData,
-      context
+  const updateDeckCodeResponse = await updateDeckCode(
+    Number(deckHistoryId),
+    formData,
+    context
+  );
+
+  if (updateDeckCodeResponse.status !== 200) {
+    return json(
+      { message: "デッキコードの更新に失敗しました" },
+      { status: 500 }
     );
-    if (updateDeckCodeResponse.status !== 200) {
-      return json(
-        { message: "デッキコードの更新に失敗しました" },
-        { status: 500 }
-      );
-    }
   }
-
-  if (isNewDeckCode) {
-    const first =
-      formData.get("first") === "on" ||
-      formData.get("first") === "true" ||
-      false;
-
-    const createDeckCodeResponse = await createDeckCode(
-      Number(formData.get("deckId")),
-      Number(deckHistoryId),
-      formData.get("newCode") as string,
-      first,
-      context
-    );
-    if (createDeckCodeResponse.status !== 201) {
-      return json(
-        { message: "デッキコードの登録に失敗しました" },
-        { status: 500 }
-      );
-    }
-  }
-
+  // }
   return json({ message: "デッキ履歴を更新しました" }, { status: 200 });
 }
 
 export async function updateDeckCode(
-  deckCodeId: number,
   historyId: number,
   formData: FormData,
   context: AppLoadContext
@@ -651,49 +647,65 @@ export async function updateDeckCode(
   const currentDeckCode = await db
     .select()
     .from(deckCodes)
-    .where(eq(deckCodes.id, deckCodeId))
+    .where(eq(deckCodes.historyId, historyId))
     .get();
 
   if (!currentDeckCode) {
     return json({ message: "デッキコードが見つかりません" }, { status: 404 });
   }
 
-  const isNewCode = code !== currentDeckCode.code;
-  // const imageUrl = isNewCode
-  //   ? await fetchDeckImage(code)
-  //   : currentDeckCode.imageUrl;
-  // if (!imageUrl) {
-  //   return json({ message: "デッキ画像の取得に失敗しました" }, { status: 500 });
-  // }
-  if (isNewCode) {
+  // 現在のデッキコードと formData の code が異なるか比較
+  const isNewDeckCode = formData.get("code") !== currentDeckCode.code;
+
+  // 同じ場合は何もしない
+  if (!isNewDeckCode) {
+    return json({ message: "デッキコードを更新しました" }, { status: 200 });
+  }
+
+  // 異なっている場合は新しいデッキコードを更新する
+  const isProduction = env.C_API_BASE_URL !== "http://localhost:8080";
+  if (isProduction) {
     const publishResult = await publishDeckCode(
-      // result.data.deckId,
       currentDeckCode.id,
       code,
       context
     );
+
     if (!publishResult) {
       return json(
         { message: "デッキコードの登録に失敗しました" },
         { status: 500 }
       );
     }
-  }
+  } else {
+    // 開発環境では publish しない
+    // 代わりに deckCode.id, deckCode.code をデッキの description に保存
+    const updateDescriptionResponse = await db
+      .update(decks)
+      .set({
+        description: `[開発環境]デッキ画像を検索して、手動でSQLを実行して登録してください。${currentDeckCode.id}, ${code}`,
+      })
+      .where(eq(decks.id, currentDeckCode.deckId))
+      .execute();
 
-  const imageUrl = isNewCode
-    ? "https://storage.googleapis.com/prod-artora-arts/images/sakusei2.png"
-    : currentDeckCode.imageUrl;
+    if (!updateDescriptionResponse.success) {
+      return json(
+        { message: "デッキの説明の更新に失敗しました" },
+        { status: 500 }
+      );
+    }
+  }
 
   const updatedDeckCode = {
     ...result.data,
     historyId,
-    imageUrl,
+    imageUrl: currentDeckCode.imageUrl,
   };
 
   const response = await db
     .update(deckCodes)
     .set(updatedDeckCode)
-    .where(eq(deckCodes.id, deckCodeId))
+    .where(eq(deckCodes.id, currentDeckCode.id))
     .execute();
   if (response.success) {
     return json({ message: "デッキコードを更新しました" }, { status: 200 });
