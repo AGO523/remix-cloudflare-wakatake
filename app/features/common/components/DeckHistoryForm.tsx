@@ -46,7 +46,7 @@ export default function DeckHistoryForm({
       </div>
 
       {/* 履歴にデッキコードを挿入 */}
-      <div className="divider">デッキ画像挿入</div>
+      <div className="divider">デッキ画像</div>
       <div className="mt-4 mb-4">
         <input
           type="text"
@@ -68,8 +68,7 @@ export default function DeckHistoryForm({
         </p>
       </div>
 
-      {/* 履歴に画像を挿入 */}
-      <div className="divider">その他の画像挿入</div>
+      <div className="divider">その他の画像</div>
       <div>
         <input
           type="text"
