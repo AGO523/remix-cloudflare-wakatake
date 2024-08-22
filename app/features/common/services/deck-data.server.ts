@@ -137,36 +137,35 @@ async function publishDeckCode(
   return true;
 }
 
-// これは不要になる
-// async function fetchDeckImage(
-//   code: string,
-//   deckId: number
-// ): Promise<string | null> {
-//   const deckImageUrlResponse = await fetch(
-//     "https://pokemon-card-deck-scraper-ghyv6dyl6a-an.a.run.app/fetchDeck",
-//     {
-//       method: "POST",
-//       body: JSON.stringify({ deckCode: code, deckId: deckId }),
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//     }
-//   );
+// 開発環境で使用
+async function fetchDeckImage(
+  code: string,
+  deckId: number
+): Promise<string | null> {
+  const deckImageUrlResponse = await fetch(
+    "https://pokemon-card-deck-scraper-ghyv6dyl6a-an.a.run.app/dev_fetchDeck",
+    {
+      method: "POST",
+      body: JSON.stringify({ deckCode: code, deckId: deckId }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
-//   if (!deckImageUrlResponse.ok) {
-//     return null;
-//   }
+  if (!deckImageUrlResponse.ok) {
+    return null;
+  }
 
-//   const deckImageUrlJson =
-//     (await deckImageUrlResponse.json()) as UploadResponse;
-//   return deckImageUrlJson.url;
-// }
+  const deckImageUrlJson =
+    (await deckImageUrlResponse.json()) as UploadResponse;
+  return deckImageUrlJson.url;
+}
 
-// デッキコードを受け取り外部 API にリクエストを送信
-// URLが返却される
 // decks にレコードを作成
 // deckHistories にレコードを作成
-// deckCodes にレコードを作成
+// deckCodes にレコードを作成、imageUrl はデフォルトの画像をセット
+// デッキコードを受け取り、pubsub に deckId, code を publish
 export async function createDeck(formData: FormData, context: AppLoadContext) {
   const env = context.env as Env;
   const db = createClient(env.DB);
@@ -323,14 +322,59 @@ export async function createDeckCode(
   const currentTime = new Date();
   const codeStatus = first ? "main" : "sub";
   const isProduction = env.C_API_BASE_URL !== "http://localhost:8080";
+
+  // 開発環境では publish しない
+  // 代わりに fetchDeckImage で取得した imageUrl をセット
+  if (!isProduction) {
+    const fetchResult = await fetchDeckImage(code, deckId);
+    if (!fetchResult) {
+      return json(
+        { message: "デッキ画像の取得に失敗しました" },
+        { status: 500 }
+      );
+    }
+
+    const imageUrl = fetchResult;
+    const formObject = {
+      deckId,
+      historyId,
+      status: codeStatus,
+      code,
+      imageUrl,
+    };
+
+    const result = createDeckCodeSchema.safeParse(formObject);
+    if (!result.success) {
+      return json(
+        { message: result.error.errors[0].message, errors: result.error },
+        { status: 400 }
+      );
+    }
+
+    const newDeckCode = {
+      ...result.data,
+      createdAt: currentTime,
+    };
+
+    const response = await db
+      .insert(deckCodes)
+      .values(newDeckCode)
+      .returning()
+      .get();
+
+    if (!response) {
+      return json(
+        { message: "デッキコードの登録に失敗しました" },
+        { status: 500 }
+      );
+    }
+
+    return json({ message: "デッキコードを登録しました" }, { status: 201 });
+  }
+  // 本番環境の場合
   // pubsub で画像を遅延保存する。それまでは下記のデフォルトを入れておく
   const imageUrl =
     "https://storage.googleapis.com/prod-artora-arts/images/sakusei2.png";
-
-  // const fetchResult = await fetchDeckImage(code);
-  // if (!fetchResult) {
-  //   return json({ message: "デッキ画像の取得に失敗しました" }, { status: 500 });
-  // }
 
   const formObject = {
     deckId,
@@ -353,8 +397,6 @@ export async function createDeckCode(
     createdAt: currentTime,
   };
 
-  // const response = await db.insert(deckCodes).values(newDeckCode).execute();
-
   const deckCode = await db
     .insert(deckCodes)
     .values(newDeckCode)
@@ -367,37 +409,17 @@ export async function createDeckCode(
       { status: 500 }
     );
   }
+  const publishResult = await publishDeckCode(
+    deckCode.id,
+    deckCode.code,
+    context
+  );
 
-  if (isProduction) {
-    const publishResult = await publishDeckCode(
-      deckCode.id,
-      deckCode.code,
-      context
+  if (!publishResult) {
+    return json(
+      { message: "デッキコードの登録に失敗しました" },
+      { status: 500 }
     );
-
-    if (!publishResult) {
-      return json(
-        { message: "デッキコードの登録に失敗しました" },
-        { status: 500 }
-      );
-    }
-  } else {
-    // 開発環境では publish しない
-    // 代わりに deckCode.id, deckCode.code をデッキの description に保存
-    const updateDescriptionResponse = await db
-      .update(decks)
-      .set({
-        description: `[開発環境]デッキ画像を検索して、手動でSQLを実行して登録してください。${deckCode.id}, ${deckCode.code}`,
-      })
-      .where(eq(decks.id, deckId))
-      .execute();
-
-    if (!updateDescriptionResponse.success) {
-      return json(
-        { message: "デッキの説明の更新に失敗しました" },
-        { status: 500 }
-      );
-    }
   }
 
   return json({ message: "デッキコードを登録しました" }, { status: 201 });
@@ -677,20 +699,45 @@ export async function updateDeckCode(
         { status: 500 }
       );
     }
-  } else {
-    // 開発環境では publish しない
-    // 代わりに deckCode.id, deckCode.code をデッキの description に保存
-    const updateDescriptionResponse = await db
-      .update(decks)
+
+    // deckCodes の imageUrl は デフォルトの画像をセットし直す
+    const updateDeckCodeResponse = await db
+      .update(deckCodes)
       .set({
-        description: `[開発環境]デッキ画像を検索して、手動でSQLを実行して登録してください。${currentDeckCode.id}, ${code}`,
+        code,
+        imageUrl:
+          "https://storage.googleapis.com/prod-artora-arts/images/sakusei2.png",
       })
-      .where(eq(decks.id, currentDeckCode.deckId))
+      .where(eq(deckCodes.id, currentDeckCode.id))
       .execute();
 
-    if (!updateDescriptionResponse.success) {
+    if (!updateDeckCodeResponse.success) {
       return json(
-        { message: "デッキの説明の更新に失敗しました" },
+        { message: "デッキコードの更新に失敗しました" },
+        { status: 500 }
+      );
+    }
+  } else {
+    // 開発環境では publish しない
+    // 代わりに fetchDeckImage で取得した imageUrl をセット
+    const fetchResult = await fetchDeckImage(code, currentDeckCode.deckId);
+    if (!fetchResult) {
+      return json(
+        { message: "デッキ画像の取得に失敗しました" },
+        { status: 500 }
+      );
+    }
+
+    const imageUrl = fetchResult;
+    const updateDeckCodeResponse = await db
+      .update(deckCodes)
+      .set({ code, imageUrl })
+      .where(eq(deckCodes.id, currentDeckCode.id))
+      .execute();
+
+    if (!updateDeckCodeResponse.success) {
+      return json(
+        { message: "デッキコードの更新に失敗しました" },
         { status: 500 }
       );
     }
