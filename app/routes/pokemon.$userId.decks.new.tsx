@@ -80,9 +80,6 @@ export default function DeckNew() {
           >
             {isSubmitting ? "デッキを作成しています..." : "作成"}
           </button>
-          <p className="text-xs text-error mt-2">
-            通信状況によっては、デッキの作成に時間がかかることがあります。10秒から30秒程度お待ちください。
-          </p>
         </Form>
       </div>
     </div>

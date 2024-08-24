@@ -95,9 +95,6 @@ export default function DeckHistoryForm({
         >
           {isSubmitting ? "送信中..." : "送信"}
         </button>
-        <p className="text-error text-sm">
-          デッキコードを入力している場合は、作成に時間がかかることがあります。10秒から30秒程度お待ちください。
-        </p>
       </div>
     </Form>
   );

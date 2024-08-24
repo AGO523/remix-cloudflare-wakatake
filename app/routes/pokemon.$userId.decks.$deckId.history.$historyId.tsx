@@ -63,6 +63,24 @@ export default function DeckHistoryDetail() {
                     alt="デッキの画像"
                     className="object-cover rounded-md mb-2 mt-2"
                   />
+
+                  {deckCode.imageUrl ===
+                    "https://storage.googleapis.com/prod-artora-arts/images/sakusei2.png" && (
+                    <>
+                      <p className="text-gray-700 text-sm mb-2">
+                        デッキ画像を作成するのに1分程度かかります
+                      </p>
+
+                      <Link
+                        to="./"
+                        className="btn btn-sm btn-info"
+                        preventScrollReset
+                      >
+                        画像を更新
+                      </Link>
+                    </>
+                  )}
+
                   <p className="text-gray-700 text-sm text-right mb-2">
                     デッキコード:{deckCode.code}
                   </p>
