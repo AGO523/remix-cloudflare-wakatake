@@ -646,6 +646,7 @@ export async function updateDeckCode(
   const env = context.env as Env;
   const db = createClient(env.DB);
   const code = formData.get("code") as string;
+  const isProduction = env.C_API_BASE_URL !== "http://localhost:8080";
   const isMain =
     formData.get("first") === "on" || formData.get("first") === "true" || false;
 
@@ -665,7 +666,7 @@ export async function updateDeckCode(
 
   // 現在のデッキコードを取得
   // formDataの code が異なる場合、新しいデッキコードを取得
-  // 同じ場合は imageUrl に現在のデッキコードの imageUrl をセット
+  // 同じ場合は何もしない
   const currentDeckCode = await db
     .select()
     .from(deckCodes)
@@ -685,7 +686,6 @@ export async function updateDeckCode(
   }
 
   // 異なっている場合は新しいデッキコードを更新する
-  const isProduction = env.C_API_BASE_URL !== "http://localhost:8080";
   if (isProduction) {
     const publishResult = await publishDeckCode(
       currentDeckCode.id,
@@ -700,15 +700,17 @@ export async function updateDeckCode(
       );
     }
 
-    // これが機能していない？
+    const imageUrl =
+      "https://storage.googleapis.com/prod-artora-arts/images/sakusei2.png";
+    const updatedDeckCode = {
+      ...result.data,
+      imageUrl,
+    };
+
     // deckCodes の imageUrl は デフォルトの画像をセットし直す
     const updateDeckCodeResponse = await db
       .update(deckCodes)
-      .set({
-        code,
-        imageUrl:
-          "https://storage.googleapis.com/prod-artora-arts/images/sakusei2.png",
-      })
+      .set(updatedDeckCode)
       .where(eq(deckCodes.id, currentDeckCode.id))
       .execute();
 
@@ -730,9 +732,14 @@ export async function updateDeckCode(
     }
 
     const imageUrl = fetchResult;
+    const updatedDeckCode = {
+      ...result.data,
+      imageUrl,
+    };
+
     const updateDeckCodeResponse = await db
       .update(deckCodes)
-      .set({ code, imageUrl })
+      .set(updatedDeckCode)
       .where(eq(deckCodes.id, currentDeckCode.id))
       .execute();
 
@@ -744,22 +751,22 @@ export async function updateDeckCode(
     }
   }
 
-  const updatedDeckCode = {
-    ...result.data,
-    historyId,
-    imageUrl: currentDeckCode.imageUrl,
-  };
+  // ここで再度上書きしてしまっている？
+  // const updatedDeckCode = {
+  //   ...result.data,
+  //   imageUrl: currentDeckCode.imageUrl,
+  // };
 
-  const response = await db
-    .update(deckCodes)
-    .set(updatedDeckCode)
-    .where(eq(deckCodes.id, currentDeckCode.id))
-    .execute();
-  if (response.success) {
-    return json({ message: "デッキコードを更新しました" }, { status: 200 });
-  }
+  // const response = await db
+  //   .update(deckCodes)
+  //   .set(updatedDeckCode)
+  //   .where(eq(deckCodes.id, currentDeckCode.id))
+  //   .execute();
+  // if (response.success) {
+  //   return json({ message: "デッキコードを更新しました" }, { status: 200 });
+  // }
 
-  return json({ message: "デッキコードの更新に失敗しました" }, { status: 500 });
+  return json({ message: "デッキコードを更新しました" }, { status: 200 });
 }
 
 export async function deleteDeckHistory(
