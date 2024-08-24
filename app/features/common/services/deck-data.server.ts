@@ -700,14 +700,17 @@ export async function updateDeckCode(
       );
     }
 
+    const imageUrl =
+      "https://storage.googleapis.com/prod-artora-arts/images/sakusei2.png";
+    const updatedDeckCode = {
+      ...result.data,
+      imageUrl,
+    };
+
     // deckCodes の imageUrl は デフォルトの画像をセットし直す
     const updateDeckCodeResponse = await db
       .update(deckCodes)
-      .set({
-        code,
-        imageUrl:
-          "https://storage.googleapis.com/prod-artora-arts/images/sakusei2.png",
-      })
+      .set(updatedDeckCode)
       .where(eq(deckCodes.id, currentDeckCode.id))
       .execute();
 
@@ -729,9 +732,14 @@ export async function updateDeckCode(
     }
 
     const imageUrl = fetchResult;
+    const updatedDeckCode = {
+      ...result.data,
+      imageUrl,
+    };
+
     const updateDeckCodeResponse = await db
       .update(deckCodes)
-      .set({ code, imageUrl })
+      .set(updatedDeckCode)
       .where(eq(deckCodes.id, currentDeckCode.id))
       .execute();
 
