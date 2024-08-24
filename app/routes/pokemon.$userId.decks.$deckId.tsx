@@ -97,6 +97,7 @@ export default function DeckDetail() {
             ))}
 
           <div className="flex justify-center">
+            {/* ここを修正 */}
             {(deck.codes.length > 0 && mainDeckCode && (
               <div>
                 <p className="text-gray-600">
@@ -118,6 +119,24 @@ export default function DeckDetail() {
               </div>
             )}
           </div>
+
+          {mainDeckCode &&
+            mainDeckCode.imageUrl ===
+              "https://storage.googleapis.com/prod-artora-arts/images/sakusei2.png" && (
+              <>
+                <p className="text-error text-sm mb-2">
+                  デッキ画像を作成するのに1分程度かかります
+                </p>
+
+                <Link
+                  to="./"
+                  className="btn btn-sm btn-info"
+                  preventScrollReset
+                >
+                  画像を更新
+                </Link>
+              </>
+            )}
 
           {deck.userId === currentUserId && (
             <div className="mt-4">
