@@ -97,7 +97,6 @@ export default function DeckDetail() {
             ))}
 
           <div className="flex justify-center">
-            {/* ここを修正 */}
             {(deck.codes.length > 0 && mainDeckCode && (
               <div>
                 <p className="text-gray-600">
