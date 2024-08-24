@@ -634,7 +634,7 @@ export async function updateDeckHistory(
       { status: 500 }
     );
   }
-  // }
+
   return json({ message: "デッキ履歴を更新しました" }, { status: 200 });
 }
 
@@ -700,6 +700,7 @@ export async function updateDeckCode(
       );
     }
 
+    // これが機能していない？
     // deckCodes の imageUrl は デフォルトの画像をセットし直す
     const updateDeckCodeResponse = await db
       .update(deckCodes)

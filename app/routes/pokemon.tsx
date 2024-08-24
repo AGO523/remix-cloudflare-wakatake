@@ -150,7 +150,7 @@ export default function PokemonLayout() {
         <div className="fixed inset-x-0 bottom-0 bg-base-100 p-2 bg-opacity-60">
           <div className="flex justify-around text-center">
             <NavLink
-              to="/pokemon/decks"
+              to="/pokemon"
               end
               className={({ isActive }) =>
                 isActive ? "text-info" : "text-gray-700"
