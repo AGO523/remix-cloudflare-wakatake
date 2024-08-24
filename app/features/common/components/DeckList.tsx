@@ -12,7 +12,7 @@ export function DeckList({ decks, currentUserId, userPageId }: DeckListProps) {
   return (
     <>
       {/* フローティング */}
-      {currentUserId === userPageId && (
+      {currentUserId && (
         <Link
           to="new"
           className="btn btn-info fixed bottom-20 right-6 m-1"

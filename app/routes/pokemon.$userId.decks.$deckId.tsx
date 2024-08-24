@@ -32,9 +32,7 @@ export default function DeckDetail() {
       (!location.pathname.includes("history") &&
         (location.pathname.endsWith("edit") ||
           location.pathname.endsWith("delete") ||
-          location.pathname.endsWith("codes") ||
-          location.pathname === "/" ||
-          location.search === ""))
+          location.pathname.endsWith("codes")))
     ) {
       outletRef.current?.scrollIntoView({ behavior: "smooth" });
     }
@@ -121,12 +119,20 @@ export default function DeckDetail() {
             )}
           </div>
 
+          {deck.userId === currentUserId && (
+            <div className="mt-4">
+              <Link to={`history_new`} className="btn btn-primary">
+                履歴を作成する
+              </Link>
+            </div>
+          )}
+
           {/* フローティング */}
           <div className="fixed right-2 bottom-14">
             <ul className="menu bg-base-100 bg-opacity-60 rounded-box shadow-lg flex flex-col space-y-1">
               <li>
                 <Link to="./" className="btn btn-sm btn-info bg-opacity-60">
-                  履歴
+                  履歴一覧
                 </Link>
               </li>
               {deck.userId === currentUserId && (
@@ -136,15 +142,7 @@ export default function DeckDetail() {
                       to={`codes`}
                       className="btn btn-sm btn-info bg-opacity-60"
                     >
-                      デッキコード
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to={`history_new`}
-                      className="btn btn-sm btn-success bg-opacity-60"
-                    >
-                      履歴作成
+                      デッキコード一覧
                     </Link>
                   </li>
                 </>
