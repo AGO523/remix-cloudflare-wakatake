@@ -669,9 +669,8 @@ export async function updateDeckCode(
     .where(eq(deckCodes.historyId, historyId))
     .get();
 
-  // デッキコード自体が存在しない場合は早期リターン
   if (!currentDeckCode) {
-    return json({ status: 200 });
+    return json({ message: "デッキコードに変更はありません" }, { status: 200 });
   }
 
   // 現在のデッキコードと formData の code が異なるか比較
