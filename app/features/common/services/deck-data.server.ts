@@ -751,21 +751,6 @@ export async function updateDeckCode(
     }
   }
 
-  // ここで再度上書きしてしまっている？
-  // const updatedDeckCode = {
-  //   ...result.data,
-  //   imageUrl: currentDeckCode.imageUrl,
-  // };
-
-  // const response = await db
-  //   .update(deckCodes)
-  //   .set(updatedDeckCode)
-  //   .where(eq(deckCodes.id, currentDeckCode.id))
-  //   .execute();
-  // if (response.success) {
-  //   return json({ message: "デッキコードを更新しました" }, { status: 200 });
-  // }
-
   return json({ message: "デッキコードを更新しました" }, { status: 200 });
 }
 

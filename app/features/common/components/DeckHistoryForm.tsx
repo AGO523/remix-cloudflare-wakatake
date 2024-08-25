@@ -55,17 +55,14 @@ export default function DeckHistoryForm({
           defaultValue={defaultValues.code || ""}
           className="input input-bordered w-full"
         />
-        <p className="text-gray-600 text-sm">
-          この履歴にデッキ画像を表示することができます
-        </p>
-        <input
-          type="checkbox"
-          name="first"
-          className="checkbox checkbox-secondary border-4 mt-2"
-        />
-        <p className="text-gray-600 text-sm pb-2">
-          ↑のデッキコードをメインのデッキ画像に設定する（後から変更可）
-        </p>
+
+        <select className="select select-bordered w-full mt-2" name="first">
+          <option disabled selected>
+            デッキ画像のステータスを選択
+          </option>
+          <option value="first">メイン</option>
+          <option value="sub">サブ</option>
+        </select>
       </div>
 
       <div className="divider">その他の画像</div>
@@ -73,7 +70,7 @@ export default function DeckHistoryForm({
         <input
           type="text"
           name="cardImageUrl"
-          placeholder="挿入する画像のURLを貼り付ける(任意)"
+          placeholder="挿入する画像のURLを添付(任意)"
           defaultValue={defaultValues.cardImageUrl || ""}
           className="input input-bordered w-full"
         />
