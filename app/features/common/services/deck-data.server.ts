@@ -97,12 +97,13 @@ const updateDeckCodeSchema = z.object({
     .max(100, "公開ステータスは100文字以内で入力してください"),
   code: z
     .string()
-    .min(1, "デッキコードは必須です")
-    .max(20, "デッキコードは20文字以内で入力してください")
-    .regex(
-      /^[a-zA-Z0-9]{6}-[a-zA-Z0-9]{6}-[a-zA-Z0-9]{6}$/,
-      "デッキコードは正しい形式で入力してください"
-    ),
+    .optional()
+    .refine((value) => {
+      if (value === undefined || value === "") {
+        return true;
+      }
+      return /^[a-zA-Z0-9]{6}-[a-zA-Z0-9]{6}-[a-zA-Z0-9]{6}$/.test(value);
+    }, "デッキコードの形式が不正です"),
 });
 
 const updateUserProfileSchema = z.object({
@@ -338,7 +339,7 @@ export async function createDeckCode(
       deckId,
       historyId,
       status: codeStatus,
-      code,
+      code: code || undefined,
       imageUrl,
     };
 
@@ -648,7 +649,7 @@ export async function updateDeckCode(
   const formObject = {
     deckId: Number(formData.get("deckId")),
     status: isMain ? "main" : "sub",
-    code: formData.get("code") as string,
+    code: code || undefined,
   };
 
   const result = updateDeckCodeSchema.safeParse(formObject);
@@ -668,8 +669,9 @@ export async function updateDeckCode(
     .where(eq(deckCodes.historyId, historyId))
     .get();
 
+  // デッキコード自体が存在しない場合は早期リターン
   if (!currentDeckCode) {
-    return json({ message: "デッキコードが見つかりません" }, { status: 404 });
+    return json({ status: 200 });
   }
 
   // 現在のデッキコードと formData の code が異なるか比較
