@@ -61,7 +61,7 @@ export default function DeckHistoryDetail() {
                   <img
                     src={deckCode.imageUrl}
                     alt="デッキの画像"
-                    className="object-cover rounded-md mb-2 mt-2"
+                    className="object-cover rounded-md mb-2 mt-2 max-h-[340px]"
                   />
 
                   {deckCode.imageUrl ===
