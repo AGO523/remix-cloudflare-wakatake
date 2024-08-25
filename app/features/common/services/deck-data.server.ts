@@ -64,7 +64,11 @@ const createDeckCodeSchema = z.object({
   code: z
     .string()
     .min(1, "デッキコードは必須です")
-    .max(100, "デッキコードは100文字以内で入力してください"),
+    .max(20, "デッキコードは20文字以内で入力してください")
+    .regex(
+      /^[a-zA-Z0-9]{6}-[a-zA-Z0-9]{6}-[a-zA-Z0-9]{6}$/,
+      "デッキコードは正しい形式で入力してください"
+    ),
   imageUrl: z.string().optional(),
 });
 
@@ -94,7 +98,11 @@ const updateDeckCodeSchema = z.object({
   code: z
     .string()
     .min(1, "デッキコードは必須です")
-    .max(100, "デッキコードは100文字以内で入力してください"),
+    .max(20, "デッキコードは20文字以内で入力してください")
+    .regex(
+      /^[a-zA-Z0-9]{6}-[a-zA-Z0-9]{6}-[a-zA-Z0-9]{6}$/,
+      "デッキコードは正しい形式で入力してください"
+    ),
 });
 
 const updateUserProfileSchema = z.object({
@@ -208,10 +216,7 @@ export async function createDeck(formData: FormData, context: AppLoadContext) {
     context
   );
   if (createDeckHistoryResponse.status !== 201) {
-    return json(
-      { message: "デッキの履歴の登録に失敗しました" },
-      { status: 500 }
-    );
+    return createDeckHistoryResponse;
   }
 
   return json(
@@ -281,10 +286,7 @@ export async function createDeckHistory(
     );
 
     if (createDeckCodeResponse.status !== 201) {
-      return json(
-        { message: "デッキコードの登録に失敗しました" },
-        { status: 500 }
-      );
+      return createDeckCodeResponse;
     }
 
     // first が true の場合 deckCodes を main にして、他のデッキコードを sub にする
@@ -296,10 +298,7 @@ export async function createDeckHistory(
       );
 
       if (updateDeckCodeResponse.status !== 200) {
-        return json(
-          { message: "デッキコードのステータスの更新に失敗しました" },
-          { status: 500 }
-        );
+        return updateDeckCodeResponse;
       }
     }
   }
@@ -577,7 +576,6 @@ export async function deleteDeck(deckId: number, context: AppLoadContext) {
 
     return json({ message: "デッキを削除しました" }, { status: 200 });
   } catch (error) {
-    console.error(error);
     return json({ message: "デッキの削除に失敗しました" }, { status: 500 });
   }
 }
@@ -629,10 +627,7 @@ export async function updateDeckHistory(
   );
 
   if (updateDeckCodeResponse.status !== 200) {
-    return json(
-      { message: "デッキコードの更新に失敗しました" },
-      { status: 500 }
-    );
+    return updateDeckCodeResponse;
   }
 
   return json({ message: "デッキ履歴を更新しました" }, { status: 200 });
@@ -680,9 +675,12 @@ export async function updateDeckCode(
   // 現在のデッキコードと formData の code が異なるか比較
   const isNewDeckCode = formData.get("code") !== currentDeckCode.code;
 
-  // 同じ場合は何もしない
+  // コードが変更されていない場合は何もしない
   if (!isNewDeckCode) {
-    return json({ message: "デッキコードを更新しました" }, { status: 200 });
+    return json(
+      { message: "デッキコードは変更されていません" },
+      { status: 200 }
+    );
   }
 
   // 異なっている場合は新しいデッキコードを更新する
@@ -782,7 +780,6 @@ export async function deleteDeckHistory(
 
     return json({ message: "デッキを削除しました" }, { status: 200 });
   } catch (error) {
-    console.error(error);
     return json({ message: "デッキの削除に失敗しました" }, { status: 500 });
   }
 }
