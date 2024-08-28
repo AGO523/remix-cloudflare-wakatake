@@ -17,6 +17,7 @@ interface Env {
   DB: D1Database;
   C_API_BASE_URL: string;
   C_AUTH_KEY: string;
+  API_TOKEN: string;
 }
 
 interface UploadResponse {
@@ -130,10 +131,12 @@ async function publishDeckCode(
   const env = context.env as Env;
   const apiEndpoint = env.C_API_BASE_URL;
   const authKey = env.C_AUTH_KEY;
+  const apiToken = env.API_TOKEN;
 
+  // COMAJI の API を経由してデッキコードを pubsub に publish
   const response = await fetch(`${apiEndpoint}/publish`, {
     method: "POST",
-    body: JSON.stringify({ deckCodeId, code }),
+    body: JSON.stringify({ deckCodeId, code, apiToken }),
     headers: {
       "X-Auth-Key": authKey,
     },
@@ -149,13 +152,21 @@ async function publishDeckCode(
 // 開発環境で使用
 async function fetchDeckImage(
   code: string,
-  deckId: number
+  deckId: number,
+  context: AppLoadContext
 ): Promise<string | null> {
+  const env = context.env as Env;
+  const apiToken = env.API_TOKEN;
+
   const deckImageUrlResponse = await fetch(
     "https://pokemon-card-deck-scraper-ghyv6dyl6a-an.a.run.app/dev_fetchDeck",
     {
       method: "POST",
-      body: JSON.stringify({ deckCode: code, deckId: deckId }),
+      body: JSON.stringify({
+        deckCode: code,
+        deckId: deckId,
+        apiToken: apiToken,
+      }),
       headers: {
         "Content-Type": "application/json",
       },
@@ -326,7 +337,7 @@ export async function createDeckCode(
   // 開発環境では publish しない
   // 代わりに fetchDeckImage で取得した imageUrl をセット
   if (!isProduction) {
-    const fetchResult = await fetchDeckImage(code, deckId);
+    const fetchResult = await fetchDeckImage(code, deckId, context);
     if (!fetchResult) {
       return json(
         { message: "デッキ画像の取得に失敗しました" },
@@ -722,7 +733,11 @@ export async function updateDeckCode(
   } else {
     // 開発環境では publish しない
     // 代わりに fetchDeckImage で取得した imageUrl をセット
-    const fetchResult = await fetchDeckImage(code, currentDeckCode.deckId);
+    const fetchResult = await fetchDeckImage(
+      code,
+      currentDeckCode.deckId,
+      context
+    );
     if (!fetchResult) {
       return json(
         { message: "デッキ画像の取得に失敗しました" },
