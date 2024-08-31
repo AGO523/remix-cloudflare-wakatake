@@ -286,6 +286,7 @@ export async function createDeckHistory(
     const isFirst =
       formData.get("first") === "on" ||
       formData.get("first") === "true" ||
+      formData.get("first") === "first" ||
       false;
 
     // デッキコードを登録
