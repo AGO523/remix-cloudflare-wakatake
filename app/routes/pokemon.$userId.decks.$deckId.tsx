@@ -22,6 +22,11 @@ export default function DeckDetail() {
   const { deck, user } = useLoaderData<typeof loader>();
   const currentUserId = user?.id;
   const mainDeckCode = deck.codes.find((code) => code.status === "main");
+  const isDeckCodeWithDefaultImage = deck.codes.find(
+    (code) =>
+      code.imageUrl ===
+      "https://storage.googleapis.com/prod-artora-arts/images/sakusei2.png"
+  );
 
   const outletRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
@@ -119,6 +124,7 @@ export default function DeckDetail() {
             )}
           </div>
 
+          {/* pubsub で作成中に出す */}
           {mainDeckCode &&
             mainDeckCode.imageUrl ===
               "https://storage.googleapis.com/prod-artora-arts/images/sakusei2.png" && (
@@ -133,6 +139,19 @@ export default function DeckDetail() {
                   preventScrollReset
                 >
                   画像を更新
+                </Link>
+              </>
+            )}
+
+          {/* main がない場合に設定を促す */}
+          {mainDeckCode === undefined &&
+            isDeckCodeWithDefaultImage === undefined && (
+              <>
+                <p className="text-error text-sm mb-2">
+                  メインとして表示する画像が設定されていません
+                </p>
+                <Link to={`codes`} className="btn btn-sm btn-info">
+                  デッキコード一覧
                 </Link>
               </>
             )}
