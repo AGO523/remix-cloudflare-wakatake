@@ -151,7 +151,7 @@ export default function DeckDetail() {
                   メインとして表示する画像が設定されていません
                 </p>
                 <Link to={`codes`} className="btn btn-sm btn-info">
-                  デッキコード一覧
+                  メイン画像を設定する
                 </Link>
               </>
             )}

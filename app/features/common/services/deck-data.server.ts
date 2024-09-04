@@ -502,6 +502,19 @@ export async function getDeckById(deckId: number, context: AppLoadContext) {
   return { ...deck, histories, codes };
 }
 
+export async function getDeck(deckId: number, context: AppLoadContext) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  const deck = await db.select().from(decks).where(eq(decks.id, deckId)).get();
+
+  if (!deck) {
+    return null;
+  }
+
+  return { ...deck };
+}
+
 export async function getDeckHistoryById(
   deckHistoryId: number,
   context: AppLoadContext

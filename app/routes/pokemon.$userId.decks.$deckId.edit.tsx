@@ -8,6 +8,7 @@ import {
 } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
+  getDeck,
   getDeckById,
   updateDeck,
 } from "~/features/common/services/deck-data.server";
@@ -18,13 +19,15 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const user = await authenticator.isAuthenticated(request, {
     failureRedirect: "/login",
   });
-  const { deckId, userId } = params;
+  const { deckId } = params;
+  const currentDeck = await getDeck(Number(deckId), context);
+  if (!currentDeck) {
+    throw new Response("Deck not found", { status: 404 });
+  }
+  const deckUserId = currentDeck.userId;
 
-  if (Number(userId) !== user.id) {
-    return redirectWithError(
-      `/pokemon/${userId}/decks`,
-      "アクセス権限がありません"
-    );
+  if (deckUserId !== user.id) {
+    return redirectWithError(`/pokemon`, "アクセス権限がありません");
   }
 
   const deck = await getDeckById(Number(deckId), context);
