@@ -1,7 +1,10 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { Form, useLoaderData, useNavigation } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
-import { createDeck } from "~/features/common/services/deck-data.server";
+import {
+  createDeck,
+  getDeck,
+} from "~/features/common/services/deck-data.server";
 import {
   jsonWithError,
   redirectWithError,
@@ -13,13 +16,16 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
   const user = await authenticator.isAuthenticated(request, {
     failureRedirect: "/login",
   });
-  const { userId } = params;
+  const { deckId } = params;
 
-  if (Number(userId) !== user.id) {
-    return redirectWithError(
-      `/pokemon/${userId}/decks`,
-      "アクセス権限がありません"
-    );
+  const deck = await getDeck(Number(deckId), context);
+  if (!deck) {
+    throw new Response("Deck not found", { status: 404 });
+  }
+  const deckUserId = deck.userId;
+
+  if (deckUserId !== user.id) {
+    return redirectWithError(`/pokemon`, "アクセス権限がありません");
   }
 
   return { user };

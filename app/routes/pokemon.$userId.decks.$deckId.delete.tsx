@@ -10,6 +10,7 @@ import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getDeckById,
   deleteDeck,
+  getDeck,
 } from "~/features/common/services/deck-data.server";
 import { redirectWithSuccess, redirectWithError } from "remix-toast";
 
@@ -19,13 +20,15 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
     failureRedirect: "/login",
   });
 
-  const { deckId, userId } = params;
+  const { deckId } = params;
+  const currentDeck = await getDeck(Number(deckId), context);
+  if (!currentDeck) {
+    throw new Response("Deck not found", { status: 404 });
+  }
+  const deckUserId = currentDeck.userId;
 
-  if (Number(userId) !== user.id) {
-    return redirectWithError(
-      `/pokemon/${userId}/decks`,
-      "アクセス権限がありません"
-    );
+  if (deckUserId !== user.id) {
+    return redirectWithError(`/pokemon`, "アクセス権限がありません");
   }
 
   const deck = await getDeckById(Number(deckId), context);

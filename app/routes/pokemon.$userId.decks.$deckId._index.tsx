@@ -43,6 +43,7 @@ export default function DeckDetail() {
               </p>
             )}
 
+            {/* 詳細と同じ見た目にする */}
             {visibleHistories.map((history) => (
               <div
                 key={history.id}

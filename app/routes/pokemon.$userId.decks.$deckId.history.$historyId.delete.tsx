@@ -5,6 +5,7 @@ import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getDeckHistoryById,
   deleteDeckHistory,
+  getDeck,
 } from "~/features/common/services/deck-data.server";
 import { redirectWithSuccess, redirectWithError } from "remix-toast";
 
@@ -14,13 +15,15 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
     failureRedirect: "/login",
   });
 
-  const { historyId, userId } = params;
+  const { historyId, deckId } = params;
+  const deck = await getDeck(Number(deckId), context);
+  if (!deck) {
+    throw new Response("Deck not found", { status: 404 });
+  }
+  const deckUserId = deck.userId;
 
-  if (Number(userId) !== user.id) {
-    return redirectWithError(
-      `/pokemon/${userId}/decks`,
-      "アクセス権限がありません"
-    );
+  if (deckUserId !== user.id) {
+    return redirectWithError(`/pokemon`, "アクセス権限がありません");
   }
 
   const deckHistory = await getDeckHistoryById(Number(historyId), context);
