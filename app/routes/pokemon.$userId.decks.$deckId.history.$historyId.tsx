@@ -6,6 +6,7 @@ import {
   getDeckHistoryById,
   getDeckCodeByHistoryId,
   getDeck,
+  getUserBy,
 } from "~/features/common/services/deck-data.server";
 import { Badge } from "~/features/common/components/Badge";
 import { DeckBadge } from "~/features/common/components/DeckBadge";
@@ -20,7 +21,11 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
   if (!deck) {
     throw new Response("Deck not found", { status: 404 });
   }
-  const deckUserId = deck.userId;
+
+  const deckUser = await getUserBy(deck.userId, context);
+  if (!deckUser) {
+    throw new Response("Deck user not found", { status: 404 });
+  }
 
   // デッキコードがある場合にはデッキコードを取得
   const deckHistory = await getDeckHistoryById(Number(historyId), context);
@@ -29,11 +34,11 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
     throw new Response("Deck History not found", { status: 404 });
   }
 
-  return json({ deckHistory, deckCode, user, deckUserId });
+  return json({ deckHistory, deckCode, user, deckUser });
 }
 
 export default function DeckHistoryDetail() {
-  const { deckHistory, deckCode, user, deckUserId } =
+  const { deckHistory, deckCode, user, deckUser } =
     useLoaderData<typeof loader>();
   const currentUserId = user?.id;
 
@@ -43,9 +48,38 @@ export default function DeckHistoryDetail() {
         <div className="w-full max-w-3xl min-w-0 px-2">
           <h1 className="text-3xl font-bold mb-6">デッキ履歴詳細</h1>
           <div className="rounded-lg shadow-lg p-6 mb-4">
+            <div className="mb-1">
+              <Link
+                to={`/pokemon/${deckUser.id}/profile`}
+                key={deckUser.id}
+                unstable_viewTransition
+              >
+                <div className="flex items-center m-2">
+                  {deckUser.avatarUrl ? (
+                    <img
+                      src={deckUser.avatarUrl}
+                      alt="アバターの画像"
+                      className="w-10 h-10 rounded-full mr-2"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full mr-2 bg-gray-300"></div>
+                  )}
+                  {deckUser.nickname ? (
+                    <p className="badge badge-ghost mt-1">
+                      作成者: {deckUser.nickname}
+                    </p>
+                  ) : (
+                    <p className="badge badge-ghost mt-1">
+                      作成者: ユーザー_{deckUser.id}
+                    </p>
+                  )}
+                </div>
+              </Link>
+            </div>
+
             <Badge status={deckHistory.status} />
 
-            {currentUserId && currentUserId === deckUserId && (
+            {currentUserId && currentUserId === deckUser.id && (
               <div className="flex justify-end mt-2 space-x-1">
                 <Link
                   preventScrollReset

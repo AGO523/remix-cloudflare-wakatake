@@ -2,7 +2,10 @@ import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
-import { getDeckById } from "~/features/common/services/deck-data.server";
+import {
+  getDeckById,
+  getUserBy,
+} from "~/features/common/services/deck-data.server";
 import { Badge } from "~/features/common/components/Badge";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
@@ -14,11 +17,16 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
   if (!deck) {
     throw new Response("Deck not found", { status: 404 });
   }
-  return json({ deck, user });
+
+  const deckUser = await getUserBy(deck.userId, context);
+  if (!deckUser) {
+    throw new Response("Deck user not found", { status: 404 });
+  }
+  return json({ deck, user, deckUser });
 }
 
 export default function DeckDetail() {
-  const { deck, user } = useLoaderData<typeof loader>();
+  const { deck, user, deckUser } = useLoaderData<typeof loader>();
   const currentUserId = user?.id;
 
   // フィルタリングされた履歴を取得
@@ -47,8 +55,37 @@ export default function DeckDetail() {
             {visibleHistories.map((history) => (
               <div
                 key={history.id}
-                className="shadow-lg rounded-lg p-6 bg-base-200"
+                className="shadow-lg rounded-lg p-6 bg-base-200 max-w-3xl"
               >
+                <div className="mb-1">
+                  <Link
+                    to={`/pokemon/${deckUser.id}/profile`}
+                    key={deckUser.id}
+                    unstable_viewTransition
+                  >
+                    <div className="flex items-center m-2">
+                      {deckUser.avatarUrl ? (
+                        <img
+                          src={deckUser.avatarUrl}
+                          alt="アバターの画像"
+                          className="w-10 h-10 rounded-full mr-2"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full mr-2 bg-gray-300"></div>
+                      )}
+                      {deckUser.nickname ? (
+                        <p className="badge badge-ghost mt-1">
+                          作成者: {deckUser.nickname}
+                        </p>
+                      ) : (
+                        <p className="badge badge-ghost mt-1">
+                          作成者: ユーザー_{deckUser.id}
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                </div>
+
                 <Link
                   to={`history/${history.id}`}
                   className="block"
