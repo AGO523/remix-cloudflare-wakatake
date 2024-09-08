@@ -7,6 +7,7 @@ import {
   getUserBy,
 } from "~/features/common/services/deck-data.server";
 import { Badge } from "~/features/common/components/Badge";
+import { UserIcon } from "~/features/common/components/UserIcon";
 
 export async function loader({ params, context, request }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
@@ -58,32 +59,11 @@ export default function DeckDetail() {
                 className="shadow-lg rounded-lg p-6 bg-base-200 max-w-3xl"
               >
                 <div className="mb-1">
-                  <Link
-                    to={`/pokemon/${deckUser.id}/profile`}
-                    key={deckUser.id}
-                    unstable_viewTransition
-                  >
-                    <div className="flex items-center m-2">
-                      {deckUser.avatarUrl ? (
-                        <img
-                          src={deckUser.avatarUrl}
-                          alt="アバターの画像"
-                          className="w-10 h-10 rounded-full mr-2"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full mr-2 bg-gray-300"></div>
-                      )}
-                      {deckUser.nickname ? (
-                        <p className="badge badge-ghost mt-1">
-                          作成者: {deckUser.nickname}
-                        </p>
-                      ) : (
-                        <p className="badge badge-ghost mt-1">
-                          作成者: ユーザー_{deckUser.id}
-                        </p>
-                      )}
-                    </div>
-                  </Link>
+                  <UserIcon
+                    userId={deckUser.id}
+                    avatarUrl={deckUser.avatarUrl}
+                    nickname={deckUser.nickname}
+                  />
                 </div>
 
                 <Link
