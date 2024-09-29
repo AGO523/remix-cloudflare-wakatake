@@ -54,6 +54,7 @@ export default function DeckNew() {
               placeholder="デッキコード（必須）"
               className="input input-bordered input-lg w-full max-w-lg mt-2"
               name="code"
+              required
             />
           </div>
           <div>
@@ -62,6 +63,7 @@ export default function DeckNew() {
               placeholder="デッキ名（必須）"
               className="input input-bordered input-lg w-full max-w-lg mt-2"
               name="title"
+              required
             />
           </div>
           <div>
