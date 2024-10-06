@@ -141,6 +141,20 @@
       "when": 1722897153552,
       "tag": "0019_chilly_dragon_man",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1727999176171,
+      "tag": "0020_first_redwing",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "5",
+      "when": 1728175262462,
+      "tag": "0021_silly_pestilence",
+      "breakpoints": true
     }
   ]
 }
