@@ -46,7 +46,7 @@ export default function App() {
   }, [toast]);
 
   return (
-    <html lang="ja" data-theme="winter">
+    <html lang="ja" data-theme="retro">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />

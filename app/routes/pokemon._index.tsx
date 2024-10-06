@@ -58,6 +58,9 @@ export default function PokemonDecks() {
       </div>
 
       <div className="flex flex-wrap justify-center mb-4">
+        <Link to={`reviews`} className="btn btn-primary m-2">
+          カード考察
+        </Link>
         {currentUserId ? (
           <>
             <Link
@@ -68,7 +71,7 @@ export default function PokemonDecks() {
             </Link>
             <Link
               to={`${currentUserId}/decks`}
-              className="btn btn-accent m-2"
+              className="btn btn-primary m-2"
               prefetch="intent"
             >
               自分のデッキを見る

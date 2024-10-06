@@ -95,3 +95,26 @@ export const cardImages = sqliteTable("cardImages", {
   imageUrl: text("imageUrl").notNull(),
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
 });
+
+// カードの情報を保存するテーブル
+// TODO: cardImageUrl を保存できるようにする?
+export const singleCard = sqliteTable("singleCard", {
+  id: integer("id").primaryKey().notNull(),
+  imageUrl: text("imageUrl"),
+  name: text("name").notNull(),
+  type: text("type").notNull(),
+  rule: text("rule"),
+  gameType: text("gameType").notNull(), // ポケモンカード or ポケポケ
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+});
+
+// レビューを保存するテーブル
+export const cardReviews = sqliteTable("cardReviews", {
+  id: integer("id").primaryKey().notNull(),
+  // 匿名を許可する
+  userId: integer("userId"),
+  singleCardId: integer("singleCardId").notNull(),
+  content: text("content").notNull(),
+  rating: integer("rating").notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+});
