@@ -98,7 +98,7 @@ export const cardImages = sqliteTable("cardImages", {
 
 // カードの情報を保存するテーブル
 // TODO: cardImageUrl を保存できるようにする?
-export const singleCard = sqliteTable("singleCard", {
+export const singleCards = sqliteTable("singleCards", {
   id: integer("id").primaryKey().notNull(),
   imageUrl: text("imageUrl"),
   name: text("name").notNull(),

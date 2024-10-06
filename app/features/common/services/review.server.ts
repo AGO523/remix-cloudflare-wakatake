@@ -2,13 +2,13 @@
 // このファイルはデータベースと接続してデータ操作を行う処理を記述する //
 /////////////////////////////////////////////////////////////
 import type { AppLoadContext } from "@remix-run/cloudflare";
-import { singleCard } from "db/schema";
+import { singleCards } from "db/schema";
 import { InferInsertModel, desc } from "drizzle-orm";
 import { createClient } from "~/features/common/services/db.server";
 import { json } from "@remix-run/cloudflare";
 import { z } from "zod";
 
-type CreateSingleCard = InferInsertModel<typeof singleCard>;
+type CreateSingleCard = InferInsertModel<typeof singleCards>;
 
 interface Env {
   DB: D1Database;
@@ -57,7 +57,7 @@ export async function createSingleCard(
   };
 
   // データベースへの挿入操作
-  const response = await db.insert(singleCard).values(newSingleCard).execute();
+  const response = await db.insert(singleCards).values(newSingleCard).execute();
 
   if (response.error) {
     return json({ message: "Failed to create single card" }, { status: 500 });
@@ -73,16 +73,16 @@ export async function getSingleCards(context: AppLoadContext) {
   const env = context.env as Env;
   const db = createClient(env.DB);
 
-  const singleCards = await db
+  const singleCardsResponse = await db
     .select()
-    .from(singleCard)
-    .orderBy(desc(singleCard.createdAt))
+    .from(singleCards)
+    .orderBy(desc(singleCards.createdAt))
     .all();
 
-  if (!singleCards) {
+  if (!singleCardsResponse) {
     return [];
   }
 
   // 配列の形式で返す、mapを使用するため
-  return singleCards;
+  return singleCardsResponse;
 }
