@@ -63,10 +63,7 @@ export async function createSingleCard(
     return json({ message: "Failed to create single card" }, { status: 500 });
   }
 
-  return json(
-    { message: "Single card created successfully", data: newSingleCard },
-    { status: 201 }
-  );
+  return json({ message: "Single card created successfully" }, { status: 201 });
 }
 
 export async function getSingleCards(context: AppLoadContext) {
