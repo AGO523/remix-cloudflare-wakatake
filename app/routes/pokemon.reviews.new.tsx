@@ -52,7 +52,7 @@ export const action = async ({ context, request }: LoaderFunctionArgs) => {
     return jsonWithError({}, responseData.message);
   }
 
-  return redirectWithSuccess(`/reviews`, responseData.message);
+  return redirectWithSuccess(`/pokemon/reviews`, responseData.message);
 };
 
 export default function SingleCardForm() {

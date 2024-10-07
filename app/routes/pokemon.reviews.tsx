@@ -14,6 +14,8 @@
 // 管理者専用
 // DBは共通なので、パスは同じ
 // /pokemon/reviews/new
+// /pokemon/reviews/:id/edit
+// /pokemon/reviews/:id/delete
 
 import { Outlet } from "@remix-run/react";
 
