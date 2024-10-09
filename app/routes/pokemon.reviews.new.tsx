@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form, Link, Outlet, useLoaderData } from "@remix-run/react";
 import { json } from "@remix-run/cloudflare";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import { createSingleCard } from "~/features/common/services/review.server";
@@ -9,7 +9,6 @@ import {
   redirectWithSuccess,
 } from "remix-toast";
 import { getCardImagesBy } from "~/features/common/services/deck-data.server";
-import UploadImageForm from "~/features/common/components/UploadImageForm";
 import CardImages from "~/features/common/components/CardImages";
 
 // type SingleCard = {
@@ -57,7 +56,6 @@ export const action = async ({ context, request }: LoaderFunctionArgs) => {
 
 export default function SingleCardForm() {
   const { user, cardImages } = useLoaderData<typeof loader>();
-  const userId = user.id;
   // const navigation = useNavigation();
   // const isSubmitting = navigation.state === "submitting";
 
@@ -150,11 +148,24 @@ export default function SingleCardForm() {
       </div>
 
       <div>
+        {/* 管理者は大量の画像をもつことになる */}
+        {/* 表示方法を考える */}
+        {/* 別ウィンドウで表示するなど */}
         <CardImages cardImages={cardImages} />
       </div>
 
       <div>
-        <UploadImageForm userId={userId} />
+        <Link
+          to={`upload`}
+          className="btn btn-info w-1/2 ml-1"
+          preventScrollReset
+        >
+          画像をアップロード
+        </Link>
+      </div>
+
+      <div>
+        <Outlet />
       </div>
     </>
   );
