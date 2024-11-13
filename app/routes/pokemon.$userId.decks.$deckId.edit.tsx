@@ -6,27 +6,25 @@ import {
   useNavigation,
   Link,
 } from "@remix-run/react";
-import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getDeck,
   getDeckById,
+  getUserBy,
   updateDeck,
 } from "~/features/common/services/deck-data.server";
 import { redirectWithSuccess, redirectWithError } from "remix-toast";
+import useAuthGuard from "~/features/common/hooks/useAuthGuard";
 
-export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
+export async function loader({ params, context }: LoaderFunctionArgs) {
   const { deckId } = params;
   const currentDeck = await getDeck(Number(deckId), context);
   if (!currentDeck) {
     throw new Response("Deck not found", { status: 404 });
   }
   const deckUserId = currentDeck.userId;
-
-  if (deckUserId !== user.id) {
+  const user = await getUserBy(Number(deckUserId), context);
+  if (!user || !user.uid) {
+    console.error("User not found, uid is null");
     return redirectWithError(`/pokemon`, "アクセス権限がありません");
   }
 
@@ -62,8 +60,13 @@ export const action = async ({
 
 export default function EditDeck() {
   const { deck, user } = useLoaderData<typeof loader>();
+  const { loading } = useAuthGuard(user.uid);
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+
+  if (loading) {
+    return <span className="loading loading-spinner loading-lg"></span>;
+  }
 
   return (
     <div className="p-4 bg-base-100 flex justify-center">
@@ -74,7 +77,7 @@ export default function EditDeck() {
         <Form method="post" className="space-y-4">
           <input type="hidden" name="userId" value={user.id} />
           <div>
-            <span className="text-gray-700">デッキ名</span>
+            <span className="text-base-content">デッキ名</span>
             <input
               type="text"
               name="title"
@@ -85,7 +88,7 @@ export default function EditDeck() {
             />
           </div>
           <div>
-            <span className="text-gray-700">デッキの説明</span>
+            <span className="text-base-content">デッキの説明</span>
             <textarea
               name="description"
               placeholder="デッキの説明"

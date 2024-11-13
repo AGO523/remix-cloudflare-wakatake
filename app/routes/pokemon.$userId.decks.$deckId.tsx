@@ -2,25 +2,34 @@ import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { useEffect, useRef } from "react";
 import { Link, Outlet, useLoaderData, useLocation } from "@remix-run/react";
-import { getAuthenticator } from "~/features/common/services/auth.server";
-import { getDeckById } from "~/features/common/services/deck-data.server";
+import {
+  getDeckById,
+  getUserBy,
+} from "~/features/common/services/deck-data.server";
 import defaultDeckImage from "~/images/sakusei2.png";
+import useAuthGuard from "~/features/common/hooks/useAuthGuard";
+import { redirectWithError } from "remix-toast";
 
-export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request);
+export async function loader({ params, context }: LoaderFunctionArgs) {
   const { deckId } = params;
 
   const deck = await getDeckById(Number(deckId), context);
   if (!deck) {
     throw new Response("Deck not found", { status: 404 });
   }
-  return json({ deck, user });
+
+  const deckUser = await getUserBy(Number(deck.userId), context);
+  if (!deckUser || !deckUser.uid) {
+    console.error("User not found, uid is null");
+    return redirectWithError(`/pokemon`, "アクセス権限がありません");
+  }
+  return json({ deck, deckUser });
 }
 
 export default function DeckDetail() {
-  const { deck, user } = useLoaderData<typeof loader>();
-  const currentUserId = user?.id;
+  const { deck, deckUser } = useLoaderData<typeof loader>();
+  const { user } = useAuthGuard(deckUser.uid, false);
+  const currentUserUid = user?.uid;
   const mainDeckCode = deck.codes.find((code) => code.status === "main");
   const isDeckCodeWithDefaultImage = deck.codes.find(
     (code) =>
@@ -50,7 +59,7 @@ export default function DeckDetail() {
           <div className="flex justify-center items-center relative">
             <h1 className="text-3xl font-bold text-center">{deck.title}</h1>
           </div>
-          {deck.userId === currentUserId && (
+          {deckUser.uid === currentUserUid && (
             <div className="flex justify-end mt-2 space-x-2">
               <Link to={`edit`} className="btn btn-sm btn-success">
                 <svg
@@ -93,7 +102,7 @@ export default function DeckDetail() {
 
           {deck.description &&
             deck.description.split("\n").map((line, index) => (
-              <div key={index} className="text-gray-700 mb-4">
+              <div key={index} className="text-base-content mb-4">
                 <span>
                   {line}
                   <br />
@@ -104,7 +113,7 @@ export default function DeckDetail() {
           <div className="flex justify-center">
             {(deck.codes.length > 0 && mainDeckCode && (
               <div>
-                <p className="text-gray-600">
+                <p className="text-base-content">
                   デッキコード: {mainDeckCode?.code}
                 </p>
                 <img
@@ -156,7 +165,7 @@ export default function DeckDetail() {
               </>
             )}
 
-          {deck.userId === currentUserId && (
+          {deckUser.uid === currentUserUid && (
             <div className="mt-4">
               <Link to={`history_new`} className="btn btn-primary">
                 履歴を作成する
@@ -172,7 +181,7 @@ export default function DeckDetail() {
                   履歴一覧
                 </Link>
               </li>
-              {deck.userId === currentUserId && (
+              {deckUser.uid === currentUserUid && (
                 <>
                   <li>
                     <Link

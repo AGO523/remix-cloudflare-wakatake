@@ -4,6 +4,11 @@ import { Link, Outlet, useLoaderData } from "@remix-run/react";
 import { getAuthenticator } from "~/features/common/services/auth.server";
 import { getUserBy } from "~/features/common/services/deck-data.server";
 
+// マイページ
+// デッキ上部のアイコンから遷移してきた場合は、userID がある
+// フッターからの遷移は自分自身で確定で、userId はない、uid はある
+// フッターからの遷移の場合はユーザー固有のマイページ
+// それ以外はProfile ページとして見えるようにする
 export async function loader({ params, request, context }: LoaderFunctionArgs) {
   const authenticator = getAuthenticator(context);
   const currentUser = await authenticator.isAuthenticated(request);

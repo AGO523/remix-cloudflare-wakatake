@@ -2,6 +2,8 @@ import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
   id: integer("id").primaryKey().notNull(),
+  uid: text("uid").notNull().default(""),
+  // TODO: remove later (profileId はgoogle認証で取得したIDだったが、firebase に移管したため不要)
   profileId: text("profileId").notNull(),
   email: text("email"),
   iconUrl: text("iconUrl"),

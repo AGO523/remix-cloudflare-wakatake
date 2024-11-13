@@ -1,17 +1,15 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
-import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getDeckById,
   getUserBy,
 } from "~/features/common/services/deck-data.server";
 import { Badge } from "~/features/common/components/Badge";
 import { UserIcon } from "~/features/common/components/UserIcon";
+import useAuthGuard from "~/features/common/hooks/useAuthGuard";
 
-export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request);
+export async function loader({ params, context }: LoaderFunctionArgs) {
   const { deckId } = params;
 
   const deck = await getDeckById(Number(deckId), context);
@@ -23,20 +21,23 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
   if (!deckUser) {
     throw new Response("Deck user not found", { status: 404 });
   }
-  return json({ deck, user, deckUser });
+  return json({ deck, deckUser });
 }
 
 export default function DeckDetail() {
-  const { deck, user, deckUser } = useLoaderData<typeof loader>();
-  const currentUserId = user?.id;
+  const { deck, deckUser } = useLoaderData<typeof loader>();
+  const { user } = useAuthGuard(deckUser.uid, false);
+
+  const currentUserUid = user?.uid;
 
   // フィルタリングされた履歴を取得
   const visibleHistories = deck.histories.filter(
-    (history) => history.status === "main" || deck.userId === currentUserId
+    (history) => history.status === "main" || deckUser.uid === currentUserUid
   );
 
+  // これは直すかも？
   const hasHiddenHistories = deck.histories.some(
-    (history) => history.status !== "main" && deck.userId === currentUserId
+    (history) => history.status !== "main" && deckUser.uid === currentUserUid
   );
 
   return (
@@ -72,7 +73,7 @@ export default function DeckDetail() {
                   preventScrollReset
                 >
                   <Badge status={history.status} />
-                  <p className="text-gray-700 text-left mt-2">
+                  <p className="text-base-content text-left mt-2">
                     {history.content &&
                       (history.content.length > 200
                         ? history.content.substring(0, 200) + "..."
