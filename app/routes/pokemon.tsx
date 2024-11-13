@@ -1,11 +1,6 @@
-import type {
-  MetaFunction,
-  LoaderFunctionArgs,
-  LinksFunction,
-} from "@remix-run/cloudflare";
-import { Outlet, NavLink, useLoaderData } from "@remix-run/react";
-import { getAuthenticator } from "~/features/common/services/auth.server";
-import { json } from "@remix-run/cloudflare";
+import type { MetaFunction, LinksFunction } from "@remix-run/cloudflare";
+import { Outlet, NavLink } from "@remix-run/react";
+import useAuthGuard from "~/features/common/hooks/useAuthGuard";
 
 export const meta: MetaFunction = () => {
   return [
@@ -27,14 +22,9 @@ export const links: LinksFunction = () => [
   },
 ];
 
-export async function loader({ request, context }: LoaderFunctionArgs) {
-  const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request);
-  return json({ user });
-}
-
 export default function PokemonLayout() {
-  const { user } = useLoaderData<typeof loader>();
+  // const { user } = useLoaderData<typeof loader>();
+  const { user } = useAuthGuard();
 
   return (
     <>
@@ -50,7 +40,7 @@ export default function PokemonLayout() {
             <img
               src="https://storage.googleapis.com/prod-artora-arts/dev-images/dorapa_aka_icon.png"
               alt="アートラのアイコン"
-              className="self-center flex-shrink-0 w-24 h-24 border rounded-full md:justify-self-start bg-base-100 border-gray-700"
+              className="self-center flex-shrink-0 w-24 h-24 border rounded-full md:justify-self-start bg-base-100 border-base-content"
             />
             <div className="flex flex-col">
               <h4 className="text-lg font-semibold text-center md:text-left">
@@ -70,10 +60,10 @@ export default function PokemonLayout() {
         <div className="fixed inset-x-0 bottom-0 bg-base-100 p-2 bg-opacity-60">
           <div className="flex justify-around text-center">
             <NavLink
-              to={`/pokemon/${user.id}/decks`}
+              to={`/pokemon/${user.uid}/decks`}
               end
               className={({ isActive }) =>
-                isActive ? "text-info" : "text-gray-700"
+                isActive ? "text-info" : "text-base-content"
               }
             >
               <div className="flex flex-col items-center">
@@ -96,9 +86,9 @@ export default function PokemonLayout() {
               </div>
             </NavLink>
             <NavLink
-              to={`/pokemon/${user.id}/decks/new`}
+              to={`/pokemon/deck/new`}
               className={({ isActive }) =>
-                isActive ? "text-info" : "text-gray-700"
+                isActive ? "text-info" : "text-base-content"
               }
             >
               <div className="flex flex-col items-center">
@@ -120,9 +110,9 @@ export default function PokemonLayout() {
               </div>
             </NavLink>
             <NavLink
-              to={`/pokemon/${user.id}/profile`}
+              to={`/pokemon/${user.uid}/profile`}
               className={({ isActive }) =>
-                isActive ? "text-info" : "text-gray-700"
+                isActive ? "text-info" : "text-base-content"
               }
             >
               <div className="flex flex-col items-center">
@@ -153,7 +143,7 @@ export default function PokemonLayout() {
               to="/pokemon"
               end
               className={({ isActive }) =>
-                isActive ? "text-info" : "text-gray-700"
+                isActive ? "text-info" : "text-base-content"
               }
             >
               <div className="flex flex-col items-center">
@@ -178,7 +168,7 @@ export default function PokemonLayout() {
             <NavLink
               to="/login"
               className={({ isActive }) =>
-                isActive ? "text-info" : "text-gray-700"
+                isActive ? "text-info" : "text-base-content"
               }
             >
               <div className="flex flex-col items-center">

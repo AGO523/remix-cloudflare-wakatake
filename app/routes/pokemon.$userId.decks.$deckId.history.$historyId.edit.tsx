@@ -1,34 +1,27 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, Outlet, useLoaderData, useNavigation } from "@remix-run/react";
-import { getAuthenticator } from "~/features/common/services/auth.server";
+import useAuthGuard from "~/features/common/hooks/useAuthGuard";
 import {
   getDeckHistoryById,
   updateDeckHistory,
   getDeckCodeByHistoryId,
   getDeck,
+  getUserBy,
 } from "~/features/common/services/deck-data.server";
 import { redirectWithSuccess, redirectWithError } from "remix-toast";
 import DeckHistoryForm from "~/features/common/components/DeckHistoryForm";
 
-export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
-
-  const { historyId, userId, deckId } = params;
+export async function loader({ params, context }: LoaderFunctionArgs) {
+  const { historyId, deckId } = params;
   const deck = await getDeck(Number(deckId), context);
   if (!deck) {
     throw new Response("Deck not found", { status: 404 });
   }
-  const deckUserId = deck.userId;
 
-  if (deckUserId !== user.id) {
-    return redirectWithError(
-      `/pokemon/${userId}/decks`,
-      "アクセス権限がありません"
-    );
+  const deckUser = await getUserBy(deck.userId, context);
+  if (!deckUser) {
+    throw new Response("Deck user not found", { status: 404 });
   }
 
   const deckHistory = await getDeckHistoryById(Number(historyId), context);
@@ -38,7 +31,7 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
 
   const deckCode = await getDeckCodeByHistoryId(Number(historyId), context);
 
-  return json({ deckHistory, user, deckCode });
+  return json({ deckHistory, deckUser, deckCode });
 }
 
 export const action = async ({
@@ -69,9 +62,14 @@ export const action = async ({
 };
 
 export default function EditDeckHistory() {
-  const { deckHistory, deckCode } = useLoaderData<typeof loader>();
+  const { deckHistory, deckUser, deckCode } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  const { loading } = useAuthGuard(deckUser.uid, false);
+
+  if (loading) {
+    return <span className="loading loading-spinner loading-lg"></span>;
+  }
 
   return (
     <>

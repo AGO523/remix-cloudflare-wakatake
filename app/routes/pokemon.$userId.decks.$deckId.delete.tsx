@@ -6,36 +6,26 @@ import {
   useNavigation,
   Link,
 } from "@remix-run/react";
-import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getDeckById,
   deleteDeck,
-  getDeck,
+  getUserBy,
 } from "~/features/common/services/deck-data.server";
 import { redirectWithSuccess, redirectWithError } from "remix-toast";
+import useAuthGuard from "~/features/common/hooks/useAuthGuard";
 
-export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
-
+export async function loader({ params, context }: LoaderFunctionArgs) {
   const { deckId } = params;
-  const currentDeck = await getDeck(Number(deckId), context);
-  if (!currentDeck) {
-    throw new Response("Deck not found", { status: 404 });
-  }
-  const deckUserId = currentDeck.userId;
-
-  if (deckUserId !== user.id) {
-    return redirectWithError(`/pokemon`, "アクセス権限がありません");
-  }
-
   const deck = await getDeckById(Number(deckId), context);
   if (!deck) {
     throw new Response("Deck not found", { status: 404 });
   }
-  return json({ deck, user });
+
+  const deckUser = await getUserBy(deck.userId, context);
+  if (!deckUser) {
+    throw new Response("Deck user not found", { status: 404 });
+  }
+  return json({ deckUser });
 }
 
 export const action = async ({ params, context }: LoaderFunctionArgs) => {
@@ -58,9 +48,14 @@ export const action = async ({ params, context }: LoaderFunctionArgs) => {
 };
 
 export default function DeleteDeck() {
-  const { user } = useLoaderData<typeof loader>();
+  const { deckUser } = useLoaderData<typeof loader>();
+  const { loading } = useAuthGuard(deckUser.uid);
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+
+  if (loading) {
+    return <span className="loading loading-spinner loading-lg"></span>;
+  }
 
   return (
     <div className="flex justify-center items-center">
@@ -74,7 +69,7 @@ export default function DeleteDeck() {
           デッキに関連するデータは全て削除されます。
         </p>
         <Form method="post" className="space-y-4">
-          <input type="hidden" name="userId" value={user.id} />
+          <input type="hidden" name="userId" value={deckUser.id} />
           <div>
             <button
               type="submit"

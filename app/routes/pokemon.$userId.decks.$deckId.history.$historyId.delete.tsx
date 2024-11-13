@@ -1,29 +1,25 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
-import { Form, Link, useNavigation } from "@remix-run/react";
-import { getAuthenticator } from "~/features/common/services/auth.server";
+import { Form, Link, useLoaderData, useNavigation } from "@remix-run/react";
+import useAuthGuard from "~/features/common/hooks/useAuthGuard";
 import {
   getDeckHistoryById,
   deleteDeckHistory,
   getDeck,
+  getUserBy,
 } from "~/features/common/services/deck-data.server";
 import { redirectWithSuccess, redirectWithError } from "remix-toast";
 
-export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
-
+export async function loader({ params, context }: LoaderFunctionArgs) {
   const { historyId, deckId } = params;
   const deck = await getDeck(Number(deckId), context);
   if (!deck) {
     throw new Response("Deck not found", { status: 404 });
   }
-  const deckUserId = deck.userId;
 
-  if (deckUserId !== user.id) {
-    return redirectWithError(`/pokemon`, "アクセス権限がありません");
+  const deckUser = await getUserBy(deck.userId, context);
+  if (!deckUser) {
+    throw new Response("Deck user not found", { status: 404 });
   }
 
   const deckHistory = await getDeckHistoryById(Number(historyId), context);
@@ -31,7 +27,7 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
     throw new Response("Deck History not found", { status: 404 });
   }
 
-  return json({ deckHistory, user });
+  return json({ deckUser });
 }
 
 export const action = async ({ params, context }: LoaderFunctionArgs) => {
@@ -53,8 +49,14 @@ export const action = async ({ params, context }: LoaderFunctionArgs) => {
 };
 
 export default function DeleteDeckHistory() {
+  const { deckUser } = useLoaderData<typeof loader>();
+  const { loading } = useAuthGuard(deckUser.uid, false);
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+
+  if (loading) {
+    return <span className="loading loading-spinner loading-lg"></span>;
+  }
 
   return (
     <div className="mt-6">

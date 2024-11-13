@@ -1,6 +1,5 @@
 import { LoaderFunctionArgs, json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
-import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getDecks,
   getDeckCount,
@@ -8,17 +7,15 @@ import {
 import { DeckList } from "~/features/common/components/DeckList";
 import { Deck } from "~/features/common/types/deck";
 import { parseDeckDates } from "~/features/common/utils/parseDates";
+import useAuthGuard from "~/features/common/hooks/useAuthGuard";
 
 type LoaderData = {
   decks: (Deck & { nickname: string | null; avatarUrl: string | null })[];
-  user: { id: number } | null;
   totalDecks: number;
   page: number;
 };
 
-export async function loader({ request, context, params }: LoaderFunctionArgs) {
-  const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request);
+export async function loader({ context, params }: LoaderFunctionArgs) {
   const page = params.page ? Number(params.page) : 1;
   const decksData = await getDecks(context, page, 10);
   const totalDecks = await getDeckCount(context);
@@ -33,15 +30,20 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
 
   return json<LoaderData>({
     decks,
-    user,
     totalDecks,
     page,
   });
 }
 
 export default function PokemonDecks() {
-  const { decks, user, totalDecks, page } = useLoaderData<LoaderData>();
-  const currentUserId = user?.id;
+  const { decks, totalDecks, page } = useLoaderData<LoaderData>();
+  const { isAuthenticated } = useAuthGuard();
+  // 暗号化した uid をキーにして、ユーザー固有のページ（デッキ作成、Profile）に遷移させる
+  // 遷移先の loader で暗号化された uid を複合する
+  // 複合に使う鍵は環境変数から？
+  // 複合した uid を使用してDBから必要なデータを取得する
+  // const cryptUid = user?.uid.split(":")[1];
+  // // const currentUserId = user?.id;
   const totalPages = Math.ceil(totalDecks / 10);
 
   return (
@@ -61,22 +63,8 @@ export default function PokemonDecks() {
         <Link to={`reviews`} className="btn btn-primary m-2">
           カード考察
         </Link>
-        {currentUserId ? (
-          <>
-            <Link
-              to={`${currentUserId}/decks/new`}
-              className="btn btn-info m-2"
-            >
-              デッキを登録する
-            </Link>
-            <Link
-              to={`${currentUserId}/decks`}
-              className="btn btn-primary m-2"
-              prefetch="intent"
-            >
-              自分のデッキを見る
-            </Link>
-          </>
+        {isAuthenticated ? (
+          <></>
         ) : (
           <Link to="/login" className="btn btn-info m-2">
             ログイン
@@ -84,7 +72,7 @@ export default function PokemonDecks() {
         )}
       </div>
 
-      <DeckList decks={decks} currentUserId={currentUserId} />
+      <DeckList decks={decks} isAuthenticated={isAuthenticated} />
 
       <div className="flex justify-center mt-6 mb-4">
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (

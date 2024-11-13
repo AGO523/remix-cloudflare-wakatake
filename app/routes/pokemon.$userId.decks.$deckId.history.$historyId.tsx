@@ -1,7 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Link, Outlet, useLoaderData } from "@remix-run/react";
-import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getDeckHistoryById,
   getDeckCodeByHistoryId,
@@ -11,11 +10,9 @@ import {
 import { Badge } from "~/features/common/components/Badge";
 import { DeckBadge } from "~/features/common/components/DeckBadge";
 import { UserIcon } from "~/features/common/components/UserIcon";
+import useAuthGuard from "~/features/common/hooks/useAuthGuard";
 
-export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request);
-
+export async function loader({ params, context }: LoaderFunctionArgs) {
   const { historyId, deckId } = params;
 
   const deck = await getDeck(Number(deckId), context);
@@ -35,13 +32,13 @@ export async function loader({ params, context, request }: LoaderFunctionArgs) {
     throw new Response("Deck History not found", { status: 404 });
   }
 
-  return json({ deckHistory, deckCode, user, deckUser });
+  return json({ deckHistory, deckCode, deckUser });
 }
 
 export default function DeckHistoryDetail() {
-  const { deckHistory, deckCode, user, deckUser } =
-    useLoaderData<typeof loader>();
-  const currentUserId = user?.id;
+  const { deckHistory, deckCode, deckUser } = useLoaderData<typeof loader>();
+  const { user } = useAuthGuard(deckUser.uid, false);
+  const currentUserUid = user?.uid;
 
   return (
     <>
@@ -59,7 +56,7 @@ export default function DeckHistoryDetail() {
 
             <Badge status={deckHistory.status} />
 
-            {currentUserId && currentUserId === deckUser.id && (
+            {currentUserUid && currentUserUid === deckUser.uid && (
               <div className="flex justify-end mt-2 space-x-1">
                 <Link
                   preventScrollReset
@@ -109,13 +106,13 @@ export default function DeckHistoryDetail() {
             )}
 
             <div className="mt-2 mb-2 text-sm text-right">
-              <p className="text-gray-700 mb-1">
+              <p className="text-base-content mb-1">
                 作成日:{" "}
                 {deckHistory.createdAt
                   ? new Date(deckHistory.createdAt).toLocaleString()
                   : ""}
               </p>
-              <p className="text-gray-700">
+              <p className="text-base-content">
                 更新日:{" "}
                 {deckHistory.updatedAt
                   ? new Date(deckHistory.updatedAt).toLocaleString()
@@ -137,7 +134,7 @@ export default function DeckHistoryDetail() {
                   {deckCode.imageUrl ===
                     "https://storage.googleapis.com/prod-artora-arts/images/sakusei2.png" && (
                     <>
-                      <p className="text-gray-700 text-sm mb-2">
+                      <p className="text-base-content text-sm mb-2">
                         デッキ画像を作成するのに1分程度かかります
                       </p>
 
@@ -151,7 +148,7 @@ export default function DeckHistoryDetail() {
                     </>
                   )}
 
-                  <p className="text-gray-700 text-sm text-right mb-2">
+                  <p className="text-base-content text-sm text-right mb-2">
                     デッキコード:{deckCode.code}
                   </p>
                 </div>
@@ -161,7 +158,7 @@ export default function DeckHistoryDetail() {
             <div className="divider"></div>
 
             <div className="mt-6 mb-6">
-              <p className="text-gray-700 text-left">
+              <p className="text-base-content text-left">
                 {deckHistory.content?.split("\n").map((line, index) => (
                   <span key={index}>
                     {line}

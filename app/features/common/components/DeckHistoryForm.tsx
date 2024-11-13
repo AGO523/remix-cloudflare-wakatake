@@ -74,7 +74,7 @@ export default function DeckHistoryForm({
           defaultValue={defaultValues.cardImageUrl || ""}
           className="input input-bordered w-full"
         />
-        <p className="text-gray-600 text-sm">
+        <p className="text-base-content text-sm">
           デッキ画像とは別に、この履歴に1枚まで画像を添付できます
           <br />
           「画像を表示」ボタンから、画像を選んでURLをコピーできます

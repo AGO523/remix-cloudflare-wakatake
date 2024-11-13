@@ -104,7 +104,7 @@ export default function Admin() {
             to="/admin"
             end
             className={({ isActive }) =>
-              isActive ? "text-primary" : "text-gray-700"
+              isActive ? "text-primary" : "text-base-content"
             }
           >
             <svg
@@ -125,7 +125,7 @@ export default function Admin() {
           <NavLink
             to="/admin/art/new"
             className={({ isActive }) =>
-              isActive ? "text-primary" : "text-gray-700"
+              isActive ? "text-primary" : "text-base-content"
             }
           >
             <svg
@@ -146,7 +146,7 @@ export default function Admin() {
           <NavLink
             to="/admin/blogs"
             className={({ isActive }) =>
-              isActive ? "text-primary" : "text-gray-700"
+              isActive ? "text-primary" : "text-base-content"
             }
           >
             <svg

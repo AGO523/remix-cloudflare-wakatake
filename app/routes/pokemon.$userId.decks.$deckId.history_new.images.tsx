@@ -1,36 +1,36 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json, useLoaderData } from "@remix-run/react";
-import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getCardImagesBy,
   getDeck,
+  getUserBy,
 } from "~/features/common/services/deck-data.server";
 import CardImages from "~/features/common/components/CardImages";
-import { redirectWithError } from "remix-toast";
+import useAuthGuard from "~/features/common/hooks/useAuthGuard";
 
-export async function loader({ context, request, params }: LoaderFunctionArgs) {
-  const authenticator = getAuthenticator(context);
-  const currentUser = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
-
+export async function loader({ context, params }: LoaderFunctionArgs) {
   const { deckId } = params;
   const deck = await getDeck(Number(deckId), context);
   if (!deck) {
     throw new Response("Deck not found", { status: 404 });
   }
-  const deckUserId = deck.userId;
 
-  if (deckUserId !== currentUser.id) {
-    return redirectWithError(`/pokemon`, "アクセス権限がありません");
+  const deckUser = await getUserBy(deck.userId, context);
+  if (!deckUser) {
+    throw new Response("Deck user not found", { status: 404 });
   }
 
-  const cardImages = await getCardImagesBy(currentUser.id, context);
-  return json({ cardImages });
+  const cardImages = await getCardImagesBy(deckUser.id, context);
+  return json({ cardImages, deckUser });
 }
 
 export default function NewDeckHistory() {
-  const { cardImages } = useLoaderData<typeof loader>();
+  const { cardImages, deckUser } = useLoaderData<typeof loader>();
+  const { loading } = useAuthGuard(deckUser.uid);
+
+  if (loading) {
+    return <span className="loading loading-spinner loading-lg"></span>;
+  }
 
   return (
     <div>

@@ -1,29 +1,25 @@
 import { LoaderFunctionArgs, json } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
-import { jsonWithError, jsonWithSuccess, redirectWithError } from "remix-toast";
-import { getAuthenticator } from "~/features/common/services/auth.server";
+import { jsonWithError, jsonWithSuccess } from "remix-toast";
 import {
   getDeck,
+  getUserBy,
   uploadAndCreateCardImage,
 } from "~/features/common/services/deck-data.server";
 import UploadImageForm from "~/features/common/components/UploadImageForm";
+import useAuthGuard from "~/features/common/hooks/useAuthGuard";
 
-export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
+export async function loader({ params, context }: LoaderFunctionArgs) {
   const { deckId } = params;
   const deck = await getDeck(Number(deckId), context);
   if (!deck) {
     throw new Response("Deck not found", { status: 404 });
   }
-  const deckUserId = deck.userId;
-
-  if (deckUserId !== user.id) {
-    return redirectWithError(`/pokemon`, "アクセス権限がありません");
+  const deckUser = await getUserBy(deck.userId, context);
+  if (!deckUser) {
+    throw new Response("Deck user not found", { status: 404 });
   }
-  return json({ user });
+  return json({ deckUser });
 }
 
 export async function action({ context, request }: LoaderFunctionArgs) {
@@ -38,12 +34,16 @@ export async function action({ context, request }: LoaderFunctionArgs) {
 }
 
 export default function UploadImage() {
-  const { user } = useLoaderData<typeof loader>();
-  const userId = user.id;
+  const { deckUser } = useLoaderData<typeof loader>();
+  const { loading } = useAuthGuard(deckUser.uid);
+
+  if (loading) {
+    return <span className="loading loading-spinner loading-lg"></span>;
+  }
 
   return (
     <div>
-      <UploadImageForm userId={userId} />
+      <UploadImageForm userId={deckUser.id} />
     </div>
   );
 }

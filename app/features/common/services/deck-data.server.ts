@@ -7,6 +7,7 @@ import { InferInsertModel, eq, desc, sql } from "drizzle-orm";
 import { createClient } from "~/features/common/services/db.server";
 import { json } from "@remix-run/cloudflare";
 import { z } from "zod";
+import { CreateDeckResponse } from "~/features/common/types/createDeckResponse";
 
 type CreateDeck = InferInsertModel<typeof decks>;
 type CreateDeckHistory = InferInsertModel<typeof deckHistories>;
@@ -28,6 +29,7 @@ interface UploadResponse {
 
 const createDeckSchema = z.object({
   userId: z.number().nonnegative(),
+  uid: z.string(),
   title: z
     .string()
     .min(1, "タイトルは必須です")
@@ -186,13 +188,24 @@ async function fetchDeckImage(
 // deckHistories にレコードを作成
 // deckCodes にレコードを作成、imageUrl はデフォルトの画像をセット
 // デッキコードを受け取り、pubsub に deckId, code を publish
-export async function createDeck(formData: FormData, context: AppLoadContext) {
+export async function createDeck(
+  formData: FormData,
+  context: AppLoadContext
+): Promise<CreateDeckResponse | Response> {
   const env = context.env as Env;
   const db = createClient(env.DB);
   const currentTime = new Date();
+  // form から uid を取得して、その uid を使用してユーザーを取得
+  const uid = String(formData.get("uid"));
+  const user = await getUserByUid(uid, context);
+
+  if (!user) {
+    return json({ message: "ユーザーが見つかりません" }, { status: 404 });
+  }
 
   const formObject = {
-    userId: Number(formData.get("userId")),
+    userId: user.id,
+    uid: uid,
     title: formData.get("title") as string,
     description: formData.get("description") as string,
     code: formData.get("code") as string,
@@ -231,10 +244,8 @@ export async function createDeck(formData: FormData, context: AppLoadContext) {
     return createDeckHistoryResponse;
   }
 
-  return json(
-    { message: "デッキを投稿しました", id: response.id },
-    { status: 201 }
-  );
+  // エラーがない場合、CreateDeckResponse型のオブジェクトを返す
+  return { message: "デッキを登録しました", userId: user.id };
 }
 
 /////////////////////////////////////////////////
@@ -1061,6 +1072,28 @@ export async function getUserBy(userId: number, context: AppLoadContext) {
   const user = await db.select().from(users).where(eq(users.id, userId)).get();
 
   return user;
+}
+
+export async function getUserByUid(uid: string, context: AppLoadContext) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  const user = await db.select().from(users).where(eq(users.uid, uid)).get();
+
+  return user;
+}
+
+export async function getUidBy(userId: number, context: AppLoadContext) {
+  const env = context.env as Env;
+  const db = createClient(env.DB);
+
+  const user = await db.select().from(users).where(eq(users.id, userId)).get();
+
+  if (!user) {
+    return null;
+  }
+
+  return user.uid;
 }
 
 export async function updateUserProfile(

@@ -1,37 +1,33 @@
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { json } from "@remix-run/cloudflare";
 import { Form, useLoaderData } from "@remix-run/react";
-import { getAuthenticator } from "~/features/common/services/auth.server";
+import useAuthGuard from "~/features/common/hooks/useAuthGuard";
 import {
   getDeck,
   getDeckCodesByDeckId,
+  getUserBy,
   updateDeckCoeToMain,
 } from "~/features/common/services/deck-data.server";
 import { redirectWithSuccess, redirectWithError } from "remix-toast";
 import { DeckBadge } from "~/features/common/components/DeckBadge";
 
-export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
-
+export async function loader({ params, context }: LoaderFunctionArgs) {
   const { deckId } = params;
   const deck = await getDeck(Number(deckId), context);
   if (!deck) {
     throw new Response("Deck not found", { status: 404 });
   }
-  const deckUserId = deck.userId;
 
-  if (deckUserId !== user.id) {
-    return redirectWithError(`/pokemon`, "アクセス権限がありません");
+  const deckUser = await getUserBy(deck.userId, context);
+  if (!deckUser) {
+    throw new Response("Deck user not found", { status: 404 });
   }
 
   const deckCodes = await getDeckCodesByDeckId(Number(deckId), context);
   if (!deckCodes) {
     throw new Response("Deck Codes not found", { status: 404 });
   }
-  return json({ deckCodes, deckId });
+  return json({ deckCodes, deckId, deckUser });
 }
 
 export const action = async ({
@@ -59,13 +55,18 @@ export const action = async ({
 };
 
 export default function DeckHistoryDetail() {
-  const { deckCodes, deckId } = useLoaderData<typeof loader>();
+  const { deckCodes, deckId, deckUser } = useLoaderData<typeof loader>();
+  const { loading } = useAuthGuard(deckUser.uid);
+
+  if (loading) {
+    return <span className="loading loading-spinner loading-lg"></span>;
+  }
 
   return (
     <div className="p-4 mt-4 bg-base-100 flex justify-center">
       <div className="w-full max-w-3xl min-w-0 px-2">
         <h1 className="text-3xl font-bold mb-6">デッキコード</h1>
-        <p className="text-gray-600">
+        <p className="text-base-content">
           デッキID: {deckId} に登録されているデッキコード一覧です
         </p>
         <div className="grid grid-cols-1 gap-4">
@@ -82,9 +83,11 @@ export default function DeckHistoryDetail() {
                   name="deckHistoryId"
                   value={deckCode.historyId || ""}
                 />
-                <p className="text-gray-700">デッキコード:{deckCode.code}</p>
+                <p className="text-base-content">
+                  デッキコード:{deckCode.code}
+                </p>
                 <DeckBadge status={deckCode.status} />
-                <p className="text-gray-700 text-sm">
+                <p className="text-base-content text-sm">
                   このデッキコードをデッキのメイン画像に設定しますか？
                 </p>
                 <button type="submit" className="btn btn-info btn-sm m-2">

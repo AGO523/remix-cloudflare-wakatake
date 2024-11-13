@@ -95,7 +95,7 @@ export default function Index() {
           <img
             src="https://storage.googleapis.com/prod-artora-arts/dev-images/artora-icon.png"
             alt="アートラのアイコン"
-            className="self-center flex-shrink-0 w-24 h-24 border rounded-full md:justify-self-start dark:bg-secondary dark:border-gray-700"
+            className="self-center flex-shrink-0 w-24 h-24 border rounded-full md:justify-self-start dark:bg-secondary dark:border-base-content"
           />
           <div className="flex flex-col">
             <h4 className="text-lg font-semibold text-center md:text-left">

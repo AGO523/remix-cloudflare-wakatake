@@ -5,17 +5,21 @@ import { UserIcon } from "~/features/common/components/UserIcon";
 
 type DeckListProps = {
   decks: (Deck & { nickname: string | null; avatarUrl: string | null })[];
-  currentUserId?: number;
+  isAuthenticated?: boolean;
   userPageId?: number | null;
 };
 
-export function DeckList({ decks, currentUserId, userPageId }: DeckListProps) {
+export function DeckList({
+  decks,
+  isAuthenticated,
+  userPageId,
+}: DeckListProps) {
   return (
     <>
       {/* フローティング */}
-      {currentUserId && (
+      {isAuthenticated && (
         <Link
-          to="new"
+          to="/pokemon/deck/new"
           className="btn btn-info fixed bottom-20 right-6 m-1"
           prefetch="intent"
         >
@@ -26,7 +30,7 @@ export function DeckList({ decks, currentUserId, userPageId }: DeckListProps) {
       <div className="p-4 bg-base-200 flex justify-center">
         <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
           {decks.length === 0 && (
-            <p className="text-gray-700">
+            <p className="text-base-content">
               {userPageId
                 ? "このユーザーのデッキはまだ登録されていません。"
                 : "まだデッキが登録されていません。"}
@@ -57,7 +61,7 @@ export function DeckList({ decks, currentUserId, userPageId }: DeckListProps) {
                   unstable_viewTransition
                 >
                   <h3 className="text-xl font-semibold mb-2">{deck.title}</h3>
-                  <p className="text-gray-700 mb-4">{deck.description}</p>
+                  <p className="text-base-content mb-4">{deck.description}</p>
                   <div className="flex justify-center items-center">
                     {mainDeckCode ? (
                       <img

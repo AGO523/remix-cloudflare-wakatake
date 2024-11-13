@@ -6,36 +6,27 @@ import {
   useLoaderData,
   useNavigation,
 } from "@remix-run/react";
-import { getAuthenticator } from "~/features/common/services/auth.server";
 import {
   getDeckById,
   createDeckHistory,
-  getDeck,
+  getUserBy,
 } from "~/features/common/services/deck-data.server";
 import { redirectWithSuccess, redirectWithError } from "remix-toast";
 import DeckHistoryForm from "~/features/common/components/DeckHistoryForm";
+import useAuthGuard from "~/features/common/hooks/useAuthGuard";
 
-export async function loader({ params, context, request }: LoaderFunctionArgs) {
-  const authenticator = getAuthenticator(context);
-  const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: "/login",
-  });
+export async function loader({ params, context }: LoaderFunctionArgs) {
   const { deckId } = params;
-  const currentDeck = await getDeck(Number(deckId), context);
-  if (!currentDeck) {
-    throw new Response("Deck not found", { status: 404 });
-  }
-  const deckUserId = currentDeck.userId;
-
-  if (deckUserId !== user.id) {
-    return redirectWithError(`/pokemon`, "アクセス権限がありません");
-  }
-
   const deck = await getDeckById(Number(deckId), context);
   if (!deck) {
     throw new Response("Deck not found", { status: 404 });
   }
-  return json({ deck, user });
+
+  const deckUser = await getUserBy(deck.userId, context);
+  if (!deckUser) {
+    throw new Response("Deck user not found", { status: 404 });
+  }
+  return json({ deck, deckUser });
 }
 
 export const action = async ({
@@ -64,9 +55,14 @@ export const action = async ({
 };
 
 export default function NewDeckHistory() {
-  const { deck, user } = useLoaderData<typeof loader>();
+  const { deck, deckUser } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  const { loading } = useAuthGuard(deckUser.uid, false);
+
+  if (loading) {
+    return <span className="loading loading-spinner loading-lg"></span>;
+  }
 
   return (
     <div className="p-4 bg-base-300 flex justify-center">
@@ -80,7 +76,7 @@ export default function NewDeckHistory() {
           isSubmitting={isSubmitting}
           defaultValues={{
             deckId: deck.id,
-            userId: user.id,
+            userId: deckUser.id,
           }}
         />
         <div className="divider">画像取得・アップロード</div>

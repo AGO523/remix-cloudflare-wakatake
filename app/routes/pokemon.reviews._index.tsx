@@ -1,6 +1,5 @@
 import { LoaderFunctionArgs, json } from "@remix-run/cloudflare";
 import { Link, useLoaderData } from "@remix-run/react";
-import { getAuthenticator } from "~/features/common/services/auth.server";
 import { getSingleCards } from "~/features/common/services/review.server";
 
 type SingleCard = {
@@ -13,11 +12,7 @@ type SingleCard = {
   createdAt: number;
 };
 
-// `loader` 関数を修正
-export async function loader({ request, context }: LoaderFunctionArgs) {
-  const authenticator = getAuthenticator(context);
-  await authenticator.isAuthenticated(request);
-
+export async function loader({ context }: LoaderFunctionArgs) {
   const singleCards = await getSingleCards(context);
   return json({ singleCards });
 }
