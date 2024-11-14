@@ -37,7 +37,7 @@ export async function loader({ context, params }: LoaderFunctionArgs) {
 
 export default function PokemonDecks() {
   const { decks, totalDecks, page } = useLoaderData<LoaderData>();
-  const { isAuthenticated } = useAuthGuard();
+  const { isAuthenticated } = useAuthGuard(undefined, false);
   // 暗号化した uid をキーにして、ユーザー固有のページ（デッキ作成、Profile）に遷移させる
   // 遷移先の loader で暗号化された uid を複合する
   // 複合に使う鍵は環境変数から？

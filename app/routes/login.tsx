@@ -1,6 +1,6 @@
 // クライアントサイドでFirebaseの認証を使ってログインするため、状態管理はremixではなく、生のreactを使用
 
-import { useNavigate, Form, useFetcher } from "@remix-run/react";
+import { useNavigate, useFetcher } from "@remix-run/react";
 import {
   loginAnonymously,
   logout,
@@ -63,8 +63,8 @@ export default function Login() {
 
         {!loading && !isAuthenticated ? (
           <>
-            {/* Googleログインボタン */}
-            <Form
+            {/* 旧Googleログインボタン */}
+            {/* <Form
               method="post"
               action="/auth/google"
               className="flex justify-center mb-4"
@@ -81,28 +81,40 @@ export default function Login() {
                 />
                 Googleアカウントでログイン
               </button>
-            </Form>
+            </Form> */}
+
+            <button
+              onClick={handleGoogleLogin}
+              className="w-full flex items-center justify-center py-3 px-4 bg-white border border-gray-300 text-gray-700 font-semibold rounded-lg shadow-md hover:bg-gray-100 transition duration-300 mb-2"
+              disabled={isButtonDisabled || fetcher.state !== "idle"}
+            >
+              <img
+                src={google_icon}
+                alt="Google icon"
+                className="w-6 h-6 mr-3"
+              />
+              Googleアカウントでログイン
+            </button>
 
             {/* 匿名ログインボタン */}
             <button
               onClick={handleLogin}
-              className="btn btn-neutral w-full"
+              className="btn btn-primary w-full mb-2"
               disabled={isButtonDisabled || fetcher.state !== "idle"}
             >
               匿名でログイン
             </button>
-            <button
-              onClick={handleGoogleLogin}
-              className="btn btn-neutral w-full"
-              disabled={isButtonDisabled || fetcher.state !== "idle"}
-            >
-              Googleでログイン
-            </button>
+
             <button
               onClick={handleLinkAnonymousToGoogle}
-              className="btn btn-neutral w-full"
+              className="btn btn-primary w-full"
               disabled={isButtonDisabled || fetcher.state !== "idle"}
             >
+              <img
+                src={google_icon}
+                alt="Google icon"
+                className="w-6 h-6 mr-3"
+              />
               匿名アカウントをGoogleとリンク
             </button>
           </>
@@ -110,9 +122,14 @@ export default function Login() {
           <>
             <button
               onClick={handleLinkAnonymousToGoogle}
-              className="btn btn-primary w-full mb-4"
+              className="btn btn-primary w-full mb-2"
               disabled={isButtonDisabled || fetcher.state !== "idle"}
             >
+              <img
+                src={google_icon}
+                alt="Google icon"
+                className="w-6 h-6 mr-3"
+              />
               匿名アカウントをGoogleとリンク
             </button>
 

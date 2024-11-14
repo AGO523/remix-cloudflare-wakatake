@@ -23,8 +23,7 @@ export const links: LinksFunction = () => [
 ];
 
 export default function PokemonLayout() {
-  // const { user } = useLoaderData<typeof loader>();
-  const { user } = useAuthGuard();
+  const { user } = useAuthGuard(undefined, false);
 
   return (
     <>
