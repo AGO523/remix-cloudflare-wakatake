@@ -46,7 +46,7 @@ export function DeckList({
                 className="block shadow-lg rounded-lg p-2 hover:shadow-xl transition-shadow bg-base-100"
               >
                 <UserIcon
-                  userId={deck.id}
+                  userId={deck.userId}
                   avatarUrl={deck.avatarUrl}
                   nickname={deck.nickname}
                 />
