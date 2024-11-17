@@ -10,7 +10,7 @@ export function UserIcon({ userId, avatarUrl, nickname }: UserIconProps) {
   return (
     <div>
       <Link
-        to={`/pokemon/${userId}/profile`}
+        to={`/pokemon/profile/${userId}`}
         key={userId}
         unstable_viewTransition
       >
