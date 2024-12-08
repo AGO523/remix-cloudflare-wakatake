@@ -98,8 +98,8 @@ export default function UserProfileLayout() {
 
           {paramsUser && paramsUser.uid === user?.uid && (
             <div className="mt-2">
-              <Link className="btn" to="/auth/logout">
-                ログアウト
+              <Link className="btn" to="/login">
+                アカウント管理
               </Link>
             </div>
           )}
